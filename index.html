@@ -501,6 +501,8 @@ opacity:1;
   .book-actions button{ color: var(--text-muted); }
   .book-actions button:hover{ color:#B33A3A; }
   .books-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding:14px 0; }
+  .books-loading{ text-align:center; font-size:13px; color: var(--text-muted); padding:20px 0; }
+  .book-upload-locked{ text-align:center; font-size:12.5px; color: var(--text-muted); background:rgba(255,255,255,0.4); border:1px solid var(--glass-border); border-radius:10px; padding:10px 14px; margin-bottom:16px; line-height:1.6; }
   .upload-progress{ text-align:center; font-size:12px; color: var(--text-muted); margin-bottom:10px; }
 
   /* --- BOOKS: icon grid, progress bar, continue-reading banner --- */
@@ -567,6 +569,8 @@ opacity:1;
     font-size:11px; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;
   }
   .quote-dismiss:hover{ color:#B33A3A; }
+  .special-day-card{ border-color: var(--ember); background: rgba(227,160,82,0.16); padding:18px 20px; }
+  .special-day-card .quote-text{ font-style:normal; font-weight:500; }
 
   /* --- REPORT panel --- */
   .report-cols{ display:flex; gap:12px; margin-bottom:14px; }
@@ -580,6 +584,95 @@ opacity:1;
   .report-stat-label{ font-size:10.5px; color: var(--text-muted); }
   .report-loading{ text-align:center; font-size:12px; color: var(--text-muted); padding:16px 0; }
   .report-note{ font-size:11px; color: var(--text-muted); text-align:center; margin-top:6px; line-height:1.5; }
+
+  /* --- CALENDAR panel: tabs shared between dates / cycle / notes --- */
+  .cal-tab-row{ display:flex; gap:8px; margin-bottom:18px; }
+  .cal-tab-btn{
+    flex:1; text-align:center; padding:9px 0; border-radius:9px; border:1px solid var(--glass-border);
+    color:var(--text-muted); font-size:12.5px; cursor:pointer; transition:all .15s ease; background:rgba(255,255,255,0.35);
+  }
+  .cal-tab-btn.active{ border-color:var(--ember); color:var(--ember); background:rgba(227,160,82,0.12); }
+  .cal-tab-panel.hidden{ display:none; }
+
+  /* important dates */
+  .cal-add-row{ margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--glass-border); }
+  input[type=date]{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:10px 12px;
+    font-family:'IBM Plex Mono', monospace; font-size:13px; margin-bottom:10px; outline:none;
+  }
+  input[type=date]:focus{ border-color: var(--ember); }
+  .cal-checkbox-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-muted); margin-bottom:14px; cursor:pointer; }
+  .cal-checkbox-row input{ width:auto; margin:0; }
+  .cal-dates-list{ display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; }
+  .cal-date-item{
+    display:flex; align-items:center; gap:10px; padding:11px 13px; border-radius:10px;
+    background:rgba(255,255,255,0.45); border:1px solid var(--glass-border);
+  }
+  .cal-date-item.today{ border-color:var(--ember); background:rgba(227,160,82,0.14); }
+  .cal-date-emoji{ font-size:20px; flex:none; }
+  .cal-date-body{ flex:1; min-width:0; }
+  .cal-date-label{ font-size:14.5px; color:var(--text-primary); }
+  .cal-date-when{ font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .cal-date-delete{ width:auto; background:none; border:none; color:var(--text-muted); font-size:14px; padding:2px 4px; flex:none; }
+  .cal-date-delete:hover{ color:#B33A3A; }
+  .cal-dates-empty{ text-align:center; font-size:13px; color:var(--text-muted); padding:14px 0; }
+
+  /* cycle / period tracker */
+  .cycle-phase-card{
+    background:rgba(255,255,255,0.5); border:1px solid var(--glass-border); border-radius:14px;
+    padding:20px 18px; text-align:center; margin-bottom:18px;
+  }
+  .cycle-phase-name{ font-family:'Fraunces', serif; font-size:22px; color:var(--ember); margin-bottom:4px; }
+  .cycle-phase-day{ font-size:12px; color:var(--text-muted); letter-spacing:.05em; text-transform:uppercase; margin-bottom:14px; }
+  .cycle-phase-message{ font-size:14.5px; line-height:1.7; color:var(--text-primary); font-style:italic; margin-bottom:10px; }
+  .cycle-phase-next{ font-size:11.5px; color:var(--text-muted); }
+  .cycle-edit-row label{ margin-top:2px; }
+  .cycle-locked{ text-align:center; font-size:12.5px; color:var(--text-muted); background:rgba(255,255,255,0.4); border:1px solid var(--glass-border); border-radius:10px; padding:10px 14px; line-height:1.6; }
+  .cycle-empty{ text-align:center; font-size:13px; color:var(--text-muted); padding:10px 0 4px; line-height:1.6; }
+
+  /* notes / messages between partners */
+  .cal-messages-list{ display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; margin-bottom:16px; padding-right:2px; }
+  .cal-message-bubble{
+    max-width:78%; padding:9px 13px; border-radius:14px; font-size:14px; line-height:1.5;
+    background:rgba(255,255,255,0.55); border:1px solid var(--glass-border); align-self:flex-start;
+  }
+  .cal-message-bubble.mine{ align-self:flex-end; background:rgba(227,160,82,0.18); border-color:var(--ember); }
+  .cal-message-meta{ font-size:9.5px; color:var(--text-muted); margin-top:4px; letter-spacing:.03em; text-transform:uppercase; }
+  .cal-messages-empty{ text-align:center; font-size:13px; color:var(--text-muted); padding:14px 0; }
+  .cal-message-add-row{ display:flex; gap:8px; }
+  .cal-message-add-row input{ margin-bottom:0; }
+  .cal-message-add-row button{ width:auto; padding:0 16px; margin-bottom:0; }
+
+  /* --- VAULT panel --- */
+  .vault-upload-row{ margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--glass-border); }
+  .vault-upload-row input[type=text]{ margin-bottom:8px; }
+  .vault-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; max-height:420px; overflow-y:auto; padding-bottom:4px; }
+  .vault-card{ position:relative; cursor:pointer; text-align:center; }
+  .vault-card-icon{
+    width:100%; aspect-ratio:1/1; border-radius:12px; background:rgba(255,255,255,0.55);
+    border:1px solid var(--glass-border); display:flex; align-items:center; justify-content:center;
+    font-size:30px; transition: transform .2s ease;
+  }
+  .vault-card:hover .vault-card-icon{ transform: translateY(-3px); }
+  .vault-card-title{ font-size:11.5px; margin-top:6px; line-height:1.35; color: var(--text-primary); word-break:break-word; }
+  .vault-card-uploader{ font-size:9.5px; color: var(--text-muted); margin-top:2px; }
+  .vault-card-delete{
+    position:absolute; top:4px; right:4px; width:auto; background:rgba(20,16,10,0.55); color:#F0E9DA;
+    border:none; border-radius:50%; width:20px; height:20px; font-size:11px; line-height:1; padding:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .vault-card-delete:hover{ background:#B33A3A; }
+  .vault-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding:14px 0; }
+  .vault-loading{ text-align:center; font-size:13px; color: var(--text-muted); padding:20px 0; }
+  #vaultViewerModal{
+    position:fixed; inset:0; z-index:6; background: rgba(8,10,16,0.92);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;
+  }
+  #vaultViewerBody{ max-width:92vw; max-height:70vh; display:flex; align-items:center; justify-content:center; }
+  #vaultViewerBody img{ max-width:92vw; max-height:70vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  #vaultViewerTitle{ margin-top:18px; font-family:'Fraunces', serif; font-size:17px; text-align:center; color:#F0E9DA; }
+  .vault-download-link{ display:inline-block; margin-top:14px; color:#E3B876; font-size:13px; }
 
   /* --- JOURNAL panel (private, per person) --- */
   .journal-list{ max-height:320px; overflow-y:auto; margin-bottom:16px; }
@@ -723,6 +816,11 @@ animation:none;
   <!-- COVER: grid of folders -->
   <div id="cover">
 
+    <!-- SPECIAL DAY BANNER — shown when today matches a saved important date -->
+    <div class="quote-card special-day-card hidden" id="specialDayCard">
+      <div class="quote-text" id="specialDayText"></div>
+    </div>
+
     <!-- QUOTE OF THE DAY — shared, dismissible, refreshes automatically each day -->
     <div class="quote-card hidden" id="quoteCard">
       <button class="quote-dismiss" id="quoteDismissBtn" title="Dismiss for today">✕</button>
@@ -777,6 +875,16 @@ animation:none;
         <div class="folder-item small" data-target="panel-report">
           <div class="folder-icon-wrap"><div class="folder-icon">📊</div></div>
           <div class="folder-label small-label">report</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-calendar">
+          <div class="folder-icon-wrap"><div class="folder-icon">📅</div></div>
+          <div class="folder-label small-label">calendar</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-vault">
+          <div class="folder-icon-wrap"><div class="folder-icon">🔐</div></div>
+          <div class="folder-label small-label">vault</div>
         </div>
       </div>
 
@@ -1064,7 +1172,7 @@ animation:none;
 
       <div id="booksBoard" class="hidden">
         <div class="continue-reading hidden" id="continueReadingBanner"></div>
-        <div class="book-upload-row">
+        <div class="book-upload-row hidden" id="bookUploadRow">
           <label for="bookTitleInput">Title</label>
           <input type="text" id="bookTitleInput" maxlength="120" placeholder="Book title">
           <label class="book-file-label" id="bookFileLabel">Choose a file to upload</label>
@@ -1072,7 +1180,9 @@ animation:none;
           <div class="upload-progress hidden" id="uploadProgress">Uploading...</div>
           <button class="btn-primary" id="postBookBtn">Upload book</button>
         </div>
-        <div class="book-grid" id="bookList"></div>
+        <div class="book-upload-locked hidden" id="bookUploadLocked">Sanjok curates the shelf — you can read anything here.</div>
+        <div class="books-loading" id="booksLoadingState">Loading the shelf...</div>
+        <div class="book-grid hidden" id="bookList"></div>
         <div class="identity-hint" id="switchIdentityBooks">not you? switch</div>
       </div>
     </div>
@@ -1089,6 +1199,93 @@ animation:none;
         <div class="report-loading">Loading report...</div>
       </div>
       <div class="report-note">Targets, moods, and meditation minutes logged in the app. Not a medical or clinical record — just your own history, for your own reflection.</div>
+    </div>
+
+    <!-- ===== CALENDAR (important dates / cycle / notes to her) ===== -->
+    <div class="app-panel-content hidden" id="panel-calendar">
+      <div class="panel-header">our calendar</div>
+
+      <div id="calendarIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaCalendar">Rashita</div>
+          <div class="chip" id="chooseSanjokCalendar">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="calendarBoard" class="hidden">
+        <div class="cal-tab-row" id="calTabRow">
+          <div class="cal-tab-btn active" data-caltab="dates">Dates</div>
+          <div class="cal-tab-btn" data-caltab="cycle">Cycle</div>
+          <div class="cal-tab-btn" data-caltab="notes">Notes</div>
+        </div>
+
+        <!-- DATES -->
+        <div class="cal-tab-panel" id="calTab-dates">
+          <div class="cal-add-row">
+            <label for="calDateLabelInput">Occasion</label>
+            <input type="text" id="calDateLabelInput" maxlength="60" placeholder="e.g. Anniversary, her birthday">
+            <label for="calDateValueInput">Date</label>
+            <input type="date" id="calDateValueInput">
+            <label class="cal-checkbox-row"><input type="checkbox" id="calDateRecurring" checked> Repeats every year</label>
+            <button class="btn-primary" id="addCalDateBtn">Add date</button>
+          </div>
+          <div class="cal-dates-list" id="calDatesList"></div>
+        </div>
+
+        <!-- CYCLE -->
+        <div class="cal-tab-panel hidden" id="calTab-cycle">
+          <div id="cyclePhaseCard" class="cycle-phase-card"></div>
+          <div id="cycleEditRow" class="cycle-edit-row hidden">
+            <label for="cycleLastStartInput">First day of last period</label>
+            <input type="date" id="cycleLastStartInput">
+            <div class="row">
+              <div style="flex:1;"><label for="cycleLengthInput">Cycle length (days)</label><input type="text" id="cycleLengthInput" placeholder="28"></div>
+              <div style="flex:1;"><label for="cyclePeriodLenInput">Period length (days)</label><input type="text" id="cyclePeriodLenInput" placeholder="5"></div>
+            </div>
+            <button class="btn-primary" id="saveCycleBtn">Save</button>
+          </div>
+          <div id="cycleLocked" class="cycle-locked hidden">Only Rashita can log this — but the phase and message above update for both of you.</div>
+        </div>
+
+        <!-- NOTES / MESSAGES -->
+        <div class="cal-tab-panel hidden" id="calTab-notes">
+          <div class="cal-messages-list" id="calMessagesList"></div>
+          <div class="cal-message-add-row">
+            <input type="text" id="calMessageInput" maxlength="300" placeholder="Send her a little note...">
+            <button class="btn-primary" id="sendCalMessageBtn">Send</button>
+          </div>
+        </div>
+
+        <div class="identity-hint" id="switchIdentityCalendar">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== VAULT (shared uploads: songs, photos, anything) ===== -->
+    <div class="app-panel-content hidden" id="panel-vault">
+      <div class="panel-header">our vault</div>
+
+      <div id="vaultIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaVault">Rashita</div>
+          <div class="chip" id="chooseSanjokVault">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="vaultBoard" class="hidden">
+        <div class="vault-upload-row">
+          <label for="vaultTitleInput">Title</label>
+          <input type="text" id="vaultTitleInput" maxlength="120" placeholder="A song, a photo, anything">
+          <label class="book-file-label" id="vaultFileLabel">Choose a file to upload</label>
+          <input type="file" id="vaultFileInput" class="hidden">
+          <div class="upload-progress hidden" id="vaultUploadProgress">Uploading...</div>
+          <button class="btn-primary" id="postVaultBtn">Add to vault</button>
+        </div>
+        <div class="vault-loading" id="vaultLoadingState">Loading the vault...</div>
+        <div class="vault-grid hidden" id="vaultList"></div>
+        <div class="identity-hint" id="switchIdentityVault">not you? switch</div>
+      </div>
     </div>
 
     <button class="btn-ghost" id="closeFolderBtn" style="margin-top:16px;">Close folder</button>
@@ -1128,6 +1325,15 @@ animation:none;
     <button class="breathe-close" id="lightboxPrev">← Prev</button>
     <button class="breathe-close" id="lightboxNext">Next →</button>
     <button class="breathe-close" id="lightboxClose">Close</button>
+  </div>
+</div>
+
+<!-- VAULT VIEWER -->
+<div id="vaultViewerModal" class="hidden">
+  <div id="vaultViewerBody"></div>
+  <div id="vaultViewerTitle"></div>
+  <div class="lightbox-controls">
+    <button class="breathe-close" id="vaultViewerCloseBtn">Close</button>
   </div>
 </div>
 
@@ -1313,6 +1519,8 @@ animation:none;
       if(targetId === 'panel-journal' && typeof initJournal === 'function') initJournal();
       if(targetId === 'panel-books' && typeof initBooks === 'function') initBooks();
       if(targetId === 'panel-report' && typeof initReport === 'function') initReport();
+      if(targetId === 'panel-calendar' && typeof initCalendar === 'function') initCalendar();
+      if(targetId === 'panel-vault' && typeof initVault === 'function') initVault();
     }catch(e){ console.error('Panel init failed for ' + targetId + ':', e); }
   }
 
@@ -1930,6 +2138,8 @@ startBtn.addEventListener('click', () => {
       if(typeof initSoloMeditation === 'function') initSoloMeditation();
       if(typeof initJournal === 'function') initJournal();
       if(typeof initBooks === 'function') initBooks();
+      if(typeof initCalendar === 'function') initCalendar();
+      if(typeof initVault === 'function') initVault();
       renderPinnedBoard();
     }catch(e){ console.error('setIdentity failed:', e); }
   }
@@ -1944,6 +2154,8 @@ startBtn.addEventListener('click', () => {
       if(typeof initSoloMeditation === 'function') initSoloMeditation();
       if(typeof initJournal === 'function') initJournal();
       if(typeof initBooks === 'function') initBooks();
+      if(typeof initCalendar === 'function') initCalendar();
+      if(typeof initVault === 'function') initVault();
       renderPinnedBoard();
     }catch(e){ console.error('logoutIdentity failed:', e); }
   }
@@ -1983,6 +2195,20 @@ startBtn.addEventListener('click', () => {
     try{
       logoutIdentity();
     }catch(e){ console.error('switchIdentityBooks failed:', e); }
+  });
+
+  const switchIdentityCalendarBtn = document.getElementById('switchIdentityCalendar');
+  if(switchIdentityCalendarBtn) switchIdentityCalendarBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityCalendar failed:', e); }
+  });
+
+  const switchIdentityVaultBtn = document.getElementById('switchIdentityVault');
+  if(switchIdentityVaultBtn) switchIdentityVaultBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityVault failed:', e); }
   });
 
   function setupMoodBoard(){
@@ -2599,6 +2825,16 @@ startBtn.addEventListener('click', () => {
   if(chooseRashitaBooksBtn) chooseRashitaBooksBtn.addEventListener('click', () => requestIdentity('rashita'));
   if(chooseSanjokBooksBtn) chooseSanjokBooksBtn.addEventListener('click', () => requestIdentity('sanjok'));
 
+  const chooseRashitaCalendarBtn = document.getElementById('chooseRashitaCalendar');
+  const chooseSanjokCalendarBtn = document.getElementById('chooseSanjokCalendar');
+  if(chooseRashitaCalendarBtn) chooseRashitaCalendarBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokCalendarBtn) chooseSanjokCalendarBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaVaultBtn = document.getElementById('chooseRashitaVault');
+  const chooseSanjokVaultBtn = document.getElementById('chooseSanjokVault');
+  if(chooseRashitaVaultBtn) chooseRashitaVaultBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokVaultBtn) chooseSanjokVaultBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
   if(switchIdentityTargets) switchIdentityTargets.addEventListener('click', () => {
     try{
       logoutIdentity();
@@ -3006,9 +3242,14 @@ startBtn.addEventListener('click', () => {
   // you can continue your own book from where you left off, and the
   // "continue reading" banner shows whichever book you touched last.
   // =================================================================
+  const BOOKS_UPLOADER_IDENTITY = 'sanjok'; // only Sanjok can add to the shelf
+
   const booksIdentityChooser = document.getElementById('booksIdentityChooser');
   const booksBoard = document.getElementById('booksBoard');
   const bookList = document.getElementById('bookList');
+  const bookUploadRow = document.getElementById('bookUploadRow');
+  const bookUploadLocked = document.getElementById('bookUploadLocked');
+  const booksLoadingState = document.getElementById('booksLoadingState');
   const bookTitleInput = document.getElementById('bookTitleInput');
   const bookFileInput = document.getElementById('bookFileInput');
   const bookFileLabel = document.getElementById('bookFileLabel');
@@ -3016,6 +3257,7 @@ startBtn.addEventListener('click', () => {
   const uploadProgress = document.getElementById('uploadProgress');
   const continueReadingBanner = document.getElementById('continueReadingBanner');
   let booksListenerAttached = false;
+  let booksDataLoaded = false;
   let lastBooksData = {};
   const MAX_BOOK_BYTES = 8 * 1024 * 1024; // ~8MB, mind Realtime Database node-size limits
   const TEXT_CHARS_PER_PAGE = 1800;
@@ -3026,6 +3268,7 @@ startBtn.addEventListener('click', () => {
       if(myIdentity){
         booksIdentityChooser.classList.add('hidden');
         booksBoard.classList.remove('hidden');
+        updateBooksUploadAccess();
         setupBooksBoard();
       } else {
         booksIdentityChooser.classList.remove('hidden');
@@ -3034,11 +3277,30 @@ startBtn.addEventListener('click', () => {
     }catch(e){ console.error('initBooks failed:', e); }
   }
 
+  function updateBooksUploadAccess(){
+    const canUpload = myIdentity === BOOKS_UPLOADER_IDENTITY;
+    if(bookUploadRow) bookUploadRow.classList.toggle('hidden', !canUpload);
+    if(bookUploadLocked) bookUploadLocked.classList.toggle('hidden', canUpload);
+  }
+
   function setupBooksBoard(){
+    // Only the small metadata (title, filename, uploader, progress) lives
+    // under 'books' — the heavy base64 file content lives separately under
+    // 'bookFiles', fetched only when a book is actually opened. Previously
+    // both lived together, so every listing had to download every book's
+    // full content just to show the shelf — on a slow connection that could
+    // time out or lag, making books "disappear" on refresh. This also adds
+    // an explicit loading state so an empty shelf is never confused with
+    // data that just hasn't arrived yet.
     if(!booksListenerAttached && firebaseReady){
       booksListenerAttached = true;
       db.ref('books').on('value', snap => {
+        booksDataLoaded = true;
         lastBooksData = snap.val() || {};
+        renderBooks(lastBooksData);
+      }, e => {
+        console.error('books listener failed:', e);
+        booksDataLoaded = true;
         renderBooks(lastBooksData);
       });
     } else {
@@ -3085,6 +3347,14 @@ startBtn.addEventListener('click', () => {
 
   function renderBooks(data){
     try{
+      if(!booksDataLoaded){
+        if(booksLoadingState) booksLoadingState.classList.remove('hidden');
+        bookList.classList.add('hidden');
+        return;
+      }
+      if(booksLoadingState) booksLoadingState.classList.add('hidden');
+      bookList.classList.remove('hidden');
+
       bookList.innerHTML = '';
       renderContinueReading(data);
 
@@ -3095,7 +3365,9 @@ startBtn.addEventListener('click', () => {
       if(entries.length === 0){
         const empty = document.createElement('div');
         empty.className = 'books-empty';
-        empty.textContent = 'No books yet — upload the first one above.';
+        empty.textContent = myIdentity === BOOKS_UPLOADER_IDENTITY
+          ? 'No books yet — upload the first one above.'
+          : 'No books on the shelf yet.';
         bookList.appendChild(empty);
         return;
       }
@@ -3131,7 +3403,7 @@ startBtn.addEventListener('click', () => {
           card.appendChild(bar);
         }
 
-        if(book.uploadedBy === myIdentity){
+        if(book.uploadedBy === myIdentity && myIdentity === BOOKS_UPLOADER_IDENTITY){
           const del = document.createElement('button');
           del.className = 'book-card-delete';
           del.textContent = '✕';
@@ -3140,6 +3412,7 @@ startBtn.addEventListener('click', () => {
             e.stopPropagation();
             if(!firebaseReady) return;
             db.ref('books/' + book.key).remove();
+            db.ref('bookFiles/' + book.key).remove();
           });
           card.appendChild(del);
         }
@@ -3152,6 +3425,7 @@ startBtn.addEventListener('click', () => {
   if(postBookBtn) postBookBtn.addEventListener('click', () => {
     try{
       if(!firebaseReady || !myIdentity) return;
+      if(myIdentity !== BOOKS_UPLOADER_IDENTITY){ alert('Only Sanjok can add books to the shelf.'); return; }
       const file = bookFileInput.files && bookFileInput.files[0];
       const title = bookTitleInput.value.trim();
       if(!file){ alert('Choose a file first.'); return; }
@@ -3163,17 +3437,18 @@ startBtn.addEventListener('click', () => {
       postBookBtn.disabled = true;
       const reader = new FileReader();
       reader.onload = () => {
-        db.ref('books').push({
+        const newRef = db.ref('books').push();
+        newRef.set({
           title: title || file.name,
           fileName: file.name,
-          dataUrl: reader.result,
           uploadedBy: myIdentity,
           uploadedAt: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-          bookTitleInput.value = '';
-          bookFileInput.value = '';
-          bookFileLabel.textContent = 'Choose a file to upload';
-        }).catch(e => { console.error('Book upload failed:', e); alert('Upload failed — see console for details.'); })
+        }).then(() => db.ref('bookFiles/' + newRef.key).set(reader.result))
+          .then(() => {
+            bookTitleInput.value = '';
+            bookFileInput.value = '';
+            bookFileLabel.textContent = 'Choose a file to upload';
+          }).catch(e => { console.error('Book upload failed:', e); alert('Upload failed — see console for details.'); })
           .finally(() => {
             uploadProgress.classList.add('hidden');
             postBookBtn.disabled = false;
@@ -3225,6 +3500,20 @@ startBtn.addEventListener('click', () => {
       readerTitle.textContent = book.title || book.fileName || 'Untitled';
       readerBody.innerHTML = '<div class="reader-unsupported">Loading…</div>';
       bookReaderModal.classList.remove('hidden');
+      readerPageIndicator.textContent = '–';
+
+      if(!firebaseReady || !book.key){
+        readerBody.innerHTML = '<div class="reader-unsupported">Couldn\'t open this book right now.</div>';
+        return;
+      }
+
+      const fileSnap = await db.ref('bookFiles/' + book.key).once('value');
+      const dataUrl = fileSnap.val();
+      if(!dataUrl){
+        readerBody.innerHTML = '<div class="reader-unsupported">This book\'s file couldn\'t be found. It may still be uploading.</div>';
+        return;
+      }
+      book = Object.assign({}, book, { dataUrl: dataUrl });
 
       const kind = fileKindFor(book);
       const savedProgress = (book.progress && book.progress[myIdentity]) || null;
@@ -3311,6 +3600,626 @@ startBtn.addEventListener('click', () => {
     bookReaderModal.classList.add('hidden');
     readerBody.innerHTML = '';
     readerState = null;
+  });
+
+  // =================================================================
+  // CALENDAR — three sections sharing one panel:
+  //   1) Important dates: shared, recurring-by-default reminders. A
+  //      global listener (not gated behind opening the panel) checks
+  //      today against every saved date as soon as the app loads, so a
+  //      banner can appear on the cover page and a browser notification
+  //      can fire even if nobody opens the calendar that day.
+  //   2) Cycle: a simple period tracker computing which phase
+  //      (menstrual, follicular, ovulation, luteal) today falls into
+  //      from the last logged period start + average cycle/period
+  //      length, with a caring message for whichever phase it is. Only
+  //      Rashita logs the dates; both of you see the phase and message.
+  //   3) Notes: a small real-time note/message thread between the two
+  //      of you.
+  // =================================================================
+  const CYCLE_LOGGER_IDENTITY = 'rashita';
+
+  const calendarIdentityChooser = document.getElementById('calendarIdentityChooser');
+  const calendarBoard = document.getElementById('calendarBoard');
+  const calTabRow = document.getElementById('calTabRow');
+
+  function initCalendar(){
+    try{
+      if(!calendarIdentityChooser || !calendarBoard) return;
+      if(myIdentity){
+        calendarIdentityChooser.classList.add('hidden');
+        calendarBoard.classList.remove('hidden');
+        setupCalendarBoard();
+      } else {
+        calendarIdentityChooser.classList.remove('hidden');
+        calendarBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initCalendar failed:', e); }
+  }
+
+  if(calTabRow){
+    calTabRow.querySelectorAll('.cal-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        calTabRow.querySelectorAll('.cal-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.cal-tab-panel').forEach(p => p.classList.add('hidden'));
+        const panel = document.getElementById('calTab-' + btn.dataset.caltab);
+        if(panel) panel.classList.remove('hidden');
+      });
+    });
+  }
+
+  function setupCalendarBoard(){
+    renderImportantDates(lastCalDatesData);
+    setupCycleTracker();
+    setupCalMessages();
+  }
+
+  // --- Important dates ---
+  const calDatesList = document.getElementById('calDatesList');
+  const calDateLabelInput = document.getElementById('calDateLabelInput');
+  const calDateValueInput = document.getElementById('calDateValueInput');
+  const calDateRecurring = document.getElementById('calDateRecurring');
+  const addCalDateBtn = document.getElementById('addCalDateBtn');
+  const specialDayCard = document.getElementById('specialDayCard');
+  const specialDayText = document.getElementById('specialDayText');
+  let lastCalDatesData = {};
+
+  function nextOccurrence(dateStr, recurring){
+    try{
+      const parts = (dateStr || '').split('-').map(Number);
+      if(parts.length !== 3 || parts.some(isNaN)) return null;
+      const today = new Date(); today.setHours(0,0,0,0);
+      if(!recurring) return new Date(parts[0], parts[1] - 1, parts[2]);
+      let year = today.getFullYear();
+      let candidate = new Date(year, parts[1] - 1, parts[2]);
+      if(candidate < today) candidate = new Date(year + 1, parts[1] - 1, parts[2]);
+      return candidate;
+    }catch(e){ return null; }
+  }
+
+  function renderImportantDates(data){
+    try{
+      if(!calDatesList) return;
+      calDatesList.innerHTML = '';
+      const today = new Date(); today.setHours(0,0,0,0);
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .map(item => Object.assign(item, { _next: nextOccurrence(item.date, item.recurring !== false) }))
+        .filter(item => item._next);
+      entries.sort((a, b) => a._next - b._next);
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'cal-dates-empty';
+        empty.textContent = 'No dates saved yet — add your first one above.';
+        calDatesList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(item => {
+        const isToday = item._next.getTime() === today.getTime();
+        const row = document.createElement('div');
+        row.className = 'cal-date-item' + (isToday ? ' today' : '');
+
+        const emoji = document.createElement('div');
+        emoji.className = 'cal-date-emoji';
+        emoji.textContent = isToday ? '🎉' : '📅';
+        row.appendChild(emoji);
+
+        const body = document.createElement('div');
+        body.className = 'cal-date-body';
+        const daysAway = Math.round((item._next - today) / 86400000);
+        const whenLabel = isToday ? 'today!' : (daysAway === 1 ? 'tomorrow' : 'in ' + daysAway + ' days');
+        const dateLabel = item._next.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        body.innerHTML = '<div class="cal-date-label">' + escapeHtml(item.label || 'Untitled') + '</div>' +
+          '<div class="cal-date-when">' + escapeHtml(dateLabel + ' · ' + whenLabel) + (item.recurring !== false ? ' · every year' : '') + '</div>';
+        row.appendChild(body);
+
+        const del = document.createElement('button');
+        del.className = 'cal-date-delete';
+        del.textContent = '✕';
+        del.title = 'Delete';
+        del.addEventListener('click', () => {
+          if(!firebaseReady) return;
+          db.ref('importantDates/' + item.key).remove();
+        });
+        row.appendChild(del);
+
+        calDatesList.appendChild(row);
+      });
+    }catch(e){ console.error('renderImportantDates failed:', e); }
+  }
+
+  function checkSpecialDayBanner(data){
+    try{
+      if(!specialDayCard || !specialDayText) return;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const todays = Object.values(data || {}).filter(item => {
+        const next = nextOccurrence(item.date, item.recurring !== false);
+        return next && next.getTime() === today.getTime();
+      });
+      if(todays.length === 0){
+        specialDayCard.classList.add('hidden');
+        return;
+      }
+      specialDayText.textContent = '✦ Today: ' + todays.map(t => t.label).join(' · ') + ' ✦';
+      specialDayCard.classList.remove('hidden');
+      maybeNotifySpecialDay(todays);
+    }catch(e){ console.error('checkSpecialDayBanner failed:', e); }
+  }
+
+  // Best-effort browser notification — this only fires while the page is
+  // open and the browser has granted permission (there's no server here
+  // to push notifications when the app is closed).
+  let specialDayNotifiedKey = null;
+  function maybeNotifySpecialDay(todays){
+    try{
+      if(!('Notification' in window)) return;
+      const todayKey = new Date().toDateString();
+      if(specialDayNotifiedKey === todayKey) return;
+      const fire = () => {
+        todays.forEach(t => {
+          try{ new Notification('Same Moment ✦', { body: 'Today is ' + t.label + '!' }); }catch(e){}
+        });
+        specialDayNotifiedKey = todayKey;
+      };
+      if(Notification.permission === 'granted') fire();
+      else if(Notification.permission !== 'denied') Notification.requestPermission().then(p => { if(p === 'granted') fire(); });
+    }catch(e){ console.error('maybeNotifySpecialDay failed:', e); }
+  }
+
+  if(addCalDateBtn) addCalDateBtn.addEventListener('click', () => {
+    try{
+      if(!firebaseReady || !myIdentity) return;
+      const label = calDateLabelInput.value.trim();
+      const value = calDateValueInput.value;
+      if(!label || !value){ alert('Add a name and a date.'); return; }
+      db.ref('importantDates').push({
+        label: label,
+        date: value,
+        recurring: !!calDateRecurring.checked,
+        createdBy: myIdentity,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        calDateLabelInput.value = '';
+        calDateValueInput.value = '';
+        calDateRecurring.checked = true;
+      });
+    }catch(e){ console.error('addCalDate failed:', e); }
+  });
+
+  // The important-dates listener is attached immediately (not lazily
+  // behind opening the calendar panel), so the special-day banner and
+  // notification work as soon as the app is open, and the list is
+  // already warm the moment you tap into the calendar.
+  if(firebaseReady){
+    db.ref('importantDates').on('value', snap => {
+      lastCalDatesData = snap.val() || {};
+      renderImportantDates(lastCalDatesData);
+      checkSpecialDayBanner(lastCalDatesData);
+    }, e => console.error('importantDates listener failed:', e));
+  }
+
+  // --- Cycle / period tracker ---
+  const cyclePhaseCard = document.getElementById('cyclePhaseCard');
+  const cycleEditRow = document.getElementById('cycleEditRow');
+  const cycleLocked = document.getElementById('cycleLocked');
+  const cycleLastStartInput = document.getElementById('cycleLastStartInput');
+  const cycleLengthInput = document.getElementById('cycleLengthInput');
+  const cyclePeriodLenInput = document.getElementById('cyclePeriodLenInput');
+  const saveCycleBtn = document.getElementById('saveCycleBtn');
+  let cycleListenerAttached = false;
+  let lastCycleData = null;
+
+  const CYCLE_PHASE_LABELS = { menstrual: 'Menstrual phase', follicular: 'Follicular phase', ovulation: 'Ovulation', luteal: 'Luteal phase' };
+  const CYCLE_PHASE_MESSAGES = {
+    menstrual: [
+      'Energy may be lower today — a warm drink, a soft blanket, and a little extra patience go a long way.',
+      'Comfort over plans today. A gentle check-in means more than she might say.',
+      'Cramps and tiredness are common now — small kindnesses like tea, a hug, or doing the dishes help a lot.'
+    ],
+    follicular: [
+      'Energy is usually on the rise now — a good window for plans, walks, or trying something new together.',
+      'Mood tends to brighten through this phase — a nice time to make her laugh.',
+      'This is often a motivated, upbeat stretch — cheer her on with whatever she\'s working on.'
+    ],
+    ovulation: [
+      'This is often her most energetic and radiant window — a lovely day to plan something special together.',
+      'Confidence and energy usually peak around now — a good day for a date or a little adventure.',
+      'She may feel especially social and warm today — make time for each other if you can.'
+    ],
+    luteal: [
+      'She may feel more tired, sensitive, or easily overwhelmed now — gentleness and patience help most.',
+      'Cravings and mood swings are common in this phase — a favorite snack and a little grace go a long way.',
+      'This can be a lower-energy, more introspective time — check in softly and try not to take things personally.'
+    ]
+  };
+
+  function computeCyclePhase(data){
+    try{
+      if(!data || !data.lastPeriodStart) return null;
+      const start = new Date(data.lastPeriodStart + 'T00:00:00');
+      if(isNaN(start.getTime())) return null;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const cycleLength = Math.max(15, parseInt(data.cycleLength, 10) || 28);
+      const periodLength = Math.min(cycleLength - 1, Math.max(1, parseInt(data.periodLength, 10) || 5));
+      let diff = Math.floor((today - start) / 86400000);
+      if(diff < 0) diff = ((diff % cycleLength) + cycleLength) % cycleLength;
+      const cycleDay = (diff % cycleLength) + 1;
+
+      const ovulationDay = Math.max(periodLength + 1, cycleLength - 14);
+      const fertileStart = Math.max(periodLength + 1, ovulationDay - 2);
+      const fertileEnd = Math.min(cycleLength, ovulationDay + 1);
+
+      let phase;
+      if(cycleDay <= periodLength) phase = 'menstrual';
+      else if(cycleDay < fertileStart) phase = 'follicular';
+      else if(cycleDay <= fertileEnd) phase = 'ovulation';
+      else phase = 'luteal';
+
+      const daysToNextPeriod = cycleLength - cycleDay + 1;
+      const nextPeriodDate = new Date(today.getTime() + daysToNextPeriod * 86400000);
+
+      return { cycleDay: cycleDay, cycleLength: cycleLength, phase: phase, nextPeriodDate: nextPeriodDate };
+    }catch(e){ console.error('computeCyclePhase failed:', e); return null; }
+  }
+
+  function pickPhaseMessage(phase){
+    const list = CYCLE_PHASE_MESSAGES[phase] || [];
+    if(list.length === 0) return '';
+    const todayKey = new Date().toDateString();
+    let seed = 0;
+    for(let i = 0; i < todayKey.length; i++) seed += todayKey.charCodeAt(i);
+    return list[seed % list.length];
+  }
+
+  function renderCyclePhase(data){
+    try{
+      if(!cyclePhaseCard) return;
+      const info = computeCyclePhase(data);
+      if(!info){
+        cyclePhaseCard.innerHTML = '<div class="cycle-empty">No cycle logged yet.' +
+          (myIdentity === CYCLE_LOGGER_IDENTITY ? ' Add the first day of your last period below.' : ' Once Rashita logs a date, her phase and a caring note will show here.') +
+          '</div>';
+        return;
+      }
+      const message = pickPhaseMessage(info.phase);
+      cyclePhaseCard.innerHTML =
+        '<div class="cycle-phase-name">' + CYCLE_PHASE_LABELS[info.phase] + '</div>' +
+        '<div class="cycle-phase-day">Day ' + info.cycleDay + ' of ' + info.cycleLength + '</div>' +
+        '<div class="cycle-phase-message">' + escapeHtml(message) + '</div>' +
+        '<div class="cycle-phase-next">Next period expected around ' + info.nextPeriodDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + '</div>';
+    }catch(e){ console.error('renderCyclePhase failed:', e); }
+  }
+
+  function setupCycleTracker(){
+    try{
+      if(cycleEditRow) cycleEditRow.classList.toggle('hidden', myIdentity !== CYCLE_LOGGER_IDENTITY);
+      if(cycleLocked) cycleLocked.classList.toggle('hidden', myIdentity === CYCLE_LOGGER_IDENTITY);
+      if(!cycleListenerAttached && firebaseReady){
+        cycleListenerAttached = true;
+        db.ref('cycleData').on('value', snap => {
+          lastCycleData = snap.val();
+          renderCyclePhase(lastCycleData);
+          if(lastCycleData && cycleLastStartInput){
+            cycleLastStartInput.value = lastCycleData.lastPeriodStart || '';
+            cycleLengthInput.value = lastCycleData.cycleLength || '';
+            cyclePeriodLenInput.value = lastCycleData.periodLength || '';
+          }
+        }, e => console.error('cycleData listener failed:', e));
+      } else {
+        renderCyclePhase(lastCycleData);
+      }
+    }catch(e){ console.error('setupCycleTracker failed:', e); }
+  }
+
+  if(saveCycleBtn) saveCycleBtn.addEventListener('click', () => {
+    try{
+      if(!firebaseReady || myIdentity !== CYCLE_LOGGER_IDENTITY) return;
+      const start = cycleLastStartInput.value;
+      const cycleLength = parseInt(cycleLengthInput.value, 10) || 28;
+      const periodLength = parseInt(cyclePeriodLenInput.value, 10) || 5;
+      if(!start){ alert('Pick the first day of your last period.'); return; }
+      db.ref('cycleData').set({
+        lastPeriodStart: start,
+        cycleLength: cycleLength,
+        periodLength: periodLength,
+        updatedBy: myIdentity,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      });
+    }catch(e){ console.error('saveCycle failed:', e); }
+  });
+
+  // --- Notes / messages between partners ---
+  const calMessagesList = document.getElementById('calMessagesList');
+  const calMessageInput = document.getElementById('calMessageInput');
+  const sendCalMessageBtn = document.getElementById('sendCalMessageBtn');
+  let calMessagesListenerAttached = false;
+  let lastCalMessagesData = {};
+
+  function setupCalMessages(){
+    if(!calMessagesListenerAttached && firebaseReady){
+      calMessagesListenerAttached = true;
+      db.ref('partnerMessages').limitToLast(200).on('value', snap => {
+        lastCalMessagesData = snap.val() || {};
+        renderCalMessages(lastCalMessagesData);
+      }, e => console.error('partnerMessages listener failed:', e));
+    } else {
+      renderCalMessages(lastCalMessagesData);
+    }
+  }
+
+  function renderCalMessages(data){
+    try{
+      if(!calMessagesList) return;
+      calMessagesList.innerHTML = '';
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'cal-messages-empty';
+        empty.textContent = 'No notes yet — send the first one.';
+        calMessagesList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(msg => {
+        const bubble = document.createElement('div');
+        bubble.className = 'cal-message-bubble' + (msg.from === myIdentity ? ' mine' : '');
+        const time = msg.createdAt ? new Date(msg.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+        bubble.innerHTML = escapeHtml(msg.text || '') + '<div class="cal-message-meta">' + escapeHtml(PARTNER_NAMES[msg.from] || msg.from || '') + (time ? ' · ' + time : '') + '</div>';
+        calMessagesList.appendChild(bubble);
+      });
+      calMessagesList.scrollTop = calMessagesList.scrollHeight;
+    }catch(e){ console.error('renderCalMessages failed:', e); }
+  }
+
+  function sendCalMessage(){
+    try{
+      if(!firebaseReady || !myIdentity || !calMessageInput) return;
+      const text = calMessageInput.value.trim();
+      if(!text) return;
+      db.ref('partnerMessages').push({
+        text: text,
+        from: myIdentity,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => { calMessageInput.value = ''; }).catch(e => console.error('sendCalMessage push failed:', e));
+    }catch(e){ console.error('sendCalMessage failed:', e); }
+  }
+
+  if(sendCalMessageBtn) sendCalMessageBtn.addEventListener('click', sendCalMessage);
+  if(calMessageInput) calMessageInput.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); sendCalMessage(); } });
+
+  // =================================================================
+  // VAULT — a shared space where either of you can upload anything
+  // (songs, photos, documents...). Like Books, only small metadata
+  // (title, filename, uploader) lives in the live list; the actual file
+  // content is fetched only when you open or download an item, so the
+  // shelf stays fast and reliable to load.
+  // =================================================================
+  const vaultIdentityChooser = document.getElementById('vaultIdentityChooser');
+  const vaultBoard = document.getElementById('vaultBoard');
+  const vaultList = document.getElementById('vaultList');
+  const vaultLoadingState = document.getElementById('vaultLoadingState');
+  const vaultTitleInput = document.getElementById('vaultTitleInput');
+  const vaultFileInput = document.getElementById('vaultFileInput');
+  const vaultFileLabel = document.getElementById('vaultFileLabel');
+  const postVaultBtn = document.getElementById('postVaultBtn');
+  const vaultUploadProgress = document.getElementById('vaultUploadProgress');
+  const MAX_VAULT_BYTES = 8 * 1024 * 1024; // ~8MB, mind Realtime Database node-size limits
+  let vaultListenerAttached = false;
+  let vaultDataLoaded = false;
+  let lastVaultData = {};
+
+  function initVault(){
+    try{
+      if(!vaultIdentityChooser || !vaultBoard) return;
+      if(myIdentity){
+        vaultIdentityChooser.classList.add('hidden');
+        vaultBoard.classList.remove('hidden');
+        setupVaultBoard();
+      } else {
+        vaultIdentityChooser.classList.remove('hidden');
+        vaultBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initVault failed:', e); }
+  }
+
+  function setupVaultBoard(){
+    if(!vaultListenerAttached && firebaseReady){
+      vaultListenerAttached = true;
+      db.ref('vault').on('value', snap => {
+        vaultDataLoaded = true;
+        lastVaultData = snap.val() || {};
+        renderVault(lastVaultData);
+      }, e => { console.error('vault listener failed:', e); vaultDataLoaded = true; renderVault(lastVaultData); });
+    } else {
+      renderVault(lastVaultData);
+    }
+  }
+
+  if(vaultFileLabel && vaultFileInput){
+    vaultFileLabel.addEventListener('click', () => vaultFileInput.click());
+    vaultFileInput.addEventListener('change', () => {
+      const f = vaultFileInput.files && vaultFileInput.files[0];
+      vaultFileLabel.textContent = f ? f.name : 'Choose a file to upload';
+    });
+  }
+
+  function iconForVaultItem(item){
+    const mt = (item.mimeType || '').toLowerCase();
+    const name = (item.fileName || '').toLowerCase();
+    if(mt.startsWith('image/')) return '🖼️';
+    if(mt.startsWith('audio/') || /\.(mp3|wav|m4a|ogg)$/.test(name)) return '🎵';
+    if(mt.startsWith('video/')) return '🎬';
+    if(/\.pdf$/.test(name)) return '📄';
+    return '📁';
+  }
+
+  function renderVault(data){
+    try{
+      if(!vaultList) return;
+      if(!vaultDataLoaded){
+        if(vaultLoadingState) vaultLoadingState.classList.remove('hidden');
+        vaultList.classList.add('hidden');
+        return;
+      }
+      if(vaultLoadingState) vaultLoadingState.classList.add('hidden');
+      vaultList.classList.remove('hidden');
+      vaultList.innerHTML = '';
+
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'vault-empty';
+        empty.textContent = 'Nothing here yet — add a song, a photo, or anything else.';
+        vaultList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'vault-card';
+        card.addEventListener('click', () => openVaultItem(item));
+
+        const icon = document.createElement('div');
+        icon.className = 'vault-card-icon';
+        icon.textContent = iconForVaultItem(item);
+        card.appendChild(icon);
+
+        const title = document.createElement('div');
+        title.className = 'vault-card-title';
+        title.textContent = item.title || item.fileName || 'Untitled';
+        card.appendChild(title);
+
+        const uploader = document.createElement('div');
+        uploader.className = 'vault-card-uploader';
+        uploader.textContent = 'by ' + (PARTNER_NAMES[item.uploadedBy] || item.uploadedBy || 'unknown');
+        card.appendChild(uploader);
+
+        if(item.uploadedBy === myIdentity){
+          const del = document.createElement('button');
+          del.className = 'vault-card-delete';
+          del.textContent = '✕';
+          del.title = 'Delete';
+          del.addEventListener('click', e => {
+            e.stopPropagation();
+            if(!firebaseReady) return;
+            db.ref('vault/' + item.key).remove();
+            db.ref('vaultFiles/' + item.key).remove();
+          });
+          card.appendChild(del);
+        }
+
+        vaultList.appendChild(card);
+      });
+    }catch(e){ console.error('renderVault failed:', e); }
+  }
+
+  if(postVaultBtn) postVaultBtn.addEventListener('click', () => {
+    try{
+      if(!firebaseReady || !myIdentity) return;
+      const file = vaultFileInput.files && vaultFileInput.files[0];
+      const title = vaultTitleInput.value.trim();
+      if(!file){ alert('Choose a file first.'); return; }
+      if(file.size > MAX_VAULT_BYTES){
+        alert('That file is too large for this storage setup (limit ~8MB). Try a smaller file.');
+        return;
+      }
+      vaultUploadProgress.classList.remove('hidden');
+      postVaultBtn.disabled = true;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const newRef = db.ref('vault').push();
+        newRef.set({
+          title: title || file.name,
+          fileName: file.name,
+          mimeType: file.type || '',
+          uploadedBy: myIdentity,
+          uploadedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => db.ref('vaultFiles/' + newRef.key).set(reader.result))
+          .then(() => {
+            vaultTitleInput.value = '';
+            vaultFileInput.value = '';
+            vaultFileLabel.textContent = 'Choose a file to upload';
+          }).catch(e => { console.error('Vault upload failed:', e); alert('Upload failed — see console for details.'); })
+          .finally(() => {
+            vaultUploadProgress.classList.add('hidden');
+            postVaultBtn.disabled = false;
+          });
+      };
+      reader.onerror = () => {
+        vaultUploadProgress.classList.add('hidden');
+        postVaultBtn.disabled = false;
+        alert('Could not read that file.');
+      };
+      reader.readAsDataURL(file);
+    }catch(e){ console.error('postVault failed:', e); vaultUploadProgress.classList.add('hidden'); postVaultBtn.disabled = false; }
+  });
+
+  // --- Vault viewer ---
+  const vaultViewerModal = document.getElementById('vaultViewerModal');
+  const vaultViewerBody = document.getElementById('vaultViewerBody');
+  const vaultViewerTitle = document.getElementById('vaultViewerTitle');
+  const vaultViewerCloseBtn = document.getElementById('vaultViewerCloseBtn');
+
+  async function openVaultItem(item){
+    try{
+      if(!vaultViewerModal) return;
+      vaultViewerTitle.textContent = item.title || item.fileName || 'Untitled';
+      vaultViewerBody.innerHTML = 'Loading…';
+      vaultViewerModal.classList.remove('hidden');
+      if(!firebaseReady || !item.key){
+        vaultViewerBody.innerHTML = 'Couldn\'t open this file right now.';
+        return;
+      }
+      const snap = await db.ref('vaultFiles/' + item.key).once('value');
+      const dataUrl = snap.val();
+      if(!dataUrl){
+        vaultViewerBody.innerHTML = 'This file couldn\'t be found. It may still be uploading.';
+        return;
+      }
+      const mt = (item.mimeType || '').toLowerCase();
+      vaultViewerBody.innerHTML = '';
+      if(mt.startsWith('image/')){
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        vaultViewerBody.appendChild(img);
+      } else if(mt.startsWith('audio/')){
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = dataUrl;
+        vaultViewerBody.appendChild(audio);
+      } else if(mt.startsWith('video/')){
+        const video = document.createElement('video');
+        video.controls = true;
+        video.style.maxWidth = '90vw';
+        video.style.maxHeight = '60vh';
+        video.src = dataUrl;
+        vaultViewerBody.appendChild(video);
+      } else {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = item.fileName || 'file';
+        link.className = 'vault-download-link';
+        link.textContent = 'Download ' + (item.fileName || 'file');
+        vaultViewerBody.appendChild(link);
+      }
+    }catch(e){
+      console.error('openVaultItem failed:', e);
+      vaultViewerBody.innerHTML = 'Couldn\'t open this file.';
+    }
+  }
+
+  if(vaultViewerCloseBtn) vaultViewerCloseBtn.addEventListener('click', () => {
+    vaultViewerModal.classList.add('hidden');
+    vaultViewerBody.innerHTML = '';
   });
 
   // =================================================================
