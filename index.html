@@ -603,7 +603,15 @@ startBtn.addEventListener('click', () => {
         bgMusic.pause();
 bgMusic.currentTime = 0;
         
-        if(!chimedForEnd){ chimedForEnd = true; playChime(); }
+        if(!chimedForEnd){
+          chimedForEnd = true;
+          playChime();
+          // NEW: clear startTime in the database once the countdown
+          // naturally finishes. Without this, the room stays "expired"
+          // forever and the next person to join sees 00:00 / session
+          // complete instantly instead of a fresh countdown.
+          roomRef.update({ startTime: null });
+        }
         stageVisual.classList.remove('breathing');
       }
     } else {
