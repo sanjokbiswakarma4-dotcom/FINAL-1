@@ -381,6 +381,33 @@ opacity:1;
   }
   textarea#noteInput:focus{ border-color: var(--ember); }
 
+  /* --- TARGETS panel --- */
+  .targets-date-nav{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+  .targets-date-nav button{ width:auto; padding:6px 12px; font-size:12px; margin-bottom:0; }
+  .targets-date-label{ font-family:'Fraunces', serif; font-size:14px; text-align:center; flex:1; color:var(--text-primary); }
+  .targets-columns{ display:flex; gap:12px; margin-bottom:8px; }
+  .targets-col{ flex:1; min-width:0; }
+  .targets-col-header{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); text-align:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--glass-border); }
+  .targets-list{ display:flex; flex-direction:column; gap:6px; max-height:230px; overflow-y:auto; margin-bottom:10px; min-height:36px; }
+  .target-item{ display:flex; align-items:flex-start; gap:7px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.4); border:1px solid var(--glass-border); font-size:12.5px; }
+  .target-item.done .target-text{ text-decoration:line-through; color:var(--text-muted); opacity:.7; }
+  .target-check{ width:17px; height:17px; border-radius:50%; border:1.5px solid var(--ember); flex:none; margin-top:1px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ember); background:transparent; line-height:1; }
+  .target-check.checked{ background:var(--ember); color:#1B140A; }
+  .target-check:disabled{ cursor:default; opacity:.6; }
+  .target-text{ flex:1; word-break:break-word; line-height:1.4; }
+  .target-text[contenteditable="true"]{ outline:1px dashed var(--ember); border-radius:4px; padding:1px 3px; }
+  .target-actions{ display:flex; gap:2px; flex:none; }
+  .target-actions button{ width:auto; padding:2px 5px; font-size:11px; background:none; border:none; color:var(--text-muted); cursor:pointer; }
+  .target-actions button:hover{ color:var(--ember); }
+  .targets-empty{ text-align:center; font-size:11px; color:var(--text-muted); padding:12px 4px; line-height:1.5; }
+  .targets-add-row{ display:flex; gap:6px; }
+  .targets-add-row input{ margin-bottom:0; font-size:12px; padding:8px 9px; }
+  .targets-add-row button{ width:auto; padding:0 12px; font-size:12px; margin-bottom:0; }
+  @media (max-width: 420px){
+    .targets-columns{ flex-direction:column; }
+    .targets-col{ margin-bottom:6px; }
+  }
+
   /* --- BREATHE OVERLAY --- */
   #breatheOverlay{
     position:fixed; inset:0; z-index:5;
@@ -479,6 +506,11 @@ animation:none;
         <div class="folder-item small" data-target="panel-notes">
           <div class="folder-icon-wrap"><div class="folder-icon">📝</div></div>
           <div class="folder-label small-label">notes</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-targets">
+          <div class="folder-icon-wrap"><div class="folder-icon">🎯</div></div>
+          <div class="folder-label small-label">targets</div>
         </div>
       </div>
 
@@ -598,6 +630,49 @@ animation:none;
       </div>
     </div>
 
+    <!-- ===== TARGETS ===== -->
+    <div class="app-panel-content hidden" id="panel-targets">
+      <div class="panel-header">our targets</div>
+
+      <div id="targetsIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaTargets">Rashita</div>
+          <div class="chip" id="chooseSanjokTargets">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="targetsBoard" class="hidden">
+        <div class="targets-date-nav">
+          <button class="btn-ghost" id="targetsPrevDay">←</button>
+          <div class="targets-date-label" id="targetsDateLabel"></div>
+          <button class="btn-ghost" id="targetsNextDay">→</button>
+        </div>
+        <div class="identity-hint" id="targetsTodayBtn" style="margin:0 0 14px;">jump to today</div>
+
+        <div class="targets-columns">
+          <div class="targets-col" data-partner="rashita">
+            <div class="targets-col-header">Rashita</div>
+            <div class="targets-list" id="targetsListRashita"></div>
+            <div class="targets-add-row hidden" id="targetsAddRowRashita">
+              <input type="text" id="targetsInputRashita" placeholder="Add a target..." maxlength="120">
+              <button class="btn-primary" id="targetsAddBtnRashita">Add</button>
+            </div>
+          </div>
+          <div class="targets-col" data-partner="sanjok">
+            <div class="targets-col-header">Sanjok</div>
+            <div class="targets-list" id="targetsListSanjok"></div>
+            <div class="targets-add-row hidden" id="targetsAddRowSanjok">
+              <input type="text" id="targetsInputSanjok" placeholder="Add a target..." maxlength="120">
+              <button class="btn-primary" id="targetsAddBtnSanjok">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="identity-hint" id="switchIdentityTargets">not you? switch</div>
+      </div>
+    </div>
+
     <button class="btn-ghost" id="closeFolderBtn" style="margin-top:16px;">Close folder</button>
   </div>
 
@@ -705,6 +780,9 @@ animation:none;
     { title: "Guided Meditation B", src: "assets/B.mp3" },
     { title: "Guided Meditation C", src: "assets/C.mp3" },
     { title: "Brain Meditation (10 min)", src: "assets/TunePocket-Brain-Meditation-10-Min-Preview.mp3" },
+    { title: "10 Min Meditation 1", src: "assets/10min1.mp3" },
+    { title: "10 Min Meditation 2", src: "assets/10min2.mp3" },
+    { title: "10 Min Meditation 3", src: "assets/10min3.mp3" },
   ];
 
   // Choice is remembered per-device (each person picks their own
@@ -786,6 +864,7 @@ animation:none;
       if(targetId === 'panel-memories') initMemories();
       if(targetId === 'panel-moods') initMoods();
       if(targetId === 'panel-notes') initNotes();
+      if(targetId === 'panel-targets') initTargets();
     }catch(e){ console.error('Panel init failed for ' + targetId + ':', e); }
   }
 
@@ -1167,6 +1246,7 @@ startBtn.addEventListener('click', () => {
       localStorage.setItem('sameMomentIdentity', id);
       initMoods();
       initNotes();
+      initTargets();
     }catch(e){ console.error('setIdentity failed:', e); }
   }
 
@@ -1186,6 +1266,7 @@ startBtn.addEventListener('click', () => {
       myIdentity = null;
       initMoods();
       initNotes();
+      initTargets();
     }catch(e){ console.error('switchIdentity failed:', e); }
   });
 
@@ -1196,6 +1277,7 @@ startBtn.addEventListener('click', () => {
       myIdentity = null;
       initMoods();
       initNotes();
+      initTargets();
     }catch(e){ console.error('switchIdentityNotes failed:', e); }
   });
 
@@ -1339,6 +1421,245 @@ startBtn.addEventListener('click', () => {
       });
       noteInput.value = '';
     }catch(e){ console.error('postNote failed:', e); }
+  });
+
+  // =================================================================
+  // TARGETS — daily goals, one column each. Same identity as Moods/
+  // Notes. Stored per-date in Firebase (targets/<date>/<partner>/<id>)
+  // so every day's list is kept and you can look back at past days.
+  // Each person can only tick/edit/delete inside their own column;
+  // the partner's column is visible but read-only.
+  // =================================================================
+  const targetsIdentityChooser = document.getElementById('targetsIdentityChooser');
+  const targetsBoard = document.getElementById('targetsBoard');
+  const targetsDateLabel = document.getElementById('targetsDateLabel');
+  const targetsPrevDay = document.getElementById('targetsPrevDay');
+  const targetsNextDay = document.getElementById('targetsNextDay');
+  const targetsTodayBtn = document.getElementById('targetsTodayBtn');
+  const switchIdentityTargets = document.getElementById('switchIdentityTargets');
+
+  const targetsListEls = {
+    rashita: document.getElementById('targetsListRashita'),
+    sanjok: document.getElementById('targetsListSanjok')
+  };
+  const targetsAddRowEls = {
+    rashita: document.getElementById('targetsAddRowRashita'),
+    sanjok: document.getElementById('targetsAddRowSanjok')
+  };
+  const targetsInputEls = {
+    rashita: document.getElementById('targetsInputRashita'),
+    sanjok: document.getElementById('targetsInputSanjok')
+  };
+  const targetsAddBtnEls = {
+    rashita: document.getElementById('targetsAddBtnRashita'),
+    sanjok: document.getElementById('targetsAddBtnSanjok')
+  };
+
+  let targetsListenerRef = null;
+  let currentTargetsDate = new Date();
+
+  function targetsDateKey(d){
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return y + '-' + m + '-' + day;
+  }
+  function isSameDay(a, b){ return targetsDateKey(a) === targetsDateKey(b); }
+
+  function renderTargetsDateLabel(){
+    if(!targetsDateLabel) return;
+    const today = new Date();
+    const label = currentTargetsDate.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' });
+    targetsDateLabel.textContent = isSameDay(currentTargetsDate, today) ? ('Today · ' + label) : label;
+  }
+
+  function initTargets(){
+    try{
+      if(!targetsIdentityChooser || !targetsBoard) return;
+      if(myIdentity){
+        targetsIdentityChooser.classList.add('hidden');
+        targetsBoard.classList.remove('hidden');
+        setupTargetsBoard();
+      } else {
+        targetsIdentityChooser.classList.remove('hidden');
+        targetsBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initTargets failed:', e); }
+  }
+
+  function setupTargetsBoard(){
+    try{
+      renderTargetsDateLabel();
+      Object.keys(targetsAddRowEls).forEach(partner => {
+        if(targetsAddRowEls[partner]) targetsAddRowEls[partner].classList.toggle('hidden', partner !== myIdentity);
+      });
+      attachTargetsListener();
+    }catch(e){ console.error('setupTargetsBoard failed:', e); }
+  }
+
+  function attachTargetsListener(){
+    if(targetsListenerRef) targetsListenerRef.off();
+    if(!firebaseReady) return;
+    const dateKey = targetsDateKey(currentTargetsDate);
+    targetsListenerRef = db.ref('targets/' + dateKey);
+    targetsListenerRef.on('value', snap => {
+      renderTargetsBoard(snap.val() || {});
+    });
+  }
+
+  function renderTargetsBoard(data){
+    ['rashita', 'sanjok'].forEach(partner => {
+      const listEl = targetsListEls[partner];
+      if(!listEl) return;
+      listEl.innerHTML = '';
+      const partnerData = data[partner] || {};
+      const entries = Object.keys(partnerData)
+        .map(key => Object.assign({ key: key }, partnerData[key]))
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'targets-empty';
+        empty.textContent = partner === myIdentity ? 'No targets yet — add one below.' : 'Nothing set for this day.';
+        listEl.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(target => {
+        const item = document.createElement('div');
+        item.className = 'target-item' + (target.done ? ' done' : '');
+
+        const check = document.createElement('button');
+        check.className = 'target-check' + (target.done ? ' checked' : '');
+        check.textContent = target.done ? '✓' : '';
+        check.disabled = partner !== myIdentity;
+        if(partner === myIdentity){
+          check.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).update({ done: !target.done });
+          });
+        }
+        item.appendChild(check);
+
+        const text = document.createElement('div');
+        text.className = 'target-text';
+        text.textContent = target.text || '';
+        item.appendChild(text);
+
+        if(partner === myIdentity){
+          const actions = document.createElement('div');
+          actions.className = 'target-actions';
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = '✎';
+          editBtn.title = 'Edit';
+          editBtn.addEventListener('click', () => startEditTarget(text, partner, target));
+          actions.appendChild(editBtn);
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '✕';
+          delBtn.title = 'Delete';
+          delBtn.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).remove();
+          });
+          actions.appendChild(delBtn);
+
+          item.appendChild(actions);
+        }
+
+        listEl.appendChild(item);
+      });
+    });
+  }
+
+  function placeCaretAtEnd(el){
+    try{
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }catch(e){}
+  }
+
+  function startEditTarget(textEl, partner, target){
+    textEl.contentEditable = 'true';
+    textEl.focus();
+    placeCaretAtEnd(textEl);
+
+    function save(){
+      textEl.removeEventListener('blur', save);
+      textEl.removeEventListener('keydown', onKey);
+      textEl.contentEditable = 'false';
+      const newText = textEl.textContent.trim();
+      if(newText && newText !== target.text){
+        if(firebaseReady){
+          db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).update({ text: newText });
+        }
+      } else if(!newText){
+        textEl.textContent = target.text;
+      }
+    }
+    function onKey(e){
+      if(e.key === 'Enter'){ e.preventDefault(); textEl.blur(); }
+      if(e.key === 'Escape'){ textEl.textContent = target.text; textEl.blur(); }
+    }
+    textEl.addEventListener('blur', save);
+    textEl.addEventListener('keydown', onKey);
+  }
+
+  function addTargetForMe(){
+    if(!myIdentity || !firebaseReady) return;
+    const input = targetsInputEls[myIdentity];
+    if(!input) return;
+    const text = input.value.trim();
+    if(!text) return;
+    db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + myIdentity).push({
+      text: text,
+      done: false,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    input.value = '';
+  }
+
+  ['rashita', 'sanjok'].forEach(partner => {
+    if(targetsAddBtnEls[partner]) targetsAddBtnEls[partner].addEventListener('click', addTargetForMe);
+    if(targetsInputEls[partner]) targetsInputEls[partner].addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); addTargetForMe(); }
+    });
+  });
+
+  if(targetsPrevDay) targetsPrevDay.addEventListener('click', () => {
+    currentTargetsDate = new Date(currentTargetsDate);
+    currentTargetsDate.setDate(currentTargetsDate.getDate() - 1);
+    renderTargetsDateLabel();
+    attachTargetsListener();
+  });
+  if(targetsNextDay) targetsNextDay.addEventListener('click', () => {
+    currentTargetsDate = new Date(currentTargetsDate);
+    currentTargetsDate.setDate(currentTargetsDate.getDate() + 1);
+    renderTargetsDateLabel();
+    attachTargetsListener();
+  });
+  if(targetsTodayBtn) targetsTodayBtn.addEventListener('click', () => {
+    currentTargetsDate = new Date();
+    renderTargetsDateLabel();
+    attachTargetsListener();
+  });
+
+  const chooseRashitaTargetsBtn = document.getElementById('chooseRashitaTargets');
+  const chooseSanjokTargetsBtn = document.getElementById('chooseSanjokTargets');
+  if(chooseRashitaTargetsBtn) chooseRashitaTargetsBtn.addEventListener('click', () => setIdentity('rashita'));
+  if(chooseSanjokTargetsBtn) chooseSanjokTargetsBtn.addEventListener('click', () => setIdentity('sanjok'));
+
+  if(switchIdentityTargets) switchIdentityTargets.addEventListener('click', () => {
+    try{
+      localStorage.removeItem('sameMomentIdentity');
+      myIdentity = null;
+      initMoods();
+      initNotes();
+      initTargets();
+    }catch(e){ console.error('switchIdentityTargets failed:', e); }
   });
 
 })();
