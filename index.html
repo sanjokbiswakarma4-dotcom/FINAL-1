@@ -411,13 +411,8 @@
         stageVisual.classList.remove('breathing');
       }
     } else {
-      startBtn.classList.remove('hidden');
-      stopBtn.classList.add('hidden');
-      chips.forEach(c => { c.style.pointerEvents='auto'; c.style.opacity='1'; });
-      stageVisual.classList.remove('breathing');
-      timerDisplay.textContent = formatTime(state.duration || durationMin*60);
-      statusLine.textContent = partnerPresent ? "they're here — ready when you are" : 'waiting for them to join';
-      statusLine.classList.remove('lit');
+    startBtn.classList.remove('hidden');
+      startBtn.disabled = !partnerPresent; startBtn.textContent =partnerPresent ? 'Begin together' : 'Waiting for them to join…'; stopBtn.classList.add('hidden'); chips.forEach(c => { c.style.pointerEvents = 'auto'; c.style.opacity = '1'; }); stageVisual.classList.remove('breathing'); timerDisplay.textContent = formatTime(state.duration || durationMin*60); statusLine.textContent = partnerPresent ? "they're here — ready when you are" : 'waiting for them to join'; statusLine.classList.remove('lit');
     }
   }
 
