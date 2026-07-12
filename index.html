@@ -26,7 +26,7 @@
     position: fixed; inset:0; width:100%; height:100%;
     object-fit: cover; z-index:0;
   }
-  
+
   .scrim{
     position: fixed; inset:0; z-index:1;
     background: linear-gradient(180deg, rgba(10,12,18,0.35) 0%, rgba(10,12,18,0.55) 55%, rgba(10,12,18,0.8) 100%);
@@ -88,8 +88,18 @@ letter-spacing:5px;
     min-height:100vh; padding: 24px;
   }
 
-  /* --- COVER: the folder --- */
-  #cover{ text-align:center; cursor:pointer; user-select:none; }
+  /* --- COVER: grid of folders, locket biggest, centered --- */
+  #cover{ text-align:center; user-select:none; }
+  .folder-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px 22px;
+    justify-items:center;
+    align-items:start;
+  }
+  .folder-item{ cursor:pointer; }
+  .folder-item.big{ grid-column: 1 / -1; margin-bottom: 6px; }
+
   .locket-wrap{
     position:relative;
 }
@@ -142,11 +152,12 @@ opacity:1;
         drop-shadow(0 0 20px rgba(227,160,82,.45));
 }
 
-.locket.opening{
-    animation:openLocket 1s forwards;
+/* generic "opening" animation, shared by the big locket and the small folder icons */
+.locket.opening, .folder-icon.opening{
+    animation:openFolder 1s forwards;
 }
 
-@keyframes openLocket{
+@keyframes openFolder{
     0%{
         transform:scale(1) rotate(0deg);
         opacity:1;
@@ -177,7 +188,40 @@ opacity:1;
 
 }
 
-  .folder-hint{ margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+  .folder-hint{ margin-top: 18px; font-size: 12px; color: var(--text-muted); }
+
+  /* --- small folder items (music / memories / moods) --- */
+  .folder-icon-wrap{ position:relative; }
+  .folder-icon-wrap::before{
+    content:"";
+    position:absolute;
+    width:120px; height:120px;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(227,160,82,.18), transparent 70%);
+    animation:pulseGlow 4s ease-in-out infinite;
+    z-index:-1;
+  }
+  .folder-icon{
+    width:74px; height:74px; border-radius:50%;
+    background: rgba(255,255,255,0.05);
+    border:1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px;
+    transition: all .4s ease;
+    filter:drop-shadow(0 12px 24px rgba(0,0,0,.35));
+  }
+  .folder-icon:hover{
+    transform:translateY(-6px) scale(1.08) rotate(-4deg);
+    filter:
+        drop-shadow(0 16px 30px rgba(0,0,0,.4))
+        drop-shadow(0 0 14px rgba(227,160,82,.4));
+  }
+  .small-label{
+    margin-top:10px; font-size:14px; letter-spacing:.1em;
+    color: var(--text-muted);
+    text-shadow: 0 0 10px rgba(255,255,255,.25);
+  }
 
   /* --- APP PANEL (glass card) --- */
   #appPanel{
@@ -189,11 +233,17 @@ opacity:1;
     border-radius: 20px;
     padding: 32px 28px 28px;
     box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+    max-height: 90vh;
+    overflow-y: auto;
   }
   .wordmark{
     font-family:'Fraunces', serif; font-weight:500; font-size:14px;
     letter-spacing:0.14em; text-transform:uppercase; color: var(--text-muted);
     text-align:center; margin-bottom: 24px;
+  }
+  .panel-header{
+    font-family:'Fraunces', serif; font-size:18px; letter-spacing:.04em;
+    text-align:center; margin-bottom:20px; color: var(--text-primary);
   }
   .config-warning{
     background: rgba(58,42,32,0.85); border:1px solid #6B4A2E; color:#F2C89A;
@@ -242,6 +292,50 @@ opacity:1;
   .copy-btn{ background:none; border:1px solid var(--glass-border); color: var(--text-muted); width:auto; padding:5px 10px; font-size:11px; border-radius:7px; }
 
   .hidden{ display:none !important; }
+
+  /* --- MUSIC panel --- */
+  .playlist{ margin-bottom:16px; max-height:220px; overflow-y:auto; }
+  .track-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 12px; border-radius:8px; cursor:pointer; font-size:14px;
+    color:var(--text-muted); border:1px solid transparent; margin-bottom:6px;
+    transition: all .15s ease;
+  }
+  .track-item:hover{ border-color: var(--glass-border); }
+  .track-item.active{ color: var(--ember); border-color: var(--ember); background: rgba(227,160,82,0.1); }
+  .player-controls{ display:flex; gap:10px; margin-bottom:14px; }
+  .player-controls button{ flex:1; }
+  .now-playing{ text-align:center; font-size:13px; color:var(--text-muted); }
+
+  /* --- MEMORIES panel --- */
+  .gallery-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; max-height:320px; overflow-y:auto; margin-bottom: 4px; }
+  .gallery-grid img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid var(--glass-border); transition: transform .2s ease; display:block; }
+  .gallery-grid img:hover{ transform: scale(1.05); }
+  .gallery-hint{ text-align:center; font-size:11px; color:var(--text-muted); margin-top:12px; }
+
+  #memoriesLightbox{
+    position:fixed; inset:0; z-index:6;
+    background: rgba(8,10,16,0.92);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;
+  }
+  #lightboxImg{ max-width:90vw; max-height:65vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  #lightboxCaption{ margin-top:16px; font-family:'Fraunces', serif; font-size:18px; text-align:center; max-width:600px; color: var(--text-primary); }
+  .lightbox-controls{ display:flex; gap:14px; margin-top:26px; }
+  .lightbox-controls button{ width:auto; padding:9px 20px; }
+
+  /* --- MOODS panel --- */
+  .mood-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:22px; }
+  .mood-emoji-btn{
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+    font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition: all .15s ease;
+  }
+  .mood-emoji-btn:hover{ transform: scale(1.1); border-color: var(--ember); }
+  .mood-emoji-btn.selected{ border-color: var(--ember); background: rgba(227,160,82,0.15); }
+  .mood-display{ text-align:center; font-size:15px; color:var(--text-muted); margin-bottom:18px; line-height:1.9; }
+  .mood-emoji-big{ font-size:24px; vertical-align:middle; }
+  .identity-hint{ text-align:center; font-size:12px; color: var(--text-muted); margin-top:10px; cursor:pointer; text-decoration:underline; }
 
   /* --- BREATHE OVERLAY --- */
   #breatheOverlay{
@@ -293,6 +387,12 @@ opacity:0;
 animation:none;
 }
   }
+
+  @media (max-width: 420px){
+    .folder-grid{ gap: 18px 12px; }
+    .folder-icon{ width:64px; height:64px; font-size:26px; }
+    .locket{ width:150px; }
+  }
 </style>
 </head>
 <body>
@@ -305,17 +405,38 @@ animation:none;
 
 <div class="stage">
 
-  <!-- COVER -->
+  <!-- COVER: grid of folders -->
   <div id="cover">
-  <div class="locket-wrap">
-  <img
-    src="assets/locket.png"
-    id="folder"
-    class="locket"
-    alt="Love Locket">
-</div>
-    <div class="folder-label">our meditation</div>
-    <div class="folder-hint">tap to open</div>
+    <div class="folder-grid">
+
+      <div class="folder-item big" data-target="panel-meditation">
+        <div class="locket-wrap">
+          <img
+            src="assets/locket.png"
+            id="folder"
+            class="locket"
+            alt="Love Locket">
+        </div>
+        <div class="folder-label">our meditation</div>
+      </div>
+
+      <div class="folder-item small" data-target="panel-music">
+        <div class="folder-icon-wrap"><div class="folder-icon">🎵</div></div>
+        <div class="folder-label small-label">music</div>
+      </div>
+
+      <div class="folder-item small" data-target="panel-memories">
+        <div class="folder-icon-wrap"><div class="folder-icon">📷</div></div>
+        <div class="folder-label small-label">memories</div>
+      </div>
+
+      <div class="folder-item small" data-target="panel-moods">
+        <div class="folder-icon-wrap"><div class="folder-icon">💭</div></div>
+        <div class="folder-label small-label">moods</div>
+      </div>
+
+    </div>
+    <div class="folder-hint">tap a folder to open</div>
   </div>
 
   <!-- APP PANEL -->
@@ -327,45 +448,86 @@ animation:none;
       <code>firebaseConfig</code>, and paste in your Firebase project's values.
     </div>
 
-    <div id="setup">
-      <label for="nameInput">Your name</label>
-      <input type="text" id="nameInput" placeholder="e.g. Ava" maxlength="20">
+    <!-- ===== MEDITATION ===== -->
+    <div class="app-panel-content" id="panel-meditation">
+      <div id="setup">
+        <label for="nameInput">Your name</label>
+        <input type="text" id="nameInput" placeholder="e.g. Ava" maxlength="20">
 
-      <label for="roomInput">Room code — share this with them</label>
-      <div class="row">
-        <input type="text" id="roomInput" placeholder="e.g. dawn-4471" maxlength="24">
-        <button class="btn-ghost" style="width:auto; padding:0 14px;" id="generateBtn">New</button>
+        <label for="roomInput">Room code — share this with them</label>
+        <div class="row">
+          <input type="text" id="roomInput" placeholder="e.g. dawn-4471" maxlength="24">
+          <button class="btn-ghost" style="width:auto; padding:0 14px;" id="generateBtn">New</button>
+        </div>
+
+        <button class="btn-primary" id="joinBtn" disabled>Join room</button>
       </div>
 
-      <button class="btn-primary" id="joinBtn" disabled>Join room</button>
+      <div id="session" class="hidden">
+        <div class="stage-visual" id="stageVisual">
+          <div class="orb you"></div>
+          <div class="orb partner"></div>
+        </div>
+        <div class="timer" id="timerDisplay">10:00</div>
+        <div class="status" id="statusLine">waiting for you to begin</div>
+
+        <div class="chips" id="chips">
+          <div class="chip" data-min="5">5m</div>
+          <div class="chip active" data-min="10">10m</div>
+          <div class="chip" data-min="15">15m</div>
+          <div class="chip" data-min="20">20m</div>
+        </div>
+
+        <button class="btn-primary" id="startBtn">Begin together</button>
+        <button class="btn-ghost hidden" id="stopBtn">End session</button>
+        <button class="btn-ghost" id="breatheBtn">Breathe</button>
+
+        <div class="share-row">
+          <span>Room: <span class="code" id="roomCodeDisplay"></span></span>
+          <button class="copy-btn" id="copyBtn">Copy code</button>
+        </div>
+      </div>
     </div>
 
-    <div id="session" class="hidden">
-      <div class="stage-visual" id="stageVisual">
-        <div class="orb you"></div>
-        <div class="orb partner"></div>
+    <!-- ===== MUSIC ===== -->
+    <div class="app-panel-content hidden" id="panel-music">
+      <div class="panel-header">our playlist</div>
+      <div class="playlist" id="playlistList"></div>
+      <div class="player-controls">
+        <button class="btn-ghost" id="prevTrackBtn">⏮ Prev</button>
+        <button class="btn-primary" id="playPauseBtn">▶ Play</button>
+        <button class="btn-ghost" id="nextTrackBtn">Next ⏭</button>
       </div>
-      <div class="timer" id="timerDisplay">10:00</div>
-      <div class="status" id="statusLine">waiting for you to begin</div>
+      <div class="now-playing" id="nowPlaying">Select a song</div>
+    </div>
 
-      <div class="chips" id="chips">
-        <div class="chip" data-min="5">5m</div>
-        <div class="chip active" data-min="10">10m</div>
-        <div class="chip" data-min="15">15m</div>
-        <div class="chip" data-min="20">20m</div>
+    <!-- ===== MEMORIES ===== -->
+    <div class="app-panel-content hidden" id="panel-memories">
+      <div class="panel-header">our memories</div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <div class="gallery-hint">tap a photo to view it full-size</div>
+    </div>
+
+    <!-- ===== MOODS ===== -->
+    <div class="app-panel-content hidden" id="panel-moods">
+      <div class="panel-header">how are you feeling?</div>
+
+      <div id="identityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashita">Rashita</div>
+          <div class="chip" id="chooseSanjok">Sanjok</div>
+        </div>
       </div>
 
-      <button class="btn-primary" id="startBtn">Begin together</button>
-      <button class="btn-ghost hidden" id="stopBtn">End session</button>
-      <button class="btn-ghost" id="breatheBtn">Breathe</button>
-
-      <div class="share-row">
-        <span>Room: <span class="code" id="roomCodeDisplay"></span></span>
-        <button class="copy-btn" id="copyBtn">Copy code</button>
+      <div id="moodBoard" class="hidden">
+        <div class="mood-row" id="myMoodRow"></div>
+        <div class="mood-display" id="moodDisplay"></div>
+        <div class="identity-hint" id="switchIdentity">not you? switch</div>
       </div>
     </div>
 
-    <button class="btn-ghost hidden" id="closeFolderBtn" style="margin-top:6px;">Close folder</button>
+    <button class="btn-ghost" id="closeFolderBtn" style="margin-top:16px;">Close folder</button>
   </div>
 
 </div>
@@ -379,6 +541,17 @@ animation:none;
 </div>
   <div class="breathe-text" id="breatheText">breathe in...</div>
   <button class="breathe-close" id="breatheCloseBtn">Close</button>
+</div>
+
+<!-- MEMORIES LIGHTBOX -->
+<div id="memoriesLightbox" class="hidden">
+  <img id="lightboxImg" src="" alt="">
+  <div id="lightboxCaption"></div>
+  <div class="lightbox-controls">
+    <button class="breathe-close" id="lightboxPrev">← Prev</button>
+    <button class="breathe-close" id="lightboxNext">Next →</button>
+    <button class="breathe-close" id="lightboxClose">Close</button>
+  </div>
 </div>
 
 <script>
@@ -405,12 +578,20 @@ animation:none;
   let room=null, myName=null, durationMin=10, roomRef=null, presenceInterval=null;
   let audioCtx=null, chimedForStart=false, chimedForEnd=false;
 
-  // NEW: cache of the last known room state + a dedicated local ticker,
+  // Cache of the last known room state + a dedicated local ticker,
   // so the countdown redraws every second instead of only when Firebase
-  // pushes an update (which was previously tied to the 2s presence write).
+  // pushes an update.
   let lastState = null;
   let myKeyGlobal = null;
   let tickInterval = null;
+
+  // Track the offset between this device's clock and Firebase's
+  // server clock. Two devices comparing raw Date.now() values can be
+  // off by several seconds, which silently breaks "is my partner here"
+  // presence checks and the countdown's elapsed-time math. getServerNow()
+  // gives every device the same trusted clock instead.
+  let serverTimeOffset = 0;
+  function getServerNow(){ return Date.now() + serverTimeOffset; }
 
   const folder = document.getElementById('folder');
   const cover = document.getElementById('cover');
@@ -426,7 +607,7 @@ animation:none;
   const stageVisual = document.getElementById('stageVisual');
   const timerDisplay = document.getElementById('timerDisplay');
   const statusLine = document.getElementById('statusLine');
-  const chips = document.querySelectorAll('.chip');
+  const chips = document.querySelectorAll('#chips .chip');
   const startBtn = document.getElementById('startBtn');
   const stopBtn = document.getElementById('stopBtn');
   const breatheBtn = document.getElementById('breatheBtn');
@@ -437,27 +618,46 @@ animation:none;
   const breatheText = document.getElementById('breatheText');
   const bgMusic = document.getElementById('bgMusic');
 
-  if(!firebaseReady){ configWarning.classList.remove('hidden'); }
+  if(!firebaseReady){
+    configWarning.classList.remove('hidden');
+  } else {
+    db.ref('.info/serverTimeOffset').on('value', snap => {
+      serverTimeOffset = snap.val() || 0;
+    });
+  }
 
-  // --- Folder open/close ---
-  folder.addEventListener('click', () => {
-    folder.classList.add('opening');
+  // --- Folder grid: open/close ---
+  function openPanel(targetId){
+    document.querySelectorAll('.app-panel-content').forEach(p => p.classList.add('hidden'));
+    const panel = document.getElementById(targetId);
+    if(panel) panel.classList.remove('hidden');
+    cover.classList.add('hidden');
+    appPanel.classList.remove('hidden');
+    closeFolderBtn.classList.remove('hidden');
 
-    
-    setTimeout(() => {
-      cover.classList.add('hidden');
-      appPanel.classList.remove('hidden');
-      closeFolderBtn.classList.remove('hidden');
-    }, 650);
+    if(targetId === 'panel-music') initMusic();
+    if(targetId === 'panel-memories') initMemories();
+    if(targetId === 'panel-moods') initMoods();
+  }
+
+  document.querySelectorAll('.folder-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const icon = item.querySelector('.locket, .folder-icon');
+      if(icon) icon.classList.add('opening');
+      setTimeout(() => {
+        openPanel(item.dataset.target);
+        if(icon) icon.classList.remove('opening');
+      }, 650);
+    });
   });
+
   closeFolderBtn.addEventListener('click', () => {
     appPanel.classList.add('hidden');
     closeFolderBtn.classList.add('hidden');
-    folder.classList.remove('open');
     cover.classList.remove('hidden');
   });
 
-  // --- Setup form ---
+  // --- Setup form (meditation) ---
   function updateJoinEnabled(){
     joinBtn.disabled = !firebaseReady || !(nameInput.value.trim() && roomInput.value.trim());
   }
@@ -515,27 +715,25 @@ animation:none;
       if(!snapshot.exists()){
         roomRef.set({ duration: durationMin * 60, startTime: null, presence: {} });
       }
-      roomRef.child('presence/' + myKey).set(Date.now());
+      roomRef.child('presence/' + myKey).set(firebase.database.ServerValue.TIMESTAMP);
 
       setupEl.classList.add('hidden');
       sessionEl.classList.remove('hidden');
       roomCodeDisplay.textContent = room;
 
       presenceInterval = setInterval(() => {
-        roomRef.child('presence/' + myKey).set(Date.now());
+        roomRef.child('presence/' + myKey).set(firebase.database.ServerValue.TIMESTAMP);
       }, 2000);
 
-      // Firebase listener: only fires when the room data actually changes
-      // (start/stop, presence writes, duration change). Cache the value —
-      // do NOT rely on this alone to drive the visible countdown.
+      // Firebase listener: only fires when the room data actually changes.
+      // Cache the value — do NOT rely on this alone to drive the countdown.
       roomRef.on('value', snap => {
         lastState = snap.val();
         render(lastState, myKey);
       });
 
-      // NEW: local ticker repaints the timer every second using the cached
-      // state, so the display counts down smoothly instead of jumping only
-      // when a presence write happens to land.
+      // Local ticker repaints the timer every second using the cached
+      // state, so the display counts down smoothly.
       if(tickInterval) clearInterval(tickInterval);
       tickInterval = setInterval(() => {
         if(lastState) render(lastState, myKeyGlobal);
@@ -555,7 +753,7 @@ startBtn.addEventListener('click', () => {
 
   roomRef.update({
     duration: durationMin * 60,
-    startTime: Date.now()
+    startTime: firebase.database.ServerValue.TIMESTAMP
   });
 
 });
@@ -567,11 +765,11 @@ startBtn.addEventListener('click', () => {
   roomRef.update({ startTime: null });
 
 });
- 
+
 
   function render(state, myKey){
     if(!state) return;
-    const now = Date.now();
+    const now = getServerNow();
     const presence = state.presence || {};
     const partnerKey = Object.keys(presence).find(k => k !== myKey);
     const partnerPresent = partnerKey && (now - presence[partnerKey] < 6000);
@@ -599,17 +797,15 @@ startBtn.addEventListener('click', () => {
       } else {
         timerDisplay.textContent = '00:00';
         statusLine.textContent = 'session complete';
-        
+
         bgMusic.pause();
 bgMusic.currentTime = 0;
-        
+
         if(!chimedForEnd){
           chimedForEnd = true;
           playChime();
-          // NEW: clear startTime in the database once the countdown
-          // naturally finishes. Without this, the room stays "expired"
-          // forever and the next person to join sees 00:00 / session
-          // complete instantly instead of a fresh countdown.
+          // Clear startTime once the countdown naturally finishes, so the
+          // room doesn't stay permanently "expired" for the next visit.
           roomRef.update({ startTime: null });
         }
         stageVisual.classList.remove('breathing');
@@ -642,13 +838,230 @@ bgMusic.currentTime = 0;
     breatheOverlay.classList.add('hidden');
     clearInterval(breatheTextTimer);
   });
+
+  // =================================================================
+  // MUSIC — playlist. Replace TRACKS with your real files/titles.
+  // Put the mp3s in an "assets/music/" folder next to this html file.
+  // =================================================================
+  const TRACKS = [
+    { title: "Track 1 — replace me", src: "assets/music/track1.mp3" },
+    { title: "Track 2 — replace me", src: "assets/music/track2.mp3" },
+    { title: "Track 3 — replace me", src: "assets/music/track3.mp3" },
+  ];
+  let currentTrackIndex = -1;
+  let musicInitialized = false;
+  const playlistPlayer = document.getElementById('playlistPlayer');
+  const playlistList = document.getElementById('playlistList');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const prevTrackBtn = document.getElementById('prevTrackBtn');
+  const nextTrackBtn = document.getElementById('nextTrackBtn');
+  const nowPlaying = document.getElementById('nowPlaying');
+
+  function renderPlaylist(){
+    playlistList.innerHTML = '';
+    TRACKS.forEach((track, i) => {
+      const item = document.createElement('div');
+      item.className = 'track-item' + (i === currentTrackIndex ? ' active' : '');
+      item.textContent = track.title;
+      item.addEventListener('click', () => playTrack(i));
+      playlistList.appendChild(item);
+    });
+  }
+
+  function playTrack(i){
+    if(i < 0 || i >= TRACKS.length) return;
+    currentTrackIndex = i;
+    playlistPlayer.src = TRACKS[i].src;
+    playlistPlayer.play().catch(() => {});
+    playPauseBtn.textContent = '⏸ Pause';
+    nowPlaying.textContent = TRACKS[i].title;
+    renderPlaylist();
+  }
+
+  playPauseBtn.addEventListener('click', () => {
+    if(currentTrackIndex === -1){
+      playTrack(0);
+      return;
+    }
+    if(playlistPlayer.paused){
+      playlistPlayer.play().catch(() => {});
+      playPauseBtn.textContent = '⏸ Pause';
+    } else {
+      playlistPlayer.pause();
+      playPauseBtn.textContent = '▶ Play';
+    }
+  });
+
+  prevTrackBtn.addEventListener('click', () => {
+    if(TRACKS.length === 0) return;
+    const i = currentTrackIndex <= 0 ? TRACKS.length - 1 : currentTrackIndex - 1;
+    playTrack(i);
+  });
+  nextTrackBtn.addEventListener('click', () => {
+    if(TRACKS.length === 0) return;
+    const i = currentTrackIndex >= TRACKS.length - 1 ? 0 : currentTrackIndex + 1;
+    playTrack(i);
+  });
+  playlistPlayer.addEventListener('ended', () => {
+    nextTrackBtn.click();
+  });
+
+  function initMusic(){
+    if(musicInitialized) return;
+    musicInitialized = true;
+    renderPlaylist();
+  }
+
+  // =================================================================
+  // MEMORIES — photo gallery. Replace PHOTOS with your real files.
+  // Put the images in an "assets/memories/" folder next to this html file.
+  // =================================================================
+  const PHOTOS = [
+    { src: "assets/memories/photo1.jpg", caption: "Add a caption here" },
+    { src: "assets/memories/photo2.jpg", caption: "Add a caption here" },
+    { src: "assets/memories/photo3.jpg", caption: "Add a caption here" },
+    { src: "assets/memories/photo4.jpg", caption: "Add a caption here" },
+    { src: "assets/memories/photo5.jpg", caption: "Add a caption here" },
+    { src: "assets/memories/photo6.jpg", caption: "Add a caption here" },
+  ];
+  let memoriesInitialized = false;
+  let lightboxIndex = 0;
+  const galleryGrid = document.getElementById('galleryGrid');
+  const memoriesLightbox = document.getElementById('memoriesLightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxPrev = document.getElementById('lightboxPrev');
+  const lightboxNext = document.getElementById('lightboxNext');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  function renderGallery(){
+    galleryGrid.innerHTML = '';
+    PHOTOS.forEach((photo, i) => {
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = photo.caption;
+      img.addEventListener('click', () => openLightbox(i));
+      galleryGrid.appendChild(img);
+    });
+  }
+
+  function openLightbox(i){
+    lightboxIndex = i;
+    updateLightbox();
+    memoriesLightbox.classList.remove('hidden');
+  }
+  function updateLightbox(){
+    const photo = PHOTOS[lightboxIndex];
+    lightboxImg.src = photo.src;
+    lightboxCaption.textContent = photo.caption;
+  }
+  lightboxPrev.addEventListener('click', () => {
+    lightboxIndex = lightboxIndex <= 0 ? PHOTOS.length - 1 : lightboxIndex - 1;
+    updateLightbox();
+  });
+  lightboxNext.addEventListener('click', () => {
+    lightboxIndex = lightboxIndex >= PHOTOS.length - 1 ? 0 : lightboxIndex + 1;
+    updateLightbox();
+  });
+  lightboxClose.addEventListener('click', () => {
+    memoriesLightbox.classList.add('hidden');
+  });
+
+  function initMemories(){
+    if(memoriesInitialized) return;
+    memoriesInitialized = true;
+    renderGallery();
+  }
+
+  // =================================================================
+  // MOODS — each partner picks who they are once, then taps an emoji.
+  // Both of you see each other's current mood live via Firebase.
+  // =================================================================
+  const MOOD_EMOJIS = ['😊','🥰','😴','😢','😤','🤔','😌','🥳'];
+  const PARTNER_NAMES = { rashita: 'Rashita', sanjok: 'Sanjok' };
+  let myIdentity = localStorage.getItem('sameMomentIdentity');
+  let moodsListenerAttached = false;
+  let moodRowRendered = false;
+
+  const identityChooser = document.getElementById('identityChooser');
+  const moodBoard = document.getElementById('moodBoard');
+  const myMoodRow = document.getElementById('myMoodRow');
+  const moodDisplay = document.getElementById('moodDisplay');
+  const switchIdentity = document.getElementById('switchIdentity');
+
+  function initMoods(){
+    if(myIdentity){
+      identityChooser.classList.add('hidden');
+      moodBoard.classList.remove('hidden');
+      setupMoodBoard();
+    } else {
+      identityChooser.classList.remove('hidden');
+      moodBoard.classList.add('hidden');
+    }
+  }
+
+  document.getElementById('chooseRashita').addEventListener('click', () => setIdentity('rashita'));
+  document.getElementById('chooseSanjok').addEventListener('click', () => setIdentity('sanjok'));
+  function setIdentity(id){
+    myIdentity = id;
+    localStorage.setItem('sameMomentIdentity', id);
+    initMoods();
+  }
+  switchIdentity.addEventListener('click', () => {
+    localStorage.removeItem('sameMomentIdentity');
+    myIdentity = null;
+    initMoods();
+  });
+
+  function setupMoodBoard(){
+    if(!moodRowRendered){
+      moodRowRendered = true;
+      MOOD_EMOJIS.forEach(emoji => {
+        const btn = document.createElement('div');
+        btn.className = 'mood-emoji-btn';
+        btn.textContent = emoji;
+        btn.addEventListener('click', () => {
+          if(!firebaseReady || !myIdentity) return;
+          db.ref('moods/' + myIdentity).set({
+            emoji: emoji,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+          });
+        });
+        myMoodRow.appendChild(btn);
+      });
+    }
+    if(!moodsListenerAttached && firebaseReady){
+      moodsListenerAttached = true;
+      db.ref('moods').on('value', snap => {
+        renderMoodDisplay(snap.val() || {});
+      });
+    }
+  }
+
+  function renderMoodDisplay(data){
+    if(!myIdentity) return;
+    const partnerId = myIdentity === 'rashita' ? 'sanjok' : 'rashita';
+    const mine = data[myIdentity];
+    const theirs = data[partnerId];
+
+    document.querySelectorAll('#myMoodRow .mood-emoji-btn').forEach(btn => {
+      btn.classList.toggle('selected', !!(mine && btn.textContent === mine.emoji));
+    });
+
+    moodDisplay.innerHTML =
+      'You: <span class="mood-emoji-big">' + (mine ? mine.emoji : '—') + '</span>' +
+      ' &nbsp;·&nbsp; ' +
+      PARTNER_NAMES[partnerId] + ': <span class="mood-emoji-big">' + (theirs ? theirs.emoji : '—') + '</span>';
+  }
+
 })();
-  
+
   </script>
 
 <audio id="bgMusic" loop>
     <source src="assets/music.mp3" type="audio/mpeg">
 </audio>
+<audio id="playlistPlayer"></audio>
 
 </body>
 </html>
