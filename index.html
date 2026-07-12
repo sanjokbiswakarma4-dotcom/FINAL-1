@@ -1,1 +1,3434 @@
-can you make a book section, and mental health section as well and in book section  either one of use upload  books which will be stored there in mental health section there will should be something to overcome with our mental health and also can you make a specific login system where we both will have a different login system so that we can't change each others data and can you also add a report section which will have the compiled records of our targets, moods, meditation, mental health
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Same Moment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+  :root{
+    --ember: #B8834A;
+    --ember-dim: #E4D6BE;
+    --sand: #EDE3D0;
+    --glass: rgba(255, 250, 240, 0.55);
+    --glass-border: rgba(62, 52, 38, 0.12);
+    --text-primary: #3E3426;
+    --text-muted: #8C7F68;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; height:100%; font-family:'Cormorant Garamond', serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; background: var(--sand); }
+
+  .bg-photo{
+    position: fixed; inset:0; width:100%; height:100%;
+    object-fit: cover; z-index:0;
+    opacity: 0.16;
+    filter: saturate(0.7) brightness(1.05);
+  }
+
+  .scrim{
+    position: fixed; inset:0; z-index:1;
+    background: linear-gradient(180deg, rgba(237,227,208,0.75) 0%, rgba(237,227,208,0.88) 55%, rgba(230,218,195,0.94) 100%);
+  }
+.love-background{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-family:'Fraunces', serif;
+    font-size:56px;
+    font-weight:300;
+    letter-spacing:8px;
+
+    color:rgba(62,52,38,0.06);
+
+    text-transform:uppercase;
+
+    pointer-events:none;
+    user-select:none;
+
+    z-index:1;
+
+    animation:floatText 12s ease-in-out infinite;
+}
+
+@keyframes floatText{
+
+    0%,100%{
+        transform:translateY(0px);
+        opacity:.5;
+    }
+
+    50%{
+        transform:translateY(-10px);
+        opacity:.85;
+    }
+}
+
+@media(max-width:768px){
+
+.love-background{
+
+font-size:32px;
+letter-spacing:4px;
+
+}
+
+}
+  .stage{
+    position: relative; z-index: 2;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; padding: 24px;
+  }
+
+  /* --- COVER: grid of folders, locket biggest, centered --- */
+  #cover{ text-align:center; user-select:none; }
+  .folder-grid{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 26px;
+  }
+  .small-folders-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap: 26px 22px;
+  }
+  .folder-item{ cursor:pointer; }
+  .folder-item.big{ margin-bottom: 6px; }
+
+  .locket-wrap{
+    position:relative;
+}
+
+.locket-wrap::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+    height:220px;
+
+    border-radius:50%;
+
+    background:radial-gradient(circle,
+        rgba(227,160,82,.25),
+        transparent 70%);
+
+    animation:pulseGlow 4s ease-in-out infinite;
+
+    z-index:-1;
+
+}
+
+@keyframes pulseGlow{
+
+0%,100%{
+transform:scale(.9);
+opacity:.5;
+}
+
+50%{
+transform:scale(1.2);
+opacity:1;
+}
+
+    }
+.locket{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.55);
+    border:1px solid var(--glass-border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:92px;
+    line-height:1;
+    cursor:pointer;
+    transition:all .5s ease;
+    filter:drop-shadow(0 14px 28px rgba(62,52,38,.15));
+}
+
+.locket:hover{
+    transform:translateY(-8px) scale(1.08) rotate(-5deg);
+    filter:
+        drop-shadow(0 18px 34px rgba(62,52,38,.18))
+        drop-shadow(0 0 16px rgba(184,131,74,.25));
+}
+
+/* generic "opening" animation, shared by the big locket and the small folder icons */
+.locket.opening, .folder-icon.opening{
+    animation:openFolder 1s forwards;
+}
+
+@keyframes openFolder{
+    0%{
+        transform:scale(1) rotate(0deg);
+        opacity:1;
+    }
+    40%{
+        transform:scale(1.1) rotate(-8deg);
+    }
+    70%{
+        transform:scale(.8);
+        opacity:.7;
+    }
+    100%{
+        transform:scale(3);
+        opacity:0;
+        filter:blur(15px);
+    }
+
+}
+.folder-label{
+
+    margin-top:24px;
+    font-size:20px;
+    letter-spacing:.15em;
+    color: var(--text-primary);
+
+}
+
+  .folder-hint{ margin-top: 18px; font-size: 12px; color: var(--text-muted); }
+
+  /* --- small folder items (music / memories / moods) --- */
+  .folder-icon-wrap{ position:relative; }
+  .folder-icon-wrap::before{
+    content:"";
+    position:absolute;
+    width:120px; height:120px;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(227,160,82,.18), transparent 70%);
+    animation:pulseGlow 4s ease-in-out infinite;
+    z-index:-1;
+  }
+  .folder-icon{
+    width:74px; height:74px; border-radius:50%;
+    background: rgba(255,255,255,0.55);
+    border:1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px;
+    transition: all .4s ease;
+    filter:drop-shadow(0 8px 16px rgba(62,52,38,.12));
+  }
+  .folder-icon:hover{
+    transform:translateY(-6px) scale(1.08) rotate(-4deg);
+    filter:
+        drop-shadow(0 10px 20px rgba(62,52,38,.16))
+        drop-shadow(0 0 10px rgba(184,131,74,.3));
+  }
+  .small-label{
+    margin-top:10px; font-size:14px; letter-spacing:.1em;
+    color: var(--text-muted);
+  }
+
+  /* --- APP PANEL (glass card) --- */
+  #appPanel{
+    width:100%; max-width: 400px;
+    background: var(--glass);
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .wordmark{
+    font-family:'Fraunces', serif; font-weight:500; font-size:14px;
+    letter-spacing:0.14em; text-transform:uppercase; color: var(--text-muted);
+    text-align:center; margin-bottom: 24px;
+  }
+  .panel-header{
+    font-family:'Fraunces', serif; font-size:18px; letter-spacing:.04em;
+    text-align:center; margin-bottom:20px; color: var(--text-primary);
+  }
+  .config-warning{
+    background: rgba(58,42,32,0.85); border:1px solid #6B4A2E; color:#F2C89A;
+    border-radius:10px; padding:12px 14px; font-size:12px; line-height:1.5; margin-bottom:18px;
+  }
+  .config-warning code{ background: rgba(0,0,0,0.3); padding:1px 5px; border-radius:4px; }
+
+  .stage-visual{ position:relative; width:180px; height:180px; margin:0 auto 16px; }
+  .orb{ position:absolute; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); transition: opacity .6s ease, margin .6s ease; }
+  .orb.you{ width:120px; height:120px; background: radial-gradient(circle at 35% 35%, var(--ember), var(--ember-dim) 75%); opacity:.35; }
+  .orb.partner{ width:120px; height:120px; background: radial-gradient(circle at 65% 65%, var(--ember), var(--ember-dim) 75%); opacity:0; margin-left:40px; }
+  .stage-visual.both .orb.you{ opacity:.55; margin-left:-16px; }
+  .stage-visual.both .orb.partner{ opacity:.55; margin-left:16px; }
+  .stage-visual.breathing .orb{ animation: breathe 8s ease-in-out infinite; }
+  @keyframes breathe{ 0%,100%{ transform:translate(-50%,-50%) scale(.86); opacity:.5; } 50%{ transform:translate(-50%,-50%) scale(1.12); opacity:.85; } }
+
+  .timer{ font-family:'Fraunces', serif; font-weight:300; font-size:50px; text-align:center; margin:2px 0 6px; font-variant-numeric:tabular-nums; }
+  .status{ text-align:center; font-size:13px; color:var(--text-muted); margin-bottom:20px; min-height:18px; }
+  .status.lit{ color: var(--ember); }
+
+  label{ display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+  input[type=text]{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:11px 12px;
+    font-family:'IBM Plex Mono', monospace; font-size:14px; margin-bottom:14px; outline:none;
+  }
+  input[type=text]:focus{ border-color: var(--ember); }
+  .row{ display:flex; gap:10px; margin-bottom:14px; }
+  .row input{ margin-bottom:0; }
+
+  .chips{ display:flex; gap:8px; margin-bottom:18px; }
+  .chip{ flex:1; text-align:center; padding:9px 0; border-radius:10px; border:1px solid var(--glass-border); color:var(--text-muted); font-size:13px; cursor:pointer; transition: all .15s ease; }
+  .chip.active{ border-color: var(--ember); color: var(--ember); background: rgba(227,160,82,0.12); }
+
+  button{ width:100%; padding:13px 0; border-radius:10px; border:none; font-family:'IBM Plex Sans', sans-serif; font-weight:500; font-size:14px; cursor:pointer; transition: opacity .15s ease; }
+  button:disabled{ cursor:not-allowed; opacity:.5; }
+  .btn-primary{ background: var(--ember); color:#1B140A; margin-bottom:10px; }
+  .btn-primary:hover:not(:disabled){ opacity:.9; }
+  .btn-ghost{ background: transparent; color: var(--text-muted); border:1px solid var(--glass-border); margin-bottom:10px; }
+  .btn-ghost:hover{ color: var(--text-primary); border-color: var(--text-muted); }
+  .btn-row{ display:flex; gap:10px; }
+  .btn-row button{ margin-bottom:10px; }
+
+  .share-row{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--glass-border); font-size:12px; color:var(--text-muted); }
+  .share-row .code{ font-family:'IBM Plex Mono', monospace; color: var(--text-primary); letter-spacing:.05em; }
+  .copy-btn{ background:none; border:1px solid var(--glass-border); color: var(--text-muted); width:auto; padding:5px 10px; font-size:11px; border-radius:7px; }
+
+  .meditation-track-list{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; max-height:160px; overflow-y:auto; }
+  .meditation-track-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:9px 12px; border-radius:8px; cursor:pointer; font-size:13px;
+    color:var(--text-muted); border:1px solid var(--glass-border);
+    transition: all .15s ease;
+  }
+  .meditation-track-item:hover{ border-color: var(--ember); }
+  .meditation-track-item.active{ color: var(--ember); border-color: var(--ember); background: rgba(184,131,74,0.1); }
+  .meditation-track-item .check{ opacity:0; font-size:12px; }
+  .meditation-track-item.active .check{ opacity:1; }
+
+  .hidden{ display:none !important; }
+
+  /* --- MEDITATION: together / solo mode toggle + solo history --- */
+  .meditation-mode-row{ display:flex; gap:8px; margin-bottom:18px; }
+  .meditation-mode-btn{
+    flex:1; text-align:center; padding:10px 0; border-radius:10px; border:1px solid var(--glass-border);
+    color:var(--text-muted); font-size:13px; cursor:pointer; transition:all .15s ease; background:rgba(255,255,255,0.35);
+  }
+  .meditation-mode-btn.active{ border-color:var(--ember); color:var(--ember); background:rgba(227,160,82,0.12); }
+  .solo-history{ margin-top:18px; padding-top:14px; border-top:1px solid var(--glass-border); }
+  .solo-history-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; text-align:center; }
+  .solo-history-list{ display:flex; flex-direction:column; gap:6px; max-height:150px; overflow-y:auto; }
+  .solo-history-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.4); border:1px solid var(--glass-border);
+    font-size:12px; color:var(--text-muted);
+  }
+  .solo-history-item .shi-mins{ color:var(--ember); font-family:'IBM Plex Mono', monospace; }
+  .solo-history-empty{ text-align:center; font-size:12px; color:var(--text-muted); padding:10px 0; }
+
+  /* --- MUSIC panel --- */
+  .playlist{ margin-bottom:16px; max-height:220px; overflow-y:auto; }
+  .track-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 12px; border-radius:8px; cursor:pointer; font-size:14px;
+    color:var(--text-muted); border:1px solid transparent; margin-bottom:6px;
+    transition: all .15s ease;
+  }
+  .track-item:hover{ border-color: var(--glass-border); }
+  .track-item.active{ color: var(--ember); border-color: var(--ember); background: rgba(227,160,82,0.1); }
+  .player-controls{ display:flex; gap:10px; margin-bottom:14px; }
+  .player-controls button{ flex:1; }
+  .now-playing{ text-align:center; font-size:13px; color:var(--text-muted); }
+
+  /* --- MEMORIES panel --- */
+  .gallery-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; max-height:320px; overflow-y:auto; margin-bottom: 4px; }
+  .gallery-grid img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid var(--glass-border); transition: transform .2s ease; display:block; }
+  .gallery-grid img:hover{ transform: scale(1.05); }
+  .gallery-hint{ text-align:center; font-size:11px; color:var(--text-muted); margin-top:12px; }
+
+  #memoriesLightbox{
+    position:fixed; inset:0; z-index:6;
+    background: rgba(8,10,16,0.92);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;
+  }
+  #lightboxImg{ max-width:90vw; max-height:65vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  #lightboxCaption{ margin-top:16px; font-family:'Fraunces', serif; font-size:18px; text-align:center; max-width:600px; color: #F0E9DA; }
+  .lightbox-controls{ display:flex; gap:14px; margin-top:26px; }
+  .lightbox-controls button{ width:auto; padding:9px 20px; }
+
+  /* --- MOODS panel --- */
+  .mood-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:22px; }
+  .mood-emoji-btn{
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(255,255,255,0.55); border:1px solid var(--glass-border);
+    font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition: all .15s ease;
+  }
+  .mood-emoji-btn:hover{ transform: scale(1.1); border-color: var(--ember); }
+  .mood-emoji-btn.selected{ border-color: var(--ember); background: rgba(227,160,82,0.15); }
+  .mood-display{ text-align:center; font-size:15px; color:var(--text-muted); margin-bottom:18px; line-height:1.9; }
+  .mood-emoji-big{ font-size:24px; vertical-align:middle; }
+  .identity-hint{ text-align:center; font-size:12px; color: var(--text-muted); margin-top:10px; cursor:pointer; text-decoration:underline; }
+
+  .mood-intensity-row{ display:flex; justify-content:center; gap:6px; margin-bottom:18px; }
+  .mood-intensity-dot{
+    width:26px; height:26px; border-radius:50%; border:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.5); font-size:11px; color:var(--text-muted); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition: all .15s ease;
+  }
+  .mood-intensity-dot.selected{ border-color:var(--ember); color:#1B140A; background:var(--ember); }
+  textarea#moodNoteInput{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:10px 12px;
+    font-family:'Cormorant Garamond', serif; font-size:14px; margin-bottom:12px;
+    outline:none; resize:vertical;
+  }
+  textarea#moodNoteInput:focus{ border-color: var(--ember); }
+  .mood-streak-row{ display:flex; justify-content:center; gap:18px; margin-bottom:16px; font-size:12px; color:var(--text-muted); text-align:center; }
+  .mood-streak-num{ display:block; font-family:'Fraunces', serif; font-size:20px; color:var(--ember); }
+  .mood-history{ margin-top:6px; padding-top:14px; border-top:1px solid var(--glass-border); }
+  .mood-history-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; text-align:center; }
+  .mood-history-list{ display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; }
+  .mood-history-item{
+    display:flex; gap:8px; align-items:flex-start;
+    padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.4); border:1px solid var(--glass-border);
+    font-size:12.5px; color:var(--text-primary);
+  }
+  .mood-history-item .mhi-emoji{ font-size:17px; flex:none; }
+  .mood-history-item .mhi-body{ flex:1; min-width:0; }
+  .mood-history-item .mhi-who{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); }
+  .mood-history-item .mhi-note{ word-break:break-word; }
+  .mood-history-item .mhi-time{ font-size:10.5px; color:var(--text-muted); margin-top:2px; }
+  .mood-history-empty{ text-align:center; font-size:12px; color:var(--text-muted); padding:10px 0; }
+
+  /* --- NOTES panel --- */
+  .notes-list{ max-height:260px; overflow-y:auto; margin-bottom:18px; }
+  .note-card{
+    background: rgba(255,255,255,0.45); border:1px solid var(--glass-border);
+    border-radius:10px; padding:12px 14px; margin-bottom:10px;
+  }
+  .note-text{ font-size:15px; line-height:1.5; color: var(--text-primary); white-space:pre-wrap; word-break:break-word; }
+  .note-meta{ display:flex; align-items:center; justify-content:space-between; margin-top:8px; font-size:11px; color: var(--text-muted); }
+  .note-author{ letter-spacing:.06em; text-transform:uppercase; }
+  .note-delete{
+    width:auto; background:none; border:none; color: var(--text-muted);
+    font-size:11px; cursor:pointer; padding:2px 6px; text-decoration:underline;
+  }
+  .note-delete:hover{ color: var(--ember); }
+  .notes-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding: 10px 0 18px; }
+  textarea#noteInput{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:11px 12px;
+    font-family:'Cormorant Garamond', serif; font-size:15px; margin-bottom:14px;
+    outline:none; resize:vertical;
+  }
+  textarea#noteInput:focus{ border-color: var(--ember); }
+
+  /* --- PIN feature (notes + moods) --- */
+  .pin-btn{
+    width:auto; background:none; border:none; color: var(--text-muted);
+    font-size:12px; cursor:pointer; padding:2px 6px;
+  }
+  .pin-btn:hover{ color: var(--ember); }
+  .pin-btn.pinned{ color: var(--ember); }
+  .pinned-tag{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color: var(--ember); margin-right:6px; }
+
+  /* --- PINNED board (shown on the cover / front page) --- */
+  .pinned-board{
+    width:100%; max-width:400px; margin: 0 auto 22px;
+    background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border:1px solid var(--glass-border); border-radius:16px; padding:16px 16px 8px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+  }
+  .pinned-board-title{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-muted); text-align:center; margin-bottom:10px; }
+  .pinned-item{
+    display:flex; align-items:flex-start; gap:8px;
+    background: rgba(255,255,255,0.45); border:1px solid var(--glass-border); border-radius:10px;
+    padding:9px 11px; margin-bottom:8px; font-size:13px; text-align:left;
+  }
+  .pinned-item .pi-emoji{ font-size:17px; flex:none; }
+  .pinned-item .pi-body{ flex:1; min-width:0; }
+  .pinned-item .pi-who{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color: var(--text-muted); }
+  .pinned-item .pi-text{ word-break:break-word; line-height:1.4; color: var(--text-primary); }
+  .pinned-item .pi-unpin{ width:auto; background:none; border:none; color: var(--text-muted); font-size:11px; cursor:pointer; flex:none; }
+  .pinned-item .pi-unpin:hover{ color:var(--ember); }
+
+  /* --- LOGIN modal (per-person password) --- */
+  #loginModalOverlay{
+    position:fixed; inset:0; z-index:9;
+    background: rgba(8,10,16,0.55);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .login-modal{
+    width:100%; max-width:320px;
+    background: var(--sand); border:1px solid var(--glass-border); border-radius:16px;
+    padding:24px 22px; box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+  }
+  .login-modal-title{ font-family:'Fraunces', serif; font-size:17px; text-align:center; margin-bottom:6px; }
+  .login-modal-sub{ font-size:12px; color: var(--text-muted); text-align:center; margin-bottom:16px; }
+  .login-error{ font-size:12px; color:#B33A3A; text-align:center; margin:-8px 0 12px; min-height:14px; }
+
+  /* --- BOOKS panel --- */
+  .book-upload-row{ margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--glass-border); }
+  .book-upload-row input[type=text]{ margin-bottom:8px; }
+  .book-file-label{
+    display:block; text-align:center; padding:10px 0; border-radius:10px; border:1px dashed var(--glass-border);
+    color: var(--text-muted); font-size:13px; cursor:pointer; margin-bottom:10px;
+  }
+  .book-file-label:hover{ border-color: var(--ember); color: var(--ember); }
+  .book-list{ max-height:300px; overflow-y:auto; }
+  .book-item{
+    display:flex; align-items:center; gap:10px;
+    background: rgba(255,255,255,0.45); border:1px solid var(--glass-border); border-radius:10px;
+    padding:10px 12px; margin-bottom:9px;
+  }
+  .book-icon{ font-size:22px; flex:none; }
+  .book-body{ flex:1; min-width:0; }
+  .book-title{ font-size:14px; color: var(--text-primary); word-break:break-word; }
+  .book-meta{ font-size:11px; color: var(--text-muted); margin-top:2px; }
+  .book-actions{ display:flex; flex-direction:column; gap:4px; flex:none; }
+  .book-actions a, .book-actions button{
+    width:auto; background:none; border:none; color: var(--ember); font-size:11px;
+    text-decoration:underline; cursor:pointer; padding:0; text-align:right;
+  }
+  .book-actions button{ color: var(--text-muted); }
+  .book-actions button:hover{ color:#B33A3A; }
+  .books-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding:14px 0; }
+  .upload-progress{ text-align:center; font-size:12px; color: var(--text-muted); margin-bottom:10px; }
+
+  /* --- BOOKS: icon grid, progress bar, continue-reading banner --- */
+  .continue-reading{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background: rgba(227,160,82,0.12); border:1px solid var(--glass-border); border-radius:10px;
+    padding:10px 12px; margin-bottom:16px; font-size:12.5px; color: var(--text-primary);
+  }
+  .continue-reading button{ width:auto; padding:6px 12px; font-size:12px; margin:0; }
+  .continue-reading .cr-info{ flex:1; min-width:0; line-height:1.5; }
+  .continue-reading .cr-title{ font-family:'Fraunces', serif; font-size:14px; }
+  .book-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; max-height:420px; overflow-y:auto; padding-bottom:4px; }
+  .book-card{ position:relative; cursor:pointer; text-align:center; }
+  .book-card-icon{
+    width:100%; aspect-ratio: 3/4; border-radius:8px;
+    background: linear-gradient(160deg, rgba(184,131,74,0.28), rgba(255,255,255,0.5));
+    border:1px solid var(--glass-border); display:flex; align-items:center; justify-content:center;
+    font-size:30px; transition: transform .15s ease; box-shadow: 0 6px 14px rgba(62,52,38,.1);
+  }
+  .book-card:hover .book-card-icon{ transform: translateY(-3px); }
+  .book-card-title{ font-size:11.5px; margin-top:6px; line-height:1.35; color: var(--text-primary); word-break:break-word; }
+  .book-card-uploader{ font-size:9.5px; color: var(--text-muted); margin-top:2px; }
+  .book-card-progress{ width:100%; height:4px; border-radius:3px; background: rgba(62,52,38,0.12); margin-top:6px; overflow:hidden; }
+  .book-card-progress-fill{ height:100%; background: var(--ember); }
+  .book-card-delete{
+    position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%;
+    background: var(--sand); border:1px solid var(--glass-border); color: var(--text-muted);
+    font-size:11px; cursor:pointer; line-height:1; display:flex; align-items:center; justify-content:center;
+  }
+  .book-card-delete:hover{ color:#B33A3A; }
+
+  /* --- BOOK READER --- */
+  #bookReaderModal{
+    position:fixed; inset:0; z-index:7;
+    background: rgba(8,10,16,0.94);
+    display:flex; flex-direction:column;
+  }
+  .reader-topbar{ display:flex; align-items:center; justify-content:space-between; padding:16px 20px; }
+  .reader-title{ font-family:'Fraunces', serif; font-size:16px; color:#F0E9DA; }
+  .reader-close{ width:auto; padding:8px 16px; background:transparent; border:1px solid rgba(240,233,218,0.3); color:#D9CFBB; border-radius:10px; font-size:13px; }
+  .reader-body{
+    flex:1; overflow-y:auto; padding: 10px 24px 20px; display:flex; flex-direction:column; align-items:center;
+    color:#EDE3D0; font-family:'Cormorant Garamond', serif; font-size:18px; line-height:1.8;
+  }
+  .reader-body canvas{ max-width:100%; border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,.4); margin-bottom:10px; }
+  .reader-text-page{ max-width:640px; white-space:pre-wrap; word-break:break-word; }
+  .reader-unsupported{ text-align:center; max-width:420px; margin:auto; }
+  .reader-unsupported a{ color: var(--ember); }
+  .reader-navbar{ display:flex; align-items:center; justify-content:center; gap:22px; padding:14px 20px 22px; }
+  .reader-navbar button{ width:auto; padding:9px 20px; background:transparent; border:1px solid rgba(240,233,218,0.3); color:#D9CFBB; border-radius:10px; }
+  .reader-page-indicator{ font-size:13px; color:#D9CFBB; min-width:110px; text-align:center; }
+
+  /* --- QUOTE OF THE DAY (cover page) --- */
+  .quote-card{
+    position:relative; width:100%; max-width:400px; margin: 0 auto 22px;
+    background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border:1px solid var(--glass-border); border-radius:16px; padding:18px 34px 18px 20px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+  }
+  .quote-text{ font-family:'Fraunces', serif; font-size:15px; font-style:italic; line-height:1.6; color: var(--text-primary); text-align:center; }
+  .quote-dismiss{
+    position:absolute; top:10px; right:10px; width:22px; height:22px; border-radius:50%;
+    background:none; border:1px solid var(--glass-border); color: var(--text-muted);
+    font-size:11px; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;
+  }
+  .quote-dismiss:hover{ color:#B33A3A; }
+
+  /* --- REPORT panel --- */
+  .report-cols{ display:flex; gap:12px; margin-bottom:14px; }
+  .report-card{
+    flex:1; min-width:0; background: rgba(255,255,255,0.45); border:1px solid var(--glass-border);
+    border-radius:12px; padding:14px 12px; text-align:center;
+  }
+  .report-card-name{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color: var(--text-muted); margin-bottom:10px; }
+  .report-stat{ margin-bottom:9px; }
+  .report-stat-num{ display:block; font-family:'Fraunces', serif; font-size:19px; color: var(--ember); }
+  .report-stat-label{ font-size:10.5px; color: var(--text-muted); }
+  .report-loading{ text-align:center; font-size:12px; color: var(--text-muted); padding:16px 0; }
+  .report-note{ font-size:11px; color: var(--text-muted); text-align:center; margin-top:6px; line-height:1.5; }
+
+  /* --- JOURNAL panel (private, per person) --- */
+  .journal-list{ max-height:320px; overflow-y:auto; margin-bottom:16px; }
+  .journal-entry{
+    background: rgba(255,255,255,0.5); border:1px solid var(--glass-border); border-radius:10px;
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .journal-entry-title{ font-family:'Fraunces', serif; font-size:16px; color: var(--text-primary); margin-bottom:4px; }
+  .journal-entry-date{ font-size:11px; letter-spacing:.05em; color: var(--text-muted); margin-bottom:10px; text-transform:uppercase; }
+  .journal-entry-text{ font-size:14.5px; line-height:1.7; color: var(--text-primary); white-space:pre-wrap; word-break:break-word; }
+  .journal-entry-actions{ display:flex; justify-content:flex-end; gap:14px; margin-top:10px; }
+  .journal-entry-actions button{
+    width:auto; background:none; border:none; color: var(--text-muted); font-size:11px;
+    cursor:pointer; padding:0; text-decoration:underline;
+  }
+  .journal-entry-actions button:hover{ color: var(--ember); }
+  .journal-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding:12px 0 18px; }
+  input#journalTitleInput{ margin-bottom:10px; }
+  textarea#journalTextInput{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:12px 14px;
+    font-family:'Cormorant Garamond', serif; font-size:15px; margin-bottom:14px;
+    outline:none; resize:vertical; line-height:1.6;
+  }
+  textarea#journalTextInput:focus{ border-color: var(--ember); }
+  .journal-privacy-note{ font-size:11px; color: var(--text-muted); text-align:center; margin-top:2px; margin-bottom:14px; line-height:1.5; }
+
+  /* --- TARGETS panel --- */
+  .targets-date-nav{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+  .targets-date-nav button{ width:auto; padding:6px 12px; font-size:12px; margin-bottom:0; }
+  .targets-date-label{ font-family:'Fraunces', serif; font-size:14px; text-align:center; flex:1; color:var(--text-primary); }
+  .targets-columns{ display:flex; gap:12px; margin-bottom:8px; }
+  .targets-col{ flex:1; min-width:0; }
+  .targets-col-header{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); text-align:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--glass-border); }
+  .targets-list{ display:flex; flex-direction:column; gap:6px; max-height:230px; overflow-y:auto; margin-bottom:10px; min-height:36px; }
+  .target-item{ display:flex; align-items:flex-start; gap:7px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.4); border:1px solid var(--glass-border); font-size:12.5px; }
+  .target-item.done .target-text{ text-decoration:line-through; color:var(--text-muted); opacity:.7; }
+  .target-check{ width:17px; height:17px; border-radius:50%; border:1.5px solid var(--ember); flex:none; margin-top:1px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ember); background:transparent; line-height:1; }
+  .target-check.checked{ background:var(--ember); color:#1B140A; }
+  .target-check:disabled{ cursor:default; opacity:.6; }
+  .target-text{ flex:1; word-break:break-word; line-height:1.4; }
+  .target-text[contenteditable="true"]{ outline:1px dashed var(--ember); border-radius:4px; padding:1px 3px; }
+  .target-actions{ display:flex; gap:2px; flex:none; }
+  .target-actions button{ width:auto; padding:2px 5px; font-size:11px; background:none; border:none; color:var(--text-muted); cursor:pointer; }
+  .target-actions button:hover{ color:var(--ember); }
+  .targets-empty{ text-align:center; font-size:11px; color:var(--text-muted); padding:12px 4px; line-height:1.5; }
+  .targets-add-row{ display:flex; gap:6px; }
+  .targets-add-row input{ margin-bottom:0; font-size:12px; padding:8px 9px; }
+  .targets-add-row button{ width:auto; padding:0 12px; font-size:12px; margin-bottom:0; }
+  @media (max-width: 420px){
+    .targets-columns{ flex-direction:column; }
+    .targets-col{ margin-bottom:6px; }
+  }
+
+  /* --- TARGETS: money-lost tracker --- */
+  .loss-box{
+    margin-top:16px; padding-top:14px; border-top:1px solid var(--glass-border);
+  }
+  .loss-title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; text-align:center; }
+  .loss-range-row{ display:flex; gap:8px; margin-bottom:12px; }
+  .loss-range-btn{
+    flex:1; text-align:center; padding:8px 0; border-radius:9px; border:1px solid var(--glass-border);
+    color:var(--text-muted); font-size:12px; cursor:pointer; transition:all .15s ease; background:rgba(255,255,255,0.35);
+  }
+  .loss-range-btn.active{ border-color:var(--ember); color:var(--ember); background:rgba(227,160,82,0.12); }
+  .loss-summary{ display:flex; justify-content:space-around; text-align:center; margin-bottom:4px; }
+  .loss-summary .loss-col .loss-amount{ display:block; font-family:'Fraunces', serif; font-size:22px; color:var(--ember); }
+  .loss-summary .loss-col .loss-label{ font-size:11px; color:var(--text-muted); letter-spacing:.05em; }
+  .loss-total{ text-align:center; font-size:13px; color:var(--text-muted); margin-top:10px; }
+  .loss-total .loss-total-amount{ color:var(--ember); font-weight:500; }
+  .loss-loading{ text-align:center; font-size:12px; color:var(--text-muted); padding:6px 0; }
+
+  /* --- BREATHE OVERLAY --- */
+  #breatheOverlay{
+    position:fixed; inset:0; z-index:5;
+    background: rgba(8,10,16,0.72);
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+  }
+  .breathe-rings{
+    position:relative;
+    width:180px;
+    height:180px;
+}
+
+.breathe-rings span{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.3);
+    animation:ripple 6s infinite;
+}
+
+.breathe-rings span:nth-child(2){
+    animation-delay:2s;
+}
+
+.breathe-rings span:nth-child(3){
+    animation-delay:4s;
+}
+
+@keyframes ripple{
+
+0%{
+transform:scale(.5);
+opacity:1;
+}
+
+100%{
+transform:scale(1.8);
+opacity:0;
+}
+
+  }
+  .breathe-text{ margin-top: 26px; font-family:'Fraunces', serif; font-size:20px; letter-spacing:0.04em; color: #F0E9DA; }
+  .breathe-close{ margin-top: 36px; width:auto; padding:9px 22px; background:transparent; border:1px solid rgba(240,233,218,0.3); color:#D9CFBB; border-radius:10px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .stage-visual.breathing .orb,
+.breathe-rings span{
+animation:none;
+}
+  }
+
+  @media (max-width: 420px){
+    .folder-grid{ gap: 18px 12px; }
+    .folder-icon{ width:64px; height:64px; font-size:26px; }
+    .locket{ width:150px; height:150px; font-size:76px; }
+  }
+</style>
+</head>
+<body>
+
+<img class="bg-photo" src="assets/background.jpg" alt="">
+<div class="scrim"></div>
+  <div class="love-background">
+    RASHITA × SANJOK
+</div>
+
+<div class="stage">
+
+  <!-- COVER: grid of folders -->
+  <div id="cover">
+
+    <!-- QUOTE OF THE DAY — shared, dismissible, refreshes automatically each day -->
+    <div class="quote-card hidden" id="quoteCard">
+      <button class="quote-dismiss" id="quoteDismissBtn" title="Dismiss for today">✕</button>
+      <div class="quote-text" id="quoteText"></div>
+    </div>
+
+    <div class="folder-grid">
+
+      <div class="folder-item big" data-target="panel-meditation">
+        <div class="locket-wrap">
+          <div id="folder" class="locket">🧘</div>
+        </div>
+        <div class="folder-label">meditation</div>
+      </div>
+
+      <div class="small-folders-row">
+        <div class="folder-item small" data-target="panel-music">
+          <div class="folder-icon-wrap"><div class="folder-icon">🎵</div></div>
+          <div class="folder-label small-label">music</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-memories">
+          <div class="folder-icon-wrap"><div class="folder-icon">📷</div></div>
+          <div class="folder-label small-label">memories</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-moods">
+          <div class="folder-icon-wrap"><div class="folder-icon">💭</div></div>
+          <div class="folder-label small-label">moods</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-notes">
+          <div class="folder-icon-wrap"><div class="folder-icon">📝</div></div>
+          <div class="folder-label small-label">notes</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-targets">
+          <div class="folder-icon-wrap"><div class="folder-icon">🎯</div></div>
+          <div class="folder-label small-label">targets</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-journal">
+          <div class="folder-icon-wrap"><div class="folder-icon">📔</div></div>
+          <div class="folder-label small-label">journal</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-books">
+          <div class="folder-icon-wrap"><div class="folder-icon">📚</div></div>
+          <div class="folder-label small-label">books</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-report">
+          <div class="folder-icon-wrap"><div class="folder-icon">📊</div></div>
+          <div class="folder-label small-label">report</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="folder-hint">tap a folder to open</div>
+
+    <!-- PINNED board — stays on the front page until whoever pinned it removes it -->
+    <div class="pinned-board hidden" id="pinnedBoard">
+      <div class="pinned-board-title">📌 pinned</div>
+      <div id="pinnedList"></div>
+    </div>
+  </div>
+
+  <!-- APP PANEL -->
+  <div id="appPanel" class="hidden">
+    <div class="wordmark">✦ SAME MOMENT ✦</div>
+
+    <div id="configWarning" class="config-warning hidden">
+      This copy isn't connected to a database yet. Open the file, find
+      <code>firebaseConfig</code>, and paste in your Firebase project's values.
+    </div>
+
+    <!-- ===== MEDITATION ===== -->
+    <div class="app-panel-content" id="panel-meditation">
+
+      <div class="meditation-mode-row" id="meditationModeRow">
+        <div class="meditation-mode-btn active" data-mode="together">With partner</div>
+        <div class="meditation-mode-btn" data-mode="solo">Solo</div>
+      </div>
+
+      <div id="setup">
+        <label for="nameInput">Your name</label>
+        <input type="text" id="nameInput" placeholder="e.g. Ava" maxlength="20">
+
+        <label for="roomInput">Room code — share this with them</label>
+        <div class="row">
+          <input type="text" id="roomInput" placeholder="e.g. dawn-4471" maxlength="24">
+          <button class="btn-ghost" style="width:auto; padding:0 14px;" id="generateBtn">New</button>
+        </div>
+
+        <button class="btn-primary" id="joinBtn" disabled>Join room</button>
+      </div>
+
+      <div id="session" class="hidden">
+        <div class="stage-visual" id="stageVisual">
+          <div class="orb you"></div>
+          <div class="orb partner"></div>
+        </div>
+        <div class="timer" id="timerDisplay">10:00</div>
+        <div class="status" id="statusLine">waiting for you to begin</div>
+
+        <div class="chips" id="chips">
+          <div class="chip" data-min="5">5m</div>
+          <div class="chip active" data-min="10">10m</div>
+          <div class="chip" data-min="15">15m</div>
+          <div class="chip" data-min="20">20m</div>
+        </div>
+
+        <label>Session music</label>
+        <div class="meditation-track-list" id="meditationTrackList"></div>
+
+        <button class="btn-primary" id="startBtn">Begin together</button>
+        <button class="btn-ghost hidden" id="stopBtn">End session</button>
+        <button class="btn-ghost" id="breatheBtn">Breathe</button>
+
+        <div class="share-row">
+          <span>Room: <span class="code" id="roomCodeDisplay"></span></span>
+          <button class="copy-btn" id="copyBtn">Copy code</button>
+        </div>
+      </div>
+
+      <!-- ===== SOLO MEDITATION ===== -->
+      <div id="soloMeditation" class="hidden">
+
+        <div id="soloIdentityChooser">
+          <div class="status" style="margin-bottom:14px;">who are you?</div>
+          <div class="chips">
+            <div class="chip" id="chooseRashitaSolo">Rashita</div>
+            <div class="chip" id="chooseSanjokSolo">Sanjok</div>
+          </div>
+        </div>
+
+        <div id="soloBoard" class="hidden">
+          <div class="stage-visual" id="soloStageVisual">
+            <div class="orb you" style="opacity:.55; margin-left:0;"></div>
+          </div>
+          <div class="timer" id="soloTimerDisplay">10:00</div>
+          <div class="status" id="soloStatusLine">ready when you are</div>
+
+          <div class="chips" id="soloChips">
+            <div class="chip" data-min="5">5m</div>
+            <div class="chip active" data-min="10">10m</div>
+            <div class="chip" data-min="15">15m</div>
+            <div class="chip" data-min="20">20m</div>
+          </div>
+
+          <label>Session music</label>
+          <div class="meditation-track-list" id="soloMeditationTrackList"></div>
+
+          <button class="btn-primary" id="soloStartBtn">Begin</button>
+          <button class="btn-ghost hidden" id="soloStopBtn">End session</button>
+          <button class="btn-ghost" id="soloBreatheBtn">Breathe</button>
+
+          <div class="solo-history">
+            <div class="solo-history-title">your recent sessions</div>
+            <div class="solo-history-list" id="soloHistoryList"></div>
+          </div>
+
+          <div class="identity-hint" id="switchIdentitySolo">not you? switch</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MUSIC ===== -->
+    <div class="app-panel-content hidden" id="panel-music">
+      <div class="panel-header">our playlist</div>
+      <div class="playlist" id="playlistList"></div>
+      <div class="player-controls">
+        <button class="btn-ghost" id="prevTrackBtn">⏮ Prev</button>
+        <button class="btn-primary" id="playPauseBtn">▶ Play</button>
+        <button class="btn-ghost" id="nextTrackBtn">Next ⏭</button>
+      </div>
+      <div class="now-playing" id="nowPlaying">Select a song</div>
+    </div>
+
+    <!-- ===== MEMORIES ===== -->
+    <div class="app-panel-content hidden" id="panel-memories">
+      <div class="panel-header">our memories</div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <div class="gallery-hint">tap a photo to view it full-size</div>
+    </div>
+
+    <!-- ===== MOODS ===== -->
+    <div class="app-panel-content hidden" id="panel-moods">
+      <div class="panel-header">how are you feeling?</div>
+
+      <div id="identityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashita">Rashita</div>
+          <div class="chip" id="chooseSanjok">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="moodBoard" class="hidden">
+        <div class="mood-row" id="myMoodRow"></div>
+        <div class="mood-intensity-row" id="moodIntensityRow"></div>
+        <textarea id="moodNoteInput" rows="2" maxlength="200" placeholder="What's behind it? (optional)"></textarea>
+        <button class="btn-primary" id="postMoodBtn">Share mood</button>
+        <div class="mood-display" id="moodDisplay"></div>
+        <div class="mood-streak-row" id="moodStreakRow"></div>
+
+        <div class="mood-history">
+          <div class="mood-history-title">recent moods</div>
+          <div class="mood-history-list" id="moodHistoryList"></div>
+        </div>
+
+        <div class="identity-hint" id="switchIdentity">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== NOTES ===== -->
+    <div class="app-panel-content hidden" id="panel-notes">
+      <div class="panel-header">our notes</div>
+
+      <div id="notesIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaNotes">Rashita</div>
+          <div class="chip" id="chooseSanjokNotes">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="notesBoard" class="hidden">
+        <div class="notes-list" id="notesList"></div>
+        <label for="noteInput">Leave a note</label>
+        <textarea id="noteInput" rows="3" maxlength="400" placeholder="Write something for them..."></textarea>
+        <button class="btn-primary" id="postNoteBtn">Post note</button>
+        <div class="identity-hint" id="switchIdentityNotes">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== TARGETS ===== -->
+    <div class="app-panel-content hidden" id="panel-targets">
+      <div class="panel-header">our targets</div>
+
+      <div id="targetsIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaTargets">Rashita</div>
+          <div class="chip" id="chooseSanjokTargets">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="targetsBoard" class="hidden">
+        <div class="targets-date-nav">
+          <button class="btn-ghost" id="targetsPrevDay">←</button>
+          <div class="targets-date-label" id="targetsDateLabel"></div>
+          <button class="btn-ghost" id="targetsNextDay">→</button>
+        </div>
+        <div class="identity-hint" id="targetsTodayBtn" style="margin:0 0 14px;">jump to today</div>
+
+        <div class="targets-columns">
+          <div class="targets-col" data-partner="rashita">
+            <div class="targets-col-header">Rashita</div>
+            <div class="targets-list" id="targetsListRashita"></div>
+            <div class="targets-add-row hidden" id="targetsAddRowRashita">
+              <input type="text" id="targetsInputRashita" placeholder="Add a target..." maxlength="120">
+              <button class="btn-primary" id="targetsAddBtnRashita">Add</button>
+            </div>
+          </div>
+          <div class="targets-col" data-partner="sanjok">
+            <div class="targets-col-header">Sanjok</div>
+            <div class="targets-list" id="targetsListSanjok"></div>
+            <div class="targets-add-row hidden" id="targetsAddRowSanjok">
+              <input type="text" id="targetsInputSanjok" placeholder="Add a target..." maxlength="120">
+              <button class="btn-primary" id="targetsAddBtnSanjok">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="loss-box">
+          <div class="loss-title">💰 money lost to missed targets</div>
+          <div class="loss-range-row" id="lossRangeRow">
+            <div class="loss-range-btn active" data-range="day">Today</div>
+            <div class="loss-range-btn" data-range="week">This week</div>
+            <div class="loss-range-btn" data-range="month">This month</div>
+          </div>
+          <div id="lossContent">
+            <div class="loss-summary">
+              <div class="loss-col">
+                <span class="loss-amount" id="lossAmountRashita">₹0</span>
+                <span class="loss-label">Rashita</span>
+              </div>
+              <div class="loss-col">
+                <span class="loss-amount" id="lossAmountSanjok">₹0</span>
+                <span class="loss-label">Sanjok</span>
+              </div>
+            </div>
+            <div class="loss-total">Together: <span class="loss-total-amount" id="lossAmountTotal">₹0</span> lost so far</div>
+          </div>
+        </div>
+
+        <div class="identity-hint" id="switchIdentityTargets">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== JOURNAL (private) ===== -->
+    <div class="app-panel-content hidden" id="panel-journal">
+      <div class="panel-header">your journal</div>
+
+      <div id="journalIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaJournal">Rashita</div>
+          <div class="chip" id="chooseSanjokJournal">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="journalBoard" class="hidden">
+        <div class="journal-privacy-note">Only visible to you once you're signed in.</div>
+        <div class="journal-list" id="journalList"></div>
+
+        <label for="journalTitleInput">Title (optional)</label>
+        <input type="text" id="journalTitleInput" maxlength="80" placeholder="Give this entry a title...">
+        <label for="journalTextInput">Entry</label>
+        <textarea id="journalTextInput" rows="5" maxlength="4000" placeholder="Write whatever you need to..."></textarea>
+        <button class="btn-primary" id="postJournalBtn">Save entry</button>
+
+        <div class="identity-hint" id="switchIdentityJournal">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== BOOKS ===== -->
+    <div class="app-panel-content hidden" id="panel-books">
+      <div class="panel-header">our books</div>
+
+      <div id="booksIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaBooks">Rashita</div>
+          <div class="chip" id="chooseSanjokBooks">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="booksBoard" class="hidden">
+        <div class="continue-reading hidden" id="continueReadingBanner"></div>
+        <div class="book-upload-row">
+          <label for="bookTitleInput">Title</label>
+          <input type="text" id="bookTitleInput" maxlength="120" placeholder="Book title">
+          <label class="book-file-label" id="bookFileLabel">Choose a file to upload</label>
+          <input type="file" id="bookFileInput" class="hidden" accept=".pdf,.epub,.txt,.doc,.docx">
+          <div class="upload-progress hidden" id="uploadProgress">Uploading...</div>
+          <button class="btn-primary" id="postBookBtn">Upload book</button>
+        </div>
+        <div class="book-grid" id="bookList"></div>
+        <div class="identity-hint" id="switchIdentityBooks">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== REPORT ===== -->
+    <div class="app-panel-content hidden" id="panel-report">
+      <div class="panel-header">our report</div>
+      <div class="loss-range-row" id="reportRangeRow">
+        <div class="loss-range-btn" data-range="week">This week</div>
+        <div class="loss-range-btn active" data-range="month">This month</div>
+        <div class="loss-range-btn" data-range="all">All time</div>
+      </div>
+      <div id="reportContent">
+        <div class="report-loading">Loading report...</div>
+      </div>
+      <div class="report-note">Targets, moods, and meditation minutes logged in the app. Not a medical or clinical record — just your own history, for your own reflection.</div>
+    </div>
+
+    <button class="btn-ghost" id="closeFolderBtn" style="margin-top:16px;">Close folder</button>
+  </div>
+
+</div>
+
+<!-- LOGIN MODAL (per-person password) -->
+<div id="loginModalOverlay" class="hidden">
+  <div class="login-modal">
+    <div class="login-modal-title" id="loginModalTitle">Enter your password</div>
+    <div class="login-modal-sub" id="loginModalSub"></div>
+    <input type="password" id="loginPasswordInput" placeholder="Password" maxlength="60">
+    <input type="password" id="loginPasswordConfirmInput" class="hidden" placeholder="Confirm password" maxlength="60">
+    <div class="login-error" id="loginError"></div>
+    <button class="btn-primary" id="loginSubmitBtn">Continue</button>
+    <button class="btn-ghost" id="loginCancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- BREATHE OVERLAY -->
+<div id="breatheOverlay" class="hidden">
+  <div class="breathe-rings">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+  <div class="breathe-text" id="breatheText">breathe in...</div>
+  <button class="breathe-close" id="breatheCloseBtn">Close</button>
+</div>
+
+<!-- MEMORIES LIGHTBOX -->
+<div id="memoriesLightbox" class="hidden">
+  <img id="lightboxImg" src="" alt="">
+  <div id="lightboxCaption"></div>
+  <div class="lightbox-controls">
+    <button class="breathe-close" id="lightboxPrev">← Prev</button>
+    <button class="breathe-close" id="lightboxNext">Next →</button>
+    <button class="breathe-close" id="lightboxClose">Close</button>
+  </div>
+</div>
+
+<!-- BOOK READER -->
+<div id="bookReaderModal" class="hidden">
+  <div class="reader-topbar">
+    <div class="reader-title" id="readerTitle"></div>
+    <button class="reader-close" id="readerCloseBtn">Close</button>
+  </div>
+  <div class="reader-body" id="readerBody"></div>
+  <div class="reader-navbar">
+    <button class="btn-ghost" id="readerPrevBtn">← Prev</button>
+    <div class="reader-page-indicator" id="readerPageIndicator">–</div>
+    <button class="btn-ghost" id="readerNextBtn">Next →</button>
+  </div>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="assets/music.mp3" type="audio/mpeg">
+</audio>
+<audio id="playlistPlayer"></audio>
+
+<script>
+(function(){
+  // ---------------------------------------------------------------
+  // Firebase project config (already filled in)
+  // ---------------------------------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyApPo1wZYRx0Ni47Ap5bV_2ik2GoPPZrmI",
+    authDomain: "newweb-6bd03.firebaseapp.com",
+    databaseURL: "https://newweb-6bd03-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "newweb-6bd03",
+  };
+
+  let db = null, firebaseReady = false;
+  try{
+    if(!firebaseConfig.databaseURL.startsWith("PASTE_")){
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      firebaseReady = true;
+    }
+  }catch(e){ console.error("Firebase failed to initialize:", e); }
+
+  let room=null, myName=null, durationMin=10, roomRef=null, presenceInterval=null;
+  let audioCtx=null, chimedForStart=false, chimedForEnd=false;
+
+  // Cache of the last known room state + a dedicated local ticker,
+  // so the countdown redraws every second instead of only when Firebase
+  // pushes an update.
+  let lastState = null;
+  let myKeyGlobal = null;
+  let tickInterval = null;
+
+  // Track the offset between this device's clock and Firebase's
+  // server clock. Two devices comparing raw Date.now() values can be
+  // off by several seconds, which silently breaks "is my partner here"
+  // presence checks and the countdown's elapsed-time math. getServerNow()
+  // gives every device the same trusted clock instead.
+  let serverTimeOffset = 0;
+  function getServerNow(){ return Date.now() + serverTimeOffset; }
+
+  const folder = document.getElementById('folder');
+  const cover = document.getElementById('cover');
+  const appPanel = document.getElementById('appPanel');
+  const closeFolderBtn = document.getElementById('closeFolderBtn');
+  const configWarning = document.getElementById('configWarning');
+  const setupEl = document.getElementById('setup');
+  const sessionEl = document.getElementById('session');
+  const nameInput = document.getElementById('nameInput');
+  const roomInput = document.getElementById('roomInput');
+  const joinBtn = document.getElementById('joinBtn');
+  const generateBtn = document.getElementById('generateBtn');
+  const stageVisual = document.getElementById('stageVisual');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const statusLine = document.getElementById('statusLine');
+  const chips = document.querySelectorAll('#chips .chip');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const breatheBtn = document.getElementById('breatheBtn');
+  const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+  const copyBtn = document.getElementById('copyBtn');
+  const breatheOverlay = document.getElementById('breatheOverlay');
+  const breatheCloseBtn = document.getElementById('breatheCloseBtn');
+  const breatheText = document.getElementById('breatheText');
+  const bgMusic = document.getElementById('bgMusic');
+  const meditationTrackList = document.getElementById('meditationTrackList');
+
+  // --- Meditation session music picker ---
+  // Separate from the Music panel's playlist — replace MEDITATION_TRACKS
+  // below with your own files/titles for meditation sessions specifically.
+  // Put the mp3s in an "assets/meditation/" folder next to this html file
+  // (or wherever you like — just match the "src" paths here).
+  const MEDITATION_TRACKS = [
+    { title: "Guided Meditation A", src: "assets/A.mp3" },
+    { title: "Guided Meditation B", src: "assets/B.mp3" },
+    { title: "Guided Meditation C", src: "assets/C.mp3" },
+    { title: "Brain Meditation (10 min)", src: "assets/TunePocket-Brain-Meditation-10-Min-Preview.mp3" },
+    { title: "10 Min Meditation 1", src: "assets/10min1.mp3" },
+    { title: "10 Min Meditation 2", src: "assets/10min2.mp3" },
+    { title: "10 Min Meditation 3", src: "assets/10min3.mp3" },
+  ];
+
+  // Choice is remembered per-device (each person picks their own
+  // ambiance locally); it starts when the session begins, stops when
+  // it ends, and can be swapped any time, including mid-session.
+  const MEDITATION_NONE = -1;
+  let meditationTrackIndex = (() => {
+    const saved = parseInt(localStorage.getItem('sameMomentMeditationTrack'), 10);
+    return Number.isInteger(saved) && saved >= MEDITATION_NONE && saved < MEDITATION_TRACKS.length ? saved : MEDITATION_NONE;
+  })();
+  let sessionMusicPlaying = false;
+
+  function renderMeditationTrackList(){
+    if(!meditationTrackList) return;
+    meditationTrackList.innerHTML = '';
+
+    const noneItem = document.createElement('div');
+    noneItem.className = 'meditation-track-item' + (meditationTrackIndex === MEDITATION_NONE ? ' active' : '');
+    noneItem.innerHTML = '<span>No music</span><span class="check">✓</span>';
+    noneItem.addEventListener('click', () => selectMeditationTrack(MEDITATION_NONE));
+    meditationTrackList.appendChild(noneItem);
+
+    MEDITATION_TRACKS.forEach((track, i) => {
+      const item = document.createElement('div');
+      item.className = 'meditation-track-item' + (i === meditationTrackIndex ? ' active' : '');
+      item.innerHTML = '<span>' + track.title + '</span><span class="check">✓</span>';
+      item.addEventListener('click', () => selectMeditationTrack(i));
+      meditationTrackList.appendChild(item);
+    });
+  }
+
+  function selectMeditationTrack(i){
+    meditationTrackIndex = i;
+    localStorage.setItem('sameMomentMeditationTrack', String(i));
+    renderMeditationTrackList();
+    // If a session is currently playing, switch to the newly chosen
+    // track (or silence) right away instead of waiting for a restart.
+    if(sessionMusicPlaying) playMeditationMusic();
+  }
+
+  function playMeditationMusic(){
+    bgMusic.pause();
+    if(meditationTrackIndex === MEDITATION_NONE){
+      bgMusic.removeAttribute('src');
+      return;
+    }
+    bgMusic.src = MEDITATION_TRACKS[meditationTrackIndex].src;
+    bgMusic.volume = 0.25;
+    bgMusic.currentTime = 0;
+    bgMusic.play().catch(() => {});
+  }
+
+  function stopMeditationMusic(){
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+
+  renderMeditationTrackList();
+
+  if(!firebaseReady){
+    configWarning.classList.remove('hidden');
+  } else {
+    db.ref('.info/serverTimeOffset').on('value', snap => {
+      serverTimeOffset = snap.val() || 0;
+    });
+  }
+
+  // --- Folder grid: open/close ---
+  function openPanel(targetId){
+    document.querySelectorAll('.app-panel-content').forEach(p => p.classList.add('hidden'));
+    const panel = document.getElementById(targetId);
+    if(panel) panel.classList.remove('hidden');
+    cover.classList.add('hidden');
+    appPanel.classList.remove('hidden');
+    closeFolderBtn.classList.remove('hidden');
+
+    try{
+      if(targetId === 'panel-music') initMusic();
+      if(targetId === 'panel-memories') initMemories();
+      if(targetId === 'panel-moods') initMoods();
+      if(targetId === 'panel-notes') initNotes();
+      if(targetId === 'panel-targets') initTargets();
+      if(targetId === 'panel-journal' && typeof initJournal === 'function') initJournal();
+      if(targetId === 'panel-books' && typeof initBooks === 'function') initBooks();
+      if(targetId === 'panel-report' && typeof initReport === 'function') initReport();
+    }catch(e){ console.error('Panel init failed for ' + targetId + ':', e); }
+  }
+
+  document.querySelectorAll('.folder-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const icon = item.querySelector('.locket, .folder-icon');
+      if(icon) icon.classList.add('opening');
+      setTimeout(() => {
+        openPanel(item.dataset.target);
+        if(icon) icon.classList.remove('opening');
+      }, 650);
+    });
+  });
+
+  closeFolderBtn.addEventListener('click', () => {
+    appPanel.classList.add('hidden');
+    closeFolderBtn.classList.add('hidden');
+    cover.classList.remove('hidden');
+  });
+
+  // --- Setup form (meditation) ---
+  function updateJoinEnabled(){
+    joinBtn.disabled = !firebaseReady || !(nameInput.value.trim() && roomInput.value.trim());
+  }
+  nameInput.addEventListener('input', updateJoinEnabled);
+  roomInput.addEventListener('input', updateJoinEnabled);
+
+  const words = ['dawn','dusk','still','quiet','soft','ember','moon','tide','calm','warm'];
+  generateBtn.addEventListener('click', () => {
+    const w = words[Math.floor(Math.random()*words.length)];
+    const n = Math.floor(1000 + Math.random()*9000);
+    roomInput.value = w + '-' + n;
+    updateJoinEnabled();
+  });
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      durationMin = parseInt(chip.dataset.min, 10);
+    });
+  });
+
+  function playChime(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      [523.25, 783.99].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now + i*0.15);
+        gain.gain.linearRampToValueAtTime(0.15, now + i*0.15 + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.15 + 2.2);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(now + i*0.15); osc.stop(now + i*0.15 + 2.3);
+      });
+    }catch(e){}
+  }
+
+  function sanitizeKey(str){ return str.replace(/[.#$\[\]/]/g, '_'); }
+  function formatTime(totalSeconds){
+    const s = Math.max(0, Math.ceil(totalSeconds));
+    const m = Math.floor(s/60), sec = s%60;
+    return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+  }
+
+  function joinRoom(){
+    myName = nameInput.value.trim();
+    const myKey = sanitizeKey(myName);
+    myKeyGlobal = myKey;
+    room = roomInput.value.trim().toLowerCase().replace(/\s+/g, '-');
+    roomRef = db.ref('rooms/' + sanitizeKey(room));
+
+    roomRef.once('value').then(snapshot => {
+      if(!snapshot.exists()){
+        roomRef.set({ duration: durationMin * 60, startTime: null, presence: {} });
+      }
+      roomRef.child('presence/' + myKey).set(firebase.database.ServerValue.TIMESTAMP);
+
+      setupEl.classList.add('hidden');
+      sessionEl.classList.remove('hidden');
+      roomCodeDisplay.textContent = room;
+
+      presenceInterval = setInterval(() => {
+        roomRef.child('presence/' + myKey).set(firebase.database.ServerValue.TIMESTAMP);
+      }, 2000);
+
+      // Firebase listener: only fires when the room data actually changes.
+      // Cache the value — do NOT rely on this alone to drive the countdown.
+      roomRef.on('value', snap => {
+        lastState = snap.val();
+        render(lastState, myKey);
+      });
+
+      // Local ticker repaints the timer every second using the cached
+      // state, so the display counts down smoothly.
+      if(tickInterval) clearInterval(tickInterval);
+      tickInterval = setInterval(() => {
+        if(lastState) render(lastState, myKeyGlobal);
+      }, 1000);
+    });
+  }
+  joinBtn.addEventListener('click', joinRoom);
+
+startBtn.addEventListener('click', () => {
+
+  sessionMusicPlaying = true;
+  playMeditationMusic();
+
+  chimedForStart = false;
+  chimedForEnd = false;
+
+  roomRef.update({
+    duration: durationMin * 60,
+    startTime: firebase.database.ServerValue.TIMESTAMP
+  });
+
+});
+  stopBtn.addEventListener('click', () => {
+
+  sessionMusicPlaying = false;
+  stopMeditationMusic();
+
+  roomRef.update({ startTime: null });
+
+});
+
+
+  function render(state, myKey){
+    if(!state) return;
+    const now = getServerNow();
+    const presence = state.presence || {};
+    const partnerKey = Object.keys(presence).find(k => k !== myKey);
+    const partnerPresent = partnerKey && (now - presence[partnerKey] < 6000);
+
+    stageVisual.classList.toggle('both', !!partnerPresent);
+
+    if(!state.startTime){
+      const mins = Math.round((state.duration || durationMin*60) / 60);
+      chips.forEach(c => c.classList.toggle('active', parseInt(c.dataset.min,10) === mins));
+    }
+
+    if(state.startTime){
+      const elapsed = (now - state.startTime) / 1000;
+      const remaining = state.duration - elapsed;
+      startBtn.classList.add('hidden');
+      stopBtn.classList.remove('hidden');
+      chips.forEach(c => { c.style.pointerEvents='none'; c.style.opacity='0.5'; });
+      stageVisual.classList.add('breathing');
+
+      if(remaining > 0){
+        timerDisplay.textContent = formatTime(remaining);
+        statusLine.textContent = partnerPresent ? 'sitting together' : 'sitting quietly — waiting for them to join';
+        statusLine.classList.add('lit');
+        if(!chimedForStart){ chimedForStart = true; playChime(); }
+      } else {
+        timerDisplay.textContent = '00:00';
+        statusLine.textContent = 'session complete';
+
+        sessionMusicPlaying = false;
+        stopMeditationMusic();
+
+        if(!chimedForEnd){
+          chimedForEnd = true;
+          playChime();
+          // Clear startTime once the countdown naturally finishes, so the
+          // room doesn't stay permanently "expired" for the next visit.
+          roomRef.update({ startTime: null });
+        }
+        stageVisual.classList.remove('breathing');
+      }
+    } else {
+    startBtn.classList.remove('hidden');
+      startBtn.disabled = !partnerPresent; startBtn.textContent =partnerPresent ? 'Begin together' : 'Waiting for them to join…'; stopBtn.classList.add('hidden'); chips.forEach(c => { c.style.pointerEvents = 'auto'; c.style.opacity = '1'; }); stageVisual.classList.remove('breathing'); timerDisplay.textContent = formatTime(state.duration || durationMin*60); statusLine.textContent = partnerPresent ? "they're here — ready when you are" : 'waiting for them to join'; statusLine.classList.remove('lit');
+    }
+  }
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(room).then(() => {
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => { copyBtn.textContent = 'Copy code'; }, 1500);
+    }).catch(() => {});
+  });
+
+  // --- Standalone Breathe guide (independent of session) ---
+  let breatheTextTimer = null;
+  function startBreathe(){
+    breatheOverlay.classList.remove('hidden');
+    let phase = 'in';
+    breatheText.textContent = 'breathe in...';
+    clearInterval(breatheTextTimer);
+    breatheTextTimer = setInterval(() => {
+      phase = phase === 'in' ? 'out' : 'in';
+      breatheText.textContent = phase === 'in' ? 'breathe in...' : 'breathe out...';
+    }, 4000);
+  }
+  breatheBtn.addEventListener('click', startBreathe);
+  breatheCloseBtn.addEventListener('click', () => {
+    breatheOverlay.classList.add('hidden');
+    clearInterval(breatheTextTimer);
+  });
+
+  // =================================================================
+  // MEDITATION — mode toggle (with partner / solo)
+  // =================================================================
+  const meditationModeRow = document.getElementById('meditationModeRow');
+  const soloMeditation = document.getElementById('soloMeditation');
+
+  if(meditationModeRow){
+    meditationModeRow.querySelectorAll('.meditation-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        meditationModeRow.querySelectorAll('.meditation-mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        if(mode === 'solo'){
+          setupEl.classList.add('hidden');
+          sessionEl.classList.add('hidden');
+          soloMeditation.classList.remove('hidden');
+          initSoloMeditation();
+        } else {
+          soloMeditation.classList.add('hidden');
+          setupEl.classList.remove('hidden');
+        }
+      });
+    });
+  }
+
+  // =================================================================
+  // SOLO MEDITATION — one person sits alone, on their own timer.
+  // Uses the same shared identity (Rashita/Sanjok) as Moods/Notes/
+  // Targets. Every completed (or manually ended) session is written
+  // to Firebase under soloSessions/<identity>/<pushId>, so history is
+  // kept in the app itself and survives closing the page/device.
+  // =================================================================
+  const soloIdentityChooser = document.getElementById('soloIdentityChooser');
+  const soloBoard = document.getElementById('soloBoard');
+  const soloStageVisual = document.getElementById('soloStageVisual');
+  const soloTimerDisplay = document.getElementById('soloTimerDisplay');
+  const soloStatusLine = document.getElementById('soloStatusLine');
+  const soloChips = document.querySelectorAll('#soloChips .chip');
+  const soloStartBtn = document.getElementById('soloStartBtn');
+  const soloStopBtn = document.getElementById('soloStopBtn');
+  const soloBreatheBtn = document.getElementById('soloBreatheBtn');
+  const soloMeditationTrackList = document.getElementById('soloMeditationTrackList');
+  const soloHistoryList = document.getElementById('soloHistoryList');
+  const switchIdentitySolo = document.getElementById('switchIdentitySolo');
+
+  let soloDurationMin = 10;
+  let soloIntervalId = null;
+  let soloRemainingSec = 0;
+  let soloRunning = false;
+  let soloSessionStartedAt = null;
+  let soloHistoryListenerAttached = false;
+
+  function initSoloMeditation(){
+    try{
+      if(!soloIdentityChooser || !soloBoard) return;
+      if(myIdentity){
+        soloIdentityChooser.classList.add('hidden');
+        soloBoard.classList.remove('hidden');
+        setupSoloBoard();
+      } else {
+        soloIdentityChooser.classList.remove('hidden');
+        soloBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initSoloMeditation failed:', e); }
+  }
+
+  function setupSoloBoard(){
+    renderSoloTrackList();
+    if(!soloRunning){
+      soloTimerDisplay.textContent = formatTime(soloDurationMin * 60);
+    }
+    if(!soloHistoryListenerAttached && firebaseReady && myIdentity){
+      soloHistoryListenerAttached = true;
+      attachSoloHistoryListener();
+    }
+  }
+
+  function attachSoloHistoryListener(){
+    if(!firebaseReady || !myIdentity) return;
+    db.ref('soloSessions/' + myIdentity).limitToLast(10).on('value', snap => {
+      renderSoloHistory(snap.val() || {});
+    });
+  }
+
+  function renderSoloHistory(data){
+    soloHistoryList.innerHTML = '';
+    const entries = Object.keys(data)
+      .map(key => Object.assign({ key: key }, data[key]))
+      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+
+    if(entries.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'solo-history-empty';
+      empty.textContent = 'No solo sessions yet — begin one below.';
+      soloHistoryList.appendChild(empty);
+      return;
+    }
+
+    entries.forEach(entry => {
+      const item = document.createElement('div');
+      item.className = 'solo-history-item';
+      const when = entry.completedAt ? new Date(entry.completedAt).toLocaleDateString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+      const mins = Math.round((entry.durationSeconds || 0) / 60);
+      item.innerHTML = '<span>' + when + '</span><span class="shi-mins">' + mins + ' min</span>';
+      soloHistoryList.appendChild(item);
+    });
+  }
+
+  function renderSoloTrackList(){
+    if(!soloMeditationTrackList) return;
+    soloMeditationTrackList.innerHTML = '';
+
+    const noneItem = document.createElement('div');
+    noneItem.className = 'meditation-track-item' + (meditationTrackIndex === MEDITATION_NONE ? ' active' : '');
+    noneItem.innerHTML = '<span>No music</span><span class="check">✓</span>';
+    noneItem.addEventListener('click', () => {
+      selectMeditationTrack(MEDITATION_NONE);
+      renderSoloTrackList();
+    });
+    soloMeditationTrackList.appendChild(noneItem);
+
+    MEDITATION_TRACKS.forEach((track, i) => {
+      const item = document.createElement('div');
+      item.className = 'meditation-track-item' + (i === meditationTrackIndex ? ' active' : '');
+      item.innerHTML = '<span>' + track.title + '</span><span class="check">✓</span>';
+      item.addEventListener('click', () => {
+        selectMeditationTrack(i);
+        renderSoloTrackList();
+      });
+      soloMeditationTrackList.appendChild(item);
+    });
+  }
+
+  soloChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      if(soloRunning) return;
+      soloChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      soloDurationMin = parseInt(chip.dataset.min, 10);
+      soloTimerDisplay.textContent = formatTime(soloDurationMin * 60);
+    });
+  });
+
+  function saveSoloSession(actualSeconds){
+    if(!firebaseReady || !myIdentity || actualSeconds < 1) return;
+    db.ref('soloSessions/' + myIdentity).push({
+      durationSeconds: Math.round(actualSeconds),
+      completedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+  function soloTick(){
+    soloRemainingSec -= 1;
+    if(soloRemainingSec <= 0){
+      soloTimerDisplay.textContent = '00:00';
+      soloStatusLine.textContent = 'session complete';
+      soloStatusLine.classList.add('lit');
+      playChime();
+      finishSolo(soloDurationMin * 60);
+    } else {
+      soloTimerDisplay.textContent = formatTime(soloRemainingSec);
+    }
+  }
+
+  function finishSolo(actualSeconds){
+    soloRunning = false;
+    clearInterval(soloIntervalId);
+    soloIntervalId = null;
+    sessionMusicPlaying = false;
+    stopMeditationMusic();
+    soloStageVisual.classList.remove('breathing');
+    soloStartBtn.classList.remove('hidden');
+    soloStartBtn.textContent = 'Begin';
+    soloStopBtn.classList.add('hidden');
+    soloChips.forEach(c => { c.style.pointerEvents = 'auto'; c.style.opacity = '1'; });
+    saveSoloSession(actualSeconds);
+  }
+
+  soloStartBtn.addEventListener('click', () => {
+    if(soloRunning) return;
+    soloRunning = true;
+    soloSessionStartedAt = Date.now();
+    soloRemainingSec = soloDurationMin * 60;
+    soloStatusLine.textContent = 'sitting quietly';
+    soloStatusLine.classList.add('lit');
+    soloStageVisual.classList.add('breathing');
+    soloStartBtn.classList.add('hidden');
+    soloStopBtn.classList.remove('hidden');
+    soloChips.forEach(c => { c.style.pointerEvents = 'none'; c.style.opacity = '0.5'; });
+
+    sessionMusicPlaying = true;
+    playMeditationMusic();
+    playChime();
+
+    clearInterval(soloIntervalId);
+    soloIntervalId = setInterval(soloTick, 1000);
+  });
+
+  soloStopBtn.addEventListener('click', () => {
+    if(!soloRunning) return;
+    const elapsedSeconds = (soloDurationMin * 60) - soloRemainingSec;
+    soloStatusLine.textContent = 'ready when you are';
+    soloStatusLine.classList.remove('lit');
+    finishSolo(elapsedSeconds);
+    soloTimerDisplay.textContent = formatTime(soloDurationMin * 60);
+  });
+
+  if(soloBreatheBtn) soloBreatheBtn.addEventListener('click', startBreathe);
+
+  const chooseRashitaSoloBtn = document.getElementById('chooseRashitaSolo');
+  const chooseSanjokSoloBtn = document.getElementById('chooseSanjokSolo');
+  if(chooseRashitaSoloBtn) chooseRashitaSoloBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokSoloBtn) chooseSanjokSoloBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  if(switchIdentitySolo) switchIdentitySolo.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentitySolo failed:', e); }
+  });
+
+  // =================================================================
+  // MUSIC — playlist. Replace TRACKS with your real files/titles.
+  // Put the mp3s in an "assets/music/" folder next to this html file.
+  // =================================================================
+  const TRACKS = [
+    { title: "Behos", src: "behos.mp3" },
+    { title: "Dooron", src: "dooron.mp3" },
+    { title: "Jindagi Aur Kuch Bhi Nahi", src: "jindagi aur kuch bhi nahi.mp3" },
+    { title: "Tum Saath Saath Ho", src: "tum saath saath ho.mp3" },
+    { title: "They Say", src: "They say.mp3" },
+    { title: "Bageicha", src: "bageicha.mp3" },
+    { title: "Chukar Mere Maan Ko", src: "chukar mere maan ko.mp3" },
+    { title: "Hum Tum Kitne Paas", src: "hum tum kitne paas.mp3" },
+    { title: "Kho Betein Hain", src: "kho betein hain.mp3" },
+    { title: "Ma Haraye", src: "ma haraye.mp3" },
+    { title: "Yeh Kaisa Rishta Hai", src: "yeh kaisa rishta hai.mp3" },
+  ];
+  let currentTrackIndex = -1;
+  let musicInitialized = false;
+  const playlistPlayer = document.getElementById('playlistPlayer');
+  const playlistList = document.getElementById('playlistList');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const prevTrackBtn = document.getElementById('prevTrackBtn');
+  const nextTrackBtn = document.getElementById('nextTrackBtn');
+  const nowPlaying = document.getElementById('nowPlaying');
+
+  function renderPlaylist(){
+    playlistList.innerHTML = '';
+    TRACKS.forEach((track, i) => {
+      const item = document.createElement('div');
+      item.className = 'track-item' + (i === currentTrackIndex ? ' active' : '');
+      item.textContent = track.title;
+      item.addEventListener('click', () => playTrack(i));
+      playlistList.appendChild(item);
+    });
+  }
+
+  function playTrack(i){
+    if(i < 0 || i >= TRACKS.length) return;
+    currentTrackIndex = i;
+    playlistPlayer.src = TRACKS[i].src;
+    playlistPlayer.play().catch(() => {});
+    playPauseBtn.textContent = '⏸ Pause';
+    nowPlaying.textContent = TRACKS[i].title;
+    renderPlaylist();
+  }
+
+  playPauseBtn.addEventListener('click', () => {
+    if(currentTrackIndex === -1){
+      playTrack(0);
+      return;
+    }
+    if(playlistPlayer.paused){
+      playlistPlayer.play().catch(() => {});
+      playPauseBtn.textContent = '⏸ Pause';
+    } else {
+      playlistPlayer.pause();
+      playPauseBtn.textContent = '▶ Play';
+    }
+  });
+
+  prevTrackBtn.addEventListener('click', () => {
+    if(TRACKS.length === 0) return;
+    const i = currentTrackIndex <= 0 ? TRACKS.length - 1 : currentTrackIndex - 1;
+    playTrack(i);
+  });
+  nextTrackBtn.addEventListener('click', () => {
+    if(TRACKS.length === 0) return;
+    const i = currentTrackIndex >= TRACKS.length - 1 ? 0 : currentTrackIndex + 1;
+    playTrack(i);
+  });
+  playlistPlayer.addEventListener('ended', () => {
+    nextTrackBtn.click();
+  });
+
+  function initMusic(){
+    try{
+      if(musicInitialized) return;
+      musicInitialized = true;
+      renderPlaylist();
+    }catch(e){ console.error('initMusic failed:', e); }
+  }
+
+  // =================================================================
+  // MEMORIES — photo gallery. Replace PHOTOS with your real files.
+  // Put the images in an "assets/memories/" folder next to this html file.
+  // =================================================================
+  const PHOTOS = [
+    { src: "1.jpg", caption: "Add a caption here" },
+    { src: "2.jpg", caption: "Add a caption here" },
+    { src: "3.jpg", caption: "Add a caption here" },
+    { src: "4.jpg", caption: "Add a caption here" },
+    { src: "5.jpg", caption: "Add a caption here" },
+  ];
+  let memoriesInitialized = false;
+  let lightboxIndex = 0;
+  const galleryGrid = document.getElementById('galleryGrid');
+  const memoriesLightbox = document.getElementById('memoriesLightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxPrev = document.getElementById('lightboxPrev');
+  const lightboxNext = document.getElementById('lightboxNext');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  function renderGallery(){
+    galleryGrid.innerHTML = '';
+    PHOTOS.forEach((photo, i) => {
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = photo.caption;
+      img.addEventListener('click', () => openLightbox(i));
+      galleryGrid.appendChild(img);
+    });
+  }
+
+  function openLightbox(i){
+    lightboxIndex = i;
+    updateLightbox();
+    memoriesLightbox.classList.remove('hidden');
+  }
+  function updateLightbox(){
+    const photo = PHOTOS[lightboxIndex];
+    lightboxImg.src = photo.src;
+    lightboxCaption.textContent = photo.caption;
+  }
+  lightboxPrev.addEventListener('click', () => {
+    lightboxIndex = lightboxIndex <= 0 ? PHOTOS.length - 1 : lightboxIndex - 1;
+    updateLightbox();
+  });
+  lightboxNext.addEventListener('click', () => {
+    lightboxIndex = lightboxIndex >= PHOTOS.length - 1 ? 0 : lightboxIndex + 1;
+    updateLightbox();
+  });
+  lightboxClose.addEventListener('click', () => {
+    memoriesLightbox.classList.add('hidden');
+  });
+
+  function initMemories(){
+    try{
+      if(memoriesInitialized) return;
+      memoriesInitialized = true;
+      renderGallery();
+    }catch(e){ console.error('initMemories failed:', e); }
+  }
+
+  // =================================================================
+  // MOODS — each partner picks who they are once, then taps an emoji.
+  // Both of you see each other's current mood live via Firebase.
+  // =================================================================
+  const MOOD_EMOJIS = ['😊','🥰','😴','😢','😤','🤔','😌','🥳'];
+  const MOOD_INTENSITIES = [1, 2, 3, 4, 5];
+  const PARTNER_NAMES = { rashita: 'Rashita', sanjok: 'Sanjok' };
+  let myIdentity = localStorage.getItem('sameMomentIdentity');
+  let moodsListenerAttached = false;
+  let moodRowRendered = false;
+  let moodIntensityRendered = false;
+  let pendingMoodEmoji = null;
+  let pendingMoodIntensity = 3;
+  let moodHistoryListenerAttached = false;
+
+  const identityChooser = document.getElementById('identityChooser');
+  const moodBoard = document.getElementById('moodBoard');
+  const myMoodRow = document.getElementById('myMoodRow');
+  const moodDisplay = document.getElementById('moodDisplay');
+  const switchIdentity = document.getElementById('switchIdentity');
+  const moodIntensityRow = document.getElementById('moodIntensityRow');
+  const moodNoteInput = document.getElementById('moodNoteInput');
+  const postMoodBtn = document.getElementById('postMoodBtn');
+  const moodStreakRow = document.getElementById('moodStreakRow');
+  const moodHistoryList = document.getElementById('moodHistoryList');
+
+  function initMoods(){
+    try{
+      if(myIdentity){
+        identityChooser.classList.add('hidden');
+        moodBoard.classList.remove('hidden');
+        setupMoodBoard();
+      } else {
+        identityChooser.classList.remove('hidden');
+        moodBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initMoods failed:', e); }
+  }
+
+  function setIdentity(id){
+    try{
+      myIdentity = id;
+      localStorage.setItem('sameMomentIdentity', id);
+      initMoods();
+      initNotes();
+      initTargets();
+      if(typeof initSoloMeditation === 'function') initSoloMeditation();
+      if(typeof initJournal === 'function') initJournal();
+      if(typeof initBooks === 'function') initBooks();
+      renderPinnedBoard();
+    }catch(e){ console.error('setIdentity failed:', e); }
+  }
+
+  function logoutIdentity(){
+    try{
+      localStorage.removeItem('sameMomentIdentity');
+      myIdentity = null;
+      initMoods();
+      initNotes();
+      initTargets();
+      if(typeof initSoloMeditation === 'function') initSoloMeditation();
+      if(typeof initJournal === 'function') initJournal();
+      if(typeof initBooks === 'function') initBooks();
+      renderPinnedBoard();
+    }catch(e){ console.error('logoutIdentity failed:', e); }
+  }
+
+  const chooseRashitaBtn = document.getElementById('chooseRashita');
+  const chooseSanjokBtn = document.getElementById('chooseSanjok');
+  if(chooseRashitaBtn) chooseRashitaBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokBtn) chooseSanjokBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaNotesBtn = document.getElementById('chooseRashitaNotes');
+  const chooseSanjokNotesBtn = document.getElementById('chooseSanjokNotes');
+  if(chooseRashitaNotesBtn) chooseRashitaNotesBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokNotesBtn) chooseSanjokNotesBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  switchIdentity.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentity failed:', e); }
+  });
+
+  const switchIdentityNotesBtn = document.getElementById('switchIdentityNotes');
+  if(switchIdentityNotesBtn) switchIdentityNotesBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityNotes failed:', e); }
+  });
+
+  const switchIdentityJournalBtn = document.getElementById('switchIdentityJournal');
+  if(switchIdentityJournalBtn) switchIdentityJournalBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityJournal failed:', e); }
+  });
+
+  const switchIdentityBooksBtn = document.getElementById('switchIdentityBooks');
+  if(switchIdentityBooksBtn) switchIdentityBooksBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityBooks failed:', e); }
+  });
+
+  function setupMoodBoard(){
+    try{
+      if(!moodRowRendered){
+        moodRowRendered = true;
+        MOOD_EMOJIS.forEach(emoji => {
+          const btn = document.createElement('div');
+          btn.className = 'mood-emoji-btn';
+          btn.textContent = emoji;
+          btn.addEventListener('click', () => {
+            pendingMoodEmoji = emoji;
+            document.querySelectorAll('#myMoodRow .mood-emoji-btn').forEach(b => {
+              b.classList.toggle('selected', b === btn);
+            });
+          });
+          myMoodRow.appendChild(btn);
+        });
+      }
+      if(!moodIntensityRendered){
+        moodIntensityRendered = true;
+        MOOD_INTENSITIES.forEach(level => {
+          const dot = document.createElement('div');
+          dot.className = 'mood-intensity-dot' + (level === pendingMoodIntensity ? ' selected' : '');
+          dot.textContent = level;
+          dot.title = 'intensity ' + level + ' of 5';
+          dot.addEventListener('click', () => {
+            pendingMoodIntensity = level;
+            document.querySelectorAll('#moodIntensityRow .mood-intensity-dot').forEach(d => {
+              d.classList.toggle('selected', d === dot);
+            });
+          });
+          moodIntensityRow.appendChild(dot);
+        });
+      }
+      if(!moodsListenerAttached && firebaseReady){
+        moodsListenerAttached = true;
+        db.ref('moods').on('value', snap => {
+          renderMoodDisplay(snap.val() || {});
+        });
+      }
+      if(!moodHistoryListenerAttached && firebaseReady){
+        moodHistoryListenerAttached = true;
+        db.ref('moodHistory').on('value', snap => {
+          renderMoodHistoryAndStreaks(snap.val() || {});
+        });
+      }
+    }catch(e){ console.error('setupMoodBoard failed:', e); }
+  }
+
+  function renderMoodDisplay(data){
+    if(!myIdentity) return;
+    const partnerId = myIdentity === 'rashita' ? 'sanjok' : 'rashita';
+    const mine = data[myIdentity];
+    const theirs = data[partnerId];
+
+    moodDisplay.innerHTML =
+      'You: <span class="mood-emoji-big">' + (mine ? mine.emoji : '—') + '</span>' +
+      (mine && mine.intensity ? ' (' + mine.intensity + '/5)' : '') +
+      ' &nbsp;·&nbsp; ' +
+      PARTNER_NAMES[partnerId] + ': <span class="mood-emoji-big">' + (theirs ? theirs.emoji : '—') + '</span>' +
+      (theirs && theirs.intensity ? ' (' + theirs.intensity + '/5)' : '');
+  }
+
+  if(postMoodBtn) postMoodBtn.addEventListener('click', () => {
+    try{
+      if(!firebaseReady || !myIdentity || !pendingMoodEmoji) return;
+      const note = moodNoteInput.value.trim();
+      const payload = {
+        emoji: pendingMoodEmoji,
+        intensity: pendingMoodIntensity,
+        note: note,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      };
+      db.ref('moods/' + myIdentity).set(payload);
+      db.ref('moodHistory/' + myIdentity).push({
+        emoji: pendingMoodEmoji,
+        intensity: pendingMoodIntensity,
+        note: note,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+      moodNoteInput.value = '';
+    }catch(e){ console.error('postMood failed:', e); }
+  });
+
+  function dayKeyFromTimestamp(ts){
+    const d = new Date(ts);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function computeStreak(entries){
+    // entries: array of {timestamp}. Counts consecutive days (ending
+    // today or yesterday, so the streak doesn't vanish before the day
+    // is over) that have at least one mood logged.
+    if(!entries.length) return 0;
+    const daySet = new Set(entries.map(e => dayKeyFromTimestamp(e.timestamp)));
+    const today = new Date();
+    let cursor = new Date(today);
+    if(!daySet.has(dayKeyFromTimestamp(cursor.getTime()))){
+      cursor.setDate(cursor.getDate() - 1);
+      if(!daySet.has(dayKeyFromTimestamp(cursor.getTime()))) return 0;
+    }
+    let streak = 0;
+    while(daySet.has(dayKeyFromTimestamp(cursor.getTime()))){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function renderMoodHistoryAndStreaks(data){
+    try{
+      if(!myIdentity) return;
+      const partnerId = myIdentity === 'rashita' ? 'sanjok' : 'rashita';
+
+      const myEntries = Object.values(data[myIdentity] || {});
+      const theirEntries = Object.values(data[partnerId] || {});
+      const myStreak = computeStreak(myEntries);
+      const theirStreak = computeStreak(theirEntries);
+
+      moodStreakRow.innerHTML =
+        '<div><span class="mood-streak-num">' + myStreak + '</span>day streak · you</div>' +
+        '<div><span class="mood-streak-num">' + theirStreak + '</span>day streak · ' + PARTNER_NAMES[partnerId] + '</div>';
+
+      const combined = [];
+      Object.keys(data).forEach(identity => {
+        const entriesForId = data[identity] || {};
+        Object.keys(entriesForId).forEach(key => {
+          combined.push(Object.assign({ author: identity, key: key }, entriesForId[key]));
+        });
+      });
+      combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      const recent = combined.slice(0, 12);
+
+      moodHistoryList.innerHTML = '';
+      if(recent.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'mood-history-empty';
+        empty.textContent = 'No moods shared yet.';
+        moodHistoryList.appendChild(empty);
+        return;
+      }
+
+      recent.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'mood-history-item';
+        const when = entry.timestamp ? new Date(entry.timestamp).toLocaleDateString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+        const noteHtml = entry.note ? ('<div class="mhi-note">' + escapeHtml(entry.note) + '</div>') : '';
+        const pinTag = entry.pinned ? '<span class="pinned-tag">📌 pinned</span>' : '';
+        item.innerHTML =
+          '<div class="mhi-emoji">' + entry.emoji + '</div>' +
+          '<div class="mhi-body">' +
+            '<div class="mhi-who">' + pinTag + (PARTNER_NAMES[entry.author] || entry.author) + (entry.intensity ? ' · ' + entry.intensity + '/5' : '') + '</div>' +
+            noteHtml +
+            '<div class="mhi-time">' + when + '</div>' +
+          '</div>';
+
+        if(entry.author === myIdentity){
+          const pinBtn = document.createElement('button');
+          pinBtn.className = 'pin-btn' + (entry.pinned ? ' pinned' : '');
+          pinBtn.textContent = entry.pinned ? 'Unpin' : 'Pin';
+          pinBtn.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('moodHistory/' + entry.author + '/' + entry.key + '/pinned').set(!entry.pinned);
+          });
+          item.appendChild(pinBtn);
+        }
+
+        moodHistoryList.appendChild(item);
+      });
+    }catch(e){ console.error('renderMoodHistoryAndStreaks failed:', e); }
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // =================================================================
+  // NOTES — shared notes board, synced live via Firebase. Anyone can
+  // post a note; only the person who posted it (based on the same
+  // identity picked in Moods) can delete it.
+  // =================================================================
+  let notesListenerAttached = false;
+  const notesIdentityChooser = document.getElementById('notesIdentityChooser');
+  const notesBoard = document.getElementById('notesBoard');
+  const notesList = document.getElementById('notesList');
+  const noteInput = document.getElementById('noteInput');
+  const postNoteBtn = document.getElementById('postNoteBtn');
+
+  function initNotes(){
+    try{
+      if(!notesIdentityChooser || !notesBoard) return;
+      if(myIdentity){
+        notesIdentityChooser.classList.add('hidden');
+        notesBoard.classList.remove('hidden');
+        setupNotesBoard();
+      } else {
+        notesIdentityChooser.classList.remove('hidden');
+        notesBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initNotes failed:', e); }
+  }
+
+  function setupNotesBoard(){
+    try{
+      if(!notesListenerAttached && firebaseReady){
+        notesListenerAttached = true;
+        db.ref('notes').on('value', snap => {
+          renderNotes(snap.val() || {});
+        });
+      }
+    }catch(e){ console.error('setupNotesBoard failed:', e); }
+  }
+
+  function renderNotes(data){
+    try{
+      notesList.innerHTML = '';
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'notes-empty';
+        empty.textContent = 'No notes yet — leave the first one.';
+        notesList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(note => {
+        const card = document.createElement('div');
+        card.className = 'note-card';
+
+        const text = document.createElement('div');
+        text.className = 'note-text';
+        text.textContent = note.text || '';
+        card.appendChild(text);
+
+        const meta = document.createElement('div');
+        meta.className = 'note-meta';
+
+        const author = document.createElement('span');
+        author.className = 'note-author';
+        author.textContent = (note.pinned ? '📌 ' : '') + (PARTNER_NAMES[note.author] || note.author || 'unknown');
+        meta.appendChild(author);
+
+        if(note.author === myIdentity){
+          const pin = document.createElement('button');
+          pin.className = 'pin-btn' + (note.pinned ? ' pinned' : '');
+          pin.textContent = note.pinned ? 'Unpin' : 'Pin';
+          pin.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('notes/' + note.key + '/pinned').set(!note.pinned);
+          });
+          meta.appendChild(pin);
+
+          const del = document.createElement('button');
+          del.className = 'note-delete';
+          del.textContent = 'Delete';
+          del.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('notes/' + note.key).remove();
+          });
+          meta.appendChild(del);
+        }
+
+        card.appendChild(meta);
+        notesList.appendChild(card);
+      });
+    }catch(e){ console.error('renderNotes failed:', e); }
+  }
+
+  if(postNoteBtn) postNoteBtn.addEventListener('click', () => {
+    try{
+      const text = noteInput.value.trim();
+      if(!text || !firebaseReady || !myIdentity) return;
+      db.ref('notes').push({
+        text: text,
+        author: myIdentity,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+      noteInput.value = '';
+    }catch(e){ console.error('postNote failed:', e); }
+  });
+
+  // =================================================================
+  // TARGETS — daily goals, one column each. Same identity as Moods/
+  // Notes. Stored per-date in Firebase (targets/<date>/<partner>/<id>)
+  // so every day's list is kept and you can look back at past days.
+  // Each person can only tick/edit/delete inside their own column;
+  // the partner's column is visible but read-only.
+  // =================================================================
+  const targetsIdentityChooser = document.getElementById('targetsIdentityChooser');
+  const targetsBoard = document.getElementById('targetsBoard');
+  const targetsDateLabel = document.getElementById('targetsDateLabel');
+  const targetsPrevDay = document.getElementById('targetsPrevDay');
+  const targetsNextDay = document.getElementById('targetsNextDay');
+  const targetsTodayBtn = document.getElementById('targetsTodayBtn');
+  const switchIdentityTargets = document.getElementById('switchIdentityTargets');
+
+  const targetsListEls = {
+    rashita: document.getElementById('targetsListRashita'),
+    sanjok: document.getElementById('targetsListSanjok')
+  };
+  const targetsAddRowEls = {
+    rashita: document.getElementById('targetsAddRowRashita'),
+    sanjok: document.getElementById('targetsAddRowSanjok')
+  };
+  const targetsInputEls = {
+    rashita: document.getElementById('targetsInputRashita'),
+    sanjok: document.getElementById('targetsInputSanjok')
+  };
+  const targetsAddBtnEls = {
+    rashita: document.getElementById('targetsAddBtnRashita'),
+    sanjok: document.getElementById('targetsAddBtnSanjok')
+  };
+
+  let targetsListenerRef = null;
+  let currentTargetsDate = new Date();
+
+  // --- Money-lost tracker: ₹1 per target left incomplete for a day ---
+  const lossRangeRow = document.getElementById('lossRangeRow');
+  const lossContent = document.getElementById('lossContent');
+  const lossAmountRashita = document.getElementById('lossAmountRashita');
+  const lossAmountSanjok = document.getElementById('lossAmountSanjok');
+  const lossAmountTotal = document.getElementById('lossAmountTotal');
+  const RUPEE_PER_MISSED_TARGET = 1;
+  let currentLossRange = 'day';
+  let lossRequestToken = 0;
+
+  function targetsDateKey(d){
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return y + '-' + m + '-' + day;
+  }
+  function isSameDay(a, b){ return targetsDateKey(a) === targetsDateKey(b); }
+
+  function renderTargetsDateLabel(){
+    if(!targetsDateLabel) return;
+    const today = new Date();
+    const label = currentTargetsDate.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' });
+    targetsDateLabel.textContent = isSameDay(currentTargetsDate, today) ? ('Today · ' + label) : label;
+  }
+
+  function initTargets(){
+    try{
+      if(!targetsIdentityChooser || !targetsBoard) return;
+      if(myIdentity){
+        targetsIdentityChooser.classList.add('hidden');
+        targetsBoard.classList.remove('hidden');
+        setupTargetsBoard();
+      } else {
+        targetsIdentityChooser.classList.remove('hidden');
+        targetsBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initTargets failed:', e); }
+  }
+
+  function setupTargetsBoard(){
+    try{
+      renderTargetsDateLabel();
+      Object.keys(targetsAddRowEls).forEach(partner => {
+        if(targetsAddRowEls[partner]) targetsAddRowEls[partner].classList.toggle('hidden', partner !== myIdentity);
+      });
+      attachTargetsListener();
+      refreshLossBox();
+    }catch(e){ console.error('setupTargetsBoard failed:', e); }
+  }
+
+  function datesForLossRange(range){
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const count = range === 'day' ? 1 : (range === 'week' ? 7 : 30);
+    const dates = [];
+    for(let i = 0; i < count; i++){
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      dates.push(d);
+    }
+    return dates;
+  }
+
+  function countIncomplete(dayData){
+    // dayData looks like { rashita: {id:{...}}, sanjok: {id:{...}} }
+    const counts = { rashita: 0, sanjok: 0 };
+    ['rashita', 'sanjok'].forEach(partner => {
+      const entries = (dayData && dayData[partner]) || {};
+      Object.values(entries).forEach(t => { if(t && !t.done) counts[partner]++; });
+    });
+    return counts;
+  }
+
+  function renderLossAmounts(counts){
+    const rashitaLost = counts.rashita * RUPEE_PER_MISSED_TARGET;
+    const sanjokLost = counts.sanjok * RUPEE_PER_MISSED_TARGET;
+    lossAmountRashita.textContent = '₹' + rashitaLost;
+    lossAmountSanjok.textContent = '₹' + sanjokLost;
+    lossAmountTotal.textContent = '₹' + (rashitaLost + sanjokLost);
+  }
+
+  function refreshLossBox(){
+    if(!lossContent) return;
+    if(!firebaseReady){
+      lossContent.innerHTML = '<div class="loss-loading">connect a database to track this</div>';
+      return;
+    }
+    const myToken = ++lossRequestToken;
+    const dates = datesForLossRange(currentLossRange);
+
+    // If we're only looking at today and the board currently being
+    // viewed IS today's live data, use it directly instead of an
+    // extra read.
+    if(currentLossRange === 'day' && isSameDay(currentTargetsDate, new Date()) && lastTargetsData){
+      renderLossAmounts(countIncomplete(lastTargetsData));
+      return;
+    }
+
+    Promise.all(dates.map(d => db.ref('targets/' + targetsDateKey(d)).once('value').then(s => s.val() || {})))
+      .then(allDaysData => {
+        if(myToken !== lossRequestToken) return; // a newer request superseded this one
+        const totals = { rashita: 0, sanjok: 0 };
+        allDaysData.forEach(dayData => {
+          const c = countIncomplete(dayData);
+          totals.rashita += c.rashita;
+          totals.sanjok += c.sanjok;
+        });
+        renderLossAmounts(totals);
+      })
+      .catch(e => { console.error('refreshLossBox failed:', e); });
+  }
+
+  if(lossRangeRow){
+    lossRangeRow.querySelectorAll('.loss-range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        lossRangeRow.querySelectorAll('.loss-range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentLossRange = btn.dataset.range;
+        refreshLossBox();
+      });
+    });
+  }
+
+  function attachTargetsListener(){
+    if(targetsListenerRef) targetsListenerRef.off();
+    if(!firebaseReady) return;
+    const dateKey = targetsDateKey(currentTargetsDate);
+    targetsListenerRef = db.ref('targets/' + dateKey);
+    targetsListenerRef.on('value', snap => {
+      renderTargetsBoard(snap.val() || {});
+    });
+  }
+
+  let lastTargetsData = null;
+
+  function renderTargetsBoard(data){
+    lastTargetsData = data;
+    if(currentLossRange === 'day' && isSameDay(currentTargetsDate, new Date())){
+      renderLossAmounts(countIncomplete(data));
+    }
+    ['rashita', 'sanjok'].forEach(partner => {
+      const listEl = targetsListEls[partner];
+      if(!listEl) return;
+      listEl.innerHTML = '';
+      const partnerData = data[partner] || {};
+      const entries = Object.keys(partnerData)
+        .map(key => Object.assign({ key: key }, partnerData[key]))
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'targets-empty';
+        empty.textContent = partner === myIdentity ? 'No targets yet — add one below.' : 'Nothing set for this day.';
+        listEl.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(target => {
+        const item = document.createElement('div');
+        item.className = 'target-item' + (target.done ? ' done' : '');
+
+        const check = document.createElement('button');
+        check.className = 'target-check' + (target.done ? ' checked' : '');
+        check.textContent = target.done ? '✓' : '';
+        check.disabled = partner !== myIdentity;
+        if(partner === myIdentity){
+          check.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).update({ done: !target.done });
+          });
+        }
+        item.appendChild(check);
+
+        const text = document.createElement('div');
+        text.className = 'target-text';
+        text.textContent = target.text || '';
+        item.appendChild(text);
+
+        if(partner === myIdentity){
+          const actions = document.createElement('div');
+          actions.className = 'target-actions';
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = '✎';
+          editBtn.title = 'Edit';
+          editBtn.addEventListener('click', () => startEditTarget(text, partner, target));
+          actions.appendChild(editBtn);
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '✕';
+          delBtn.title = 'Delete';
+          delBtn.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).remove();
+          });
+          actions.appendChild(delBtn);
+
+          item.appendChild(actions);
+        }
+
+        listEl.appendChild(item);
+      });
+    });
+  }
+
+  function placeCaretAtEnd(el){
+    try{
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }catch(e){}
+  }
+
+  function startEditTarget(textEl, partner, target){
+    textEl.contentEditable = 'true';
+    textEl.focus();
+    placeCaretAtEnd(textEl);
+
+    function save(){
+      textEl.removeEventListener('blur', save);
+      textEl.removeEventListener('keydown', onKey);
+      textEl.contentEditable = 'false';
+      const newText = textEl.textContent.trim();
+      if(newText && newText !== target.text){
+        if(firebaseReady){
+          db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).update({ text: newText });
+        }
+      } else if(!newText){
+        textEl.textContent = target.text;
+      }
+    }
+    function onKey(e){
+      if(e.key === 'Enter'){ e.preventDefault(); textEl.blur(); }
+      if(e.key === 'Escape'){ textEl.textContent = target.text; textEl.blur(); }
+    }
+    textEl.addEventListener('blur', save);
+    textEl.addEventListener('keydown', onKey);
+  }
+
+  function addTargetForMe(){
+    if(!myIdentity || !firebaseReady) return;
+    const input = targetsInputEls[myIdentity];
+    if(!input) return;
+    const text = input.value.trim();
+    if(!text) return;
+    db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + myIdentity).push({
+      text: text,
+      done: false,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    input.value = '';
+  }
+
+  ['rashita', 'sanjok'].forEach(partner => {
+    if(targetsAddBtnEls[partner]) targetsAddBtnEls[partner].addEventListener('click', addTargetForMe);
+    if(targetsInputEls[partner]) targetsInputEls[partner].addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); addTargetForMe(); }
+    });
+  });
+
+  if(targetsPrevDay) targetsPrevDay.addEventListener('click', () => {
+    currentTargetsDate = new Date(currentTargetsDate);
+    currentTargetsDate.setDate(currentTargetsDate.getDate() - 1);
+    renderTargetsDateLabel();
+    attachTargetsListener();
+  });
+  if(targetsNextDay) targetsNextDay.addEventListener('click', () => {
+    currentTargetsDate = new Date(currentTargetsDate);
+    currentTargetsDate.setDate(currentTargetsDate.getDate() + 1);
+    renderTargetsDateLabel();
+    attachTargetsListener();
+  });
+  if(targetsTodayBtn) targetsTodayBtn.addEventListener('click', () => {
+    currentTargetsDate = new Date();
+    renderTargetsDateLabel();
+    attachTargetsListener();
+  });
+
+  const chooseRashitaTargetsBtn = document.getElementById('chooseRashitaTargets');
+  const chooseSanjokTargetsBtn = document.getElementById('chooseSanjokTargets');
+  if(chooseRashitaTargetsBtn) chooseRashitaTargetsBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokTargetsBtn) chooseSanjokTargetsBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaJournalBtn = document.getElementById('chooseRashitaJournal');
+  const chooseSanjokJournalBtn = document.getElementById('chooseSanjokJournal');
+  if(chooseRashitaJournalBtn) chooseRashitaJournalBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokJournalBtn) chooseSanjokJournalBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaBooksBtn = document.getElementById('chooseRashitaBooks');
+  const chooseSanjokBooksBtn = document.getElementById('chooseSanjokBooks');
+  if(chooseRashitaBooksBtn) chooseRashitaBooksBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokBooksBtn) chooseSanjokBooksBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  if(switchIdentityTargets) switchIdentityTargets.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityTargets failed:', e); }
+  });
+
+  // =================================================================
+  // LOGIN MODAL — a lightweight per-person password gate. It is not
+  // bank-grade security (this is a static page with no server), but it
+  // stops one partner from casually picking the other's name and
+  // editing their moods/notes/targets/journal. Password hashes (SHA-256,
+  // salted) are stored in Firebase at auth/<identity>/hash — never the
+  // plain password itself.
+  // =================================================================
+  const loginModalOverlay = document.getElementById('loginModalOverlay');
+  const loginModalTitle = document.getElementById('loginModalTitle');
+  const loginModalSub = document.getElementById('loginModalSub');
+  const loginPasswordInput = document.getElementById('loginPasswordInput');
+  const loginPasswordConfirmInput = document.getElementById('loginPasswordConfirmInput');
+  const loginError = document.getElementById('loginError');
+  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+  const loginCancelBtn = document.getElementById('loginCancelBtn');
+  let loginResolver = null;
+
+  async function hashPassword(str){
+    try{
+      const enc = new TextEncoder().encode('same-moment-salt::' + str);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }catch(e){ console.error('hashPassword failed:', e); return null; }
+  }
+
+  function openLoginModal(id, mode){
+    return new Promise(resolve => {
+      loginResolver = resolve;
+      loginModalTitle.textContent = (mode === 'create' ? 'Set a password, ' : 'Welcome back, ') + PARTNER_NAMES[id];
+      loginModalSub.textContent = mode === 'create'
+        ? 'This keeps your data only editable by you.'
+        : 'Enter your password to continue.';
+      loginPasswordConfirmInput.classList.toggle('hidden', mode !== 'create');
+      loginPasswordInput.value = '';
+      loginPasswordConfirmInput.value = '';
+      loginError.textContent = '';
+      loginModalOverlay.classList.remove('hidden');
+      setTimeout(() => loginPasswordInput.focus(), 50);
+    });
+  }
+
+  function closeLoginModal(result){
+    loginModalOverlay.classList.add('hidden');
+    if(loginResolver){
+      const resolve = loginResolver;
+      loginResolver = null;
+      resolve(result);
+    }
+  }
+
+  if(loginCancelBtn) loginCancelBtn.addEventListener('click', () => closeLoginModal(null));
+
+  if(loginSubmitBtn) loginSubmitBtn.addEventListener('click', () => {
+    const isCreateMode = !loginPasswordConfirmInput.classList.contains('hidden');
+    const pw = loginPasswordInput.value;
+    if(!pw || pw.length < 4){
+      loginError.textContent = 'Password must be at least 4 characters.';
+      return;
+    }
+    if(isCreateMode && pw !== loginPasswordConfirmInput.value){
+      loginError.textContent = "Passwords don't match.";
+      return;
+    }
+    closeLoginModal(pw);
+  });
+
+  [loginPasswordInput, loginPasswordConfirmInput].forEach(inp => {
+    if(!inp) return;
+    inp.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); loginSubmitBtn.click(); }
+    });
+  });
+
+  async function requestIdentity(id){
+    try{
+      if(!firebaseReady){ setIdentity(id); return; }
+      const snap = await db.ref('auth/' + id).once('value');
+      const existing = snap.val();
+      if(!existing || !existing.hash){
+        const pw = await openLoginModal(id, 'create');
+        if(pw === null) return;
+        const hash = await hashPassword(pw);
+        if(!hash) return;
+        await db.ref('auth/' + id).set({ hash: hash, createdAt: firebase.database.ServerValue.TIMESTAMP });
+        setIdentity(id);
+      } else {
+        const pw = await openLoginModal(id, 'enter');
+        if(pw === null) return;
+        const hash = await hashPassword(pw);
+        if(hash && hash === existing.hash){
+          setIdentity(id);
+        } else {
+          alert('Incorrect password.');
+        }
+      }
+    }catch(e){ console.error('requestIdentity failed:', e); }
+  }
+
+  // =================================================================
+  // PIN — shared helper used by both Notes and Moods. Pinned items are
+  // shown on the front page (cover) in the Pinned board until whoever
+  // pinned them un-pins/deletes it. Anyone can only pin/unpin their own
+  // posts, same rule as deleting.
+  // =================================================================
+  const pinnedBoard = document.getElementById('pinnedBoard');
+  const pinnedList = document.getElementById('pinnedList');
+  let lastNotesData = {};
+  let lastMoodHistoryData = {};
+
+  function renderPinnedBoard(){
+    if(!pinnedList || !pinnedBoard) return;
+    const items = [];
+
+    Object.keys(lastNotesData || {}).forEach(key => {
+      const n = lastNotesData[key];
+      if(n && n.pinned){
+        items.push({
+          type: 'note', key: key, author: n.author, text: n.text,
+          emoji: '📝', timestamp: n.createdAt || 0
+        });
+      }
+    });
+
+    Object.keys(lastMoodHistoryData || {}).forEach(identity => {
+      Object.keys(lastMoodHistoryData[identity] || {}).forEach(key => {
+        const m = lastMoodHistoryData[identity][key];
+        if(m && m.pinned){
+          items.push({
+            type: 'mood', key: key, author: identity,
+            text: (m.note ? m.note : (m.intensity ? m.intensity + '/5' : '')),
+            emoji: m.emoji || '💭', timestamp: m.timestamp || 0
+          });
+        }
+      });
+    });
+
+    if(items.length === 0){
+      pinnedBoard.classList.add('hidden');
+      pinnedList.innerHTML = '';
+      return;
+    }
+
+    items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    pinnedBoard.classList.remove('hidden');
+    pinnedList.innerHTML = '';
+
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'pinned-item';
+
+      const emoji = document.createElement('div');
+      emoji.className = 'pi-emoji';
+      emoji.textContent = item.emoji;
+      el.appendChild(emoji);
+
+      const body = document.createElement('div');
+      body.className = 'pi-body';
+      const who = document.createElement('div');
+      who.className = 'pi-who';
+      who.textContent = PARTNER_NAMES[item.author] || item.author;
+      body.appendChild(who);
+      const text = document.createElement('div');
+      text.className = 'pi-text';
+      text.textContent = item.text || '';
+      body.appendChild(text);
+      el.appendChild(body);
+
+      if(myIdentity && item.author === myIdentity){
+        const unpin = document.createElement('button');
+        unpin.className = 'pi-unpin';
+        unpin.textContent = 'Unpin';
+        unpin.addEventListener('click', () => {
+          if(!firebaseReady) return;
+          if(item.type === 'note'){
+            db.ref('notes/' + item.key + '/pinned').set(false);
+          } else {
+            db.ref('moodHistory/' + item.author + '/' + item.key + '/pinned').set(false);
+          }
+        });
+        el.appendChild(unpin);
+      }
+
+      pinnedList.appendChild(el);
+    });
+  }
+
+  if(firebaseReady){
+    db.ref('notes').on('value', snap => {
+      lastNotesData = snap.val() || {};
+      renderPinnedBoard();
+    });
+    db.ref('moodHistory').on('value', snap => {
+      lastMoodHistoryData = snap.val() || {};
+      renderPinnedBoard();
+    });
+  }
+
+  // =================================================================
+  // QUOTE OF THE DAY — a new line every day, shown on the front page.
+  // Same quote for both of you (picked deterministically from the
+  // date), and either of you can dismiss it for the day; it comes back
+  // fresh tomorrow regardless of who dismissed it.
+  // =================================================================
+  const MOTIVATIONAL_QUOTES = [
+    "Small steps, taken together, still count as moving forward.",
+    "The quiet days matter as much as the loud ones.",
+    "You don't have to feel ready to begin — start anyway.",
+    "Progress rarely looks dramatic while it's happening.",
+    "Today only asks for today's effort, nothing more.",
+    "Rest is part of the work, not a break from it.",
+    "Say the kind thing you're thinking — don't save it.",
+    "Consistency is quieter than motivation, and it lasts longer.",
+    "A short walk can loosen a stuck thought.",
+    "Whatever went sideways this morning, this afternoon can still go right.",
+    "You are allowed to be proud of the boring, steady days.",
+    "Ask for what you need before you're desperate for it.",
+    "One honest conversation can save a week of guessing.",
+    "The goal is direction, not perfection.",
+    "Notice one good thing before you notice the rest.",
+    "It's okay to go slow, as long as you don't stop.",
+    "The smallest kindness today can be the thing someone remembers.",
+    "Doubt is normal; let it ride along without driving.",
+    "You've gotten through every hard day so far. That's real evidence.",
+    "Choose the version of today you'll be glad you chose.",
+    "Some days the win is just showing up gently.",
+    "Let today be simple where it can be.",
+    "A little patience with yourself goes a long way.",
+    "The best time to start again is right now, not Monday.",
+    "You can care about the outcome and still be gentle with the process.",
+    "Say thank you today, even for something small.",
+    "Not every day has to be productive to be worthwhile.",
+    "Give today's version of you the same grace you'd give a friend.",
+    "Momentum builds quietly — trust the small repeats.",
+    "The two of you can carry more together than either can alone.",
+    "Check in with each other before the day gets away from you.",
+    "A five-minute pause can reset a whole afternoon.",
+    "Let today be one you're kind to yourself about, later.",
+    "Effort counts even on the days it doesn't show.",
+    "The right time to rest is before you're running on empty.",
+    "You get to define what a good day looks like today.",
+    "Keep the promise you made to yourself this morning.",
+    "Curiosity gets you further than pressure does.",
+    "Today's a fine day to try the thing you've been putting off.",
+    "Whatever you're building, one more brick still counts."
+  ];
+
+  function quoteDateKey(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function quoteForDate(dateKey){
+    let hash = 0;
+    for(let i = 0; i < dateKey.length; i++){
+      hash = (hash * 31 + dateKey.charCodeAt(i)) >>> 0;
+    }
+    return MOTIVATIONAL_QUOTES[hash % MOTIVATIONAL_QUOTES.length];
+  }
+
+  const quoteCard = document.getElementById('quoteCard');
+  const quoteText = document.getElementById('quoteText');
+  const quoteDismissBtn = document.getElementById('quoteDismissBtn');
+  const todaysQuoteKey = quoteDateKey();
+
+  function renderQuoteCard(dismissed){
+    if(!quoteCard || !quoteText) return;
+    if(dismissed){
+      quoteCard.classList.add('hidden');
+      return;
+    }
+    quoteText.textContent = quoteForDate(todaysQuoteKey);
+    quoteCard.classList.remove('hidden');
+  }
+
+  if(firebaseReady){
+    db.ref('dailyQuoteDismissed/' + todaysQuoteKey).on('value', snap => {
+      renderQuoteCard(!!snap.val());
+    });
+  } else {
+    renderQuoteCard(false);
+  }
+
+  if(quoteDismissBtn) quoteDismissBtn.addEventListener('click', () => {
+    if(!firebaseReady){ quoteCard.classList.add('hidden'); return; }
+    db.ref('dailyQuoteDismissed/' + todaysQuoteKey).set(true);
+  });
+
+  // =================================================================
+  // JOURNAL — private, per-person. Only the signed-in identity's own
+  // entries are read/shown; there is no shared/partner view of this
+  // data anywhere in the app.
+  // =================================================================
+  const journalIdentityChooser = document.getElementById('journalIdentityChooser');
+  const journalBoard = document.getElementById('journalBoard');
+  const journalList = document.getElementById('journalList');
+  const journalTitleInput = document.getElementById('journalTitleInput');
+  const journalTextInput = document.getElementById('journalTextInput');
+  const postJournalBtn = document.getElementById('postJournalBtn');
+  let journalListenerAttachedFor = null;
+
+  function initJournal(){
+    try{
+      if(!journalIdentityChooser || !journalBoard) return;
+      if(myIdentity){
+        journalIdentityChooser.classList.add('hidden');
+        journalBoard.classList.remove('hidden');
+        setupJournalBoard();
+      } else {
+        journalIdentityChooser.classList.remove('hidden');
+        journalBoard.classList.add('hidden');
+        journalList.innerHTML = '';
+      }
+    }catch(e){ console.error('initJournal failed:', e); }
+  }
+
+  function setupJournalBoard(){
+    if(!firebaseReady || !myIdentity) return;
+    if(journalListenerAttachedFor === myIdentity) return;
+    journalListenerAttachedFor = myIdentity;
+    db.ref('journal/' + myIdentity).on('value', snap => {
+      renderJournal(snap.val() || {});
+    });
+  }
+
+  function renderJournal(data){
+    try{
+      journalList.innerHTML = '';
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'journal-empty';
+        empty.textContent = 'No entries yet — write the first one below.';
+        journalList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'journal-entry';
+
+        if(entry.title){
+          const title = document.createElement('div');
+          title.className = 'journal-entry-title';
+          title.textContent = entry.title;
+          card.appendChild(title);
+        }
+
+        const date = document.createElement('div');
+        date.className = 'journal-entry-date';
+        date.textContent = entry.createdAt ? new Date(entry.createdAt).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+        card.appendChild(date);
+
+        const text = document.createElement('div');
+        text.className = 'journal-entry-text';
+        text.textContent = entry.text || '';
+        card.appendChild(text);
+
+        const actions = document.createElement('div');
+        actions.className = 'journal-entry-actions';
+        const del = document.createElement('button');
+        del.textContent = 'Delete';
+        del.addEventListener('click', () => {
+          if(!firebaseReady || !myIdentity) return;
+          db.ref('journal/' + myIdentity + '/' + entry.key).remove();
+        });
+        actions.appendChild(del);
+        card.appendChild(actions);
+
+        journalList.appendChild(card);
+      });
+    }catch(e){ console.error('renderJournal failed:', e); }
+  }
+
+  if(postJournalBtn) postJournalBtn.addEventListener('click', () => {
+    try{
+      const text = journalTextInput.value.trim();
+      if(!text || !firebaseReady || !myIdentity) return;
+      db.ref('journal/' + myIdentity).push({
+        title: journalTitleInput.value.trim(),
+        text: text,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+      journalTitleInput.value = '';
+      journalTextInput.value = '';
+    }catch(e){ console.error('postJournal failed:', e); }
+  });
+
+  // =================================================================
+  // BOOKS — either partner can upload a book; both can browse and
+  // read the shared shelf. Files are stored as base64 directly in the
+  // Realtime Database (there's no Storage bucket configured), so this
+  // works best for smaller files — a few MB at most. Anyone can delete
+  // only what they uploaded. Reading progress (current page) is tracked
+  // per-person per-book at books/<id>/progress/<identity>, so each of
+  // you can continue your own book from where you left off, and the
+  // "continue reading" banner shows whichever book you touched last.
+  // =================================================================
+  const booksIdentityChooser = document.getElementById('booksIdentityChooser');
+  const booksBoard = document.getElementById('booksBoard');
+  const bookList = document.getElementById('bookList');
+  const bookTitleInput = document.getElementById('bookTitleInput');
+  const bookFileInput = document.getElementById('bookFileInput');
+  const bookFileLabel = document.getElementById('bookFileLabel');
+  const postBookBtn = document.getElementById('postBookBtn');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const continueReadingBanner = document.getElementById('continueReadingBanner');
+  let booksListenerAttached = false;
+  let lastBooksData = {};
+  const MAX_BOOK_BYTES = 8 * 1024 * 1024; // ~8MB, mind Realtime Database node-size limits
+  const TEXT_CHARS_PER_PAGE = 1800;
+
+  function initBooks(){
+    try{
+      if(!booksIdentityChooser || !booksBoard) return;
+      if(myIdentity){
+        booksIdentityChooser.classList.add('hidden');
+        booksBoard.classList.remove('hidden');
+        setupBooksBoard();
+      } else {
+        booksIdentityChooser.classList.remove('hidden');
+        booksBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initBooks failed:', e); }
+  }
+
+  function setupBooksBoard(){
+    if(!booksListenerAttached && firebaseReady){
+      booksListenerAttached = true;
+      db.ref('books').on('value', snap => {
+        lastBooksData = snap.val() || {};
+        renderBooks(lastBooksData);
+      });
+    } else {
+      renderBooks(lastBooksData);
+    }
+  }
+
+  if(bookFileLabel && bookFileInput){
+    bookFileLabel.addEventListener('click', () => bookFileInput.click());
+    bookFileInput.addEventListener('change', () => {
+      const f = bookFileInput.files && bookFileInput.files[0];
+      bookFileLabel.textContent = f ? f.name : 'Choose a file to upload';
+    });
+  }
+
+  function renderContinueReading(data){
+    if(!continueReadingBanner || !myIdentity) return;
+    let best = null;
+    Object.keys(data).forEach(key => {
+      const book = data[key];
+      const progress = book.progress && book.progress[myIdentity];
+      if(progress && (!best || (progress.updatedAt || 0) > (best.progress.updatedAt || 0))){
+        best = { key: key, book: book, progress: progress };
+      }
+    });
+    if(!best){
+      continueReadingBanner.classList.add('hidden');
+      continueReadingBanner.innerHTML = '';
+      return;
+    }
+    continueReadingBanner.classList.remove('hidden');
+    continueReadingBanner.innerHTML = '';
+    const info = document.createElement('div');
+    info.className = 'cr-info';
+    info.innerHTML = 'Continue reading<div class="cr-title">' + escapeHtml(best.book.title || best.book.fileName || 'Untitled') + '</div>' +
+      'Page ' + best.progress.page + (best.progress.totalPages ? ' of ' + best.progress.totalPages : '');
+    continueReadingBanner.appendChild(info);
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary';
+    btn.textContent = 'Continue';
+    btn.addEventListener('click', () => openBookReader(Object.assign({ key: best.key }, best.book)));
+    continueReadingBanner.appendChild(btn);
+  }
+
+  function renderBooks(data){
+    try{
+      bookList.innerHTML = '';
+      renderContinueReading(data);
+
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'books-empty';
+        empty.textContent = 'No books yet — upload the first one above.';
+        bookList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        card.addEventListener('click', () => openBookReader(book));
+
+        const icon = document.createElement('div');
+        icon.className = 'book-card-icon';
+        icon.textContent = '📘';
+        card.appendChild(icon);
+
+        const title = document.createElement('div');
+        title.className = 'book-card-title';
+        title.textContent = book.title || book.fileName || 'Untitled';
+        card.appendChild(title);
+
+        const uploader = document.createElement('div');
+        uploader.className = 'book-card-uploader';
+        uploader.textContent = 'by ' + (PARTNER_NAMES[book.uploadedBy] || book.uploadedBy || 'unknown');
+        card.appendChild(uploader);
+
+        const myProgress = book.progress && book.progress[myIdentity];
+        if(myProgress && myProgress.totalPages){
+          const bar = document.createElement('div');
+          bar.className = 'book-card-progress';
+          const fill = document.createElement('div');
+          fill.className = 'book-card-progress-fill';
+          fill.style.width = Math.min(100, Math.round((myProgress.page / myProgress.totalPages) * 100)) + '%';
+          bar.appendChild(fill);
+          card.appendChild(bar);
+        }
+
+        if(book.uploadedBy === myIdentity){
+          const del = document.createElement('button');
+          del.className = 'book-card-delete';
+          del.textContent = '✕';
+          del.title = 'Delete';
+          del.addEventListener('click', e => {
+            e.stopPropagation();
+            if(!firebaseReady) return;
+            db.ref('books/' + book.key).remove();
+          });
+          card.appendChild(del);
+        }
+
+        bookList.appendChild(card);
+      });
+    }catch(e){ console.error('renderBooks failed:', e); }
+  }
+
+  if(postBookBtn) postBookBtn.addEventListener('click', () => {
+    try{
+      if(!firebaseReady || !myIdentity) return;
+      const file = bookFileInput.files && bookFileInput.files[0];
+      const title = bookTitleInput.value.trim();
+      if(!file){ alert('Choose a file first.'); return; }
+      if(file.size > MAX_BOOK_BYTES){
+        alert('That file is too large for this storage setup (limit ~8MB). Try a smaller file.');
+        return;
+      }
+      uploadProgress.classList.remove('hidden');
+      postBookBtn.disabled = true;
+      const reader = new FileReader();
+      reader.onload = () => {
+        db.ref('books').push({
+          title: title || file.name,
+          fileName: file.name,
+          dataUrl: reader.result,
+          uploadedBy: myIdentity,
+          uploadedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+          bookTitleInput.value = '';
+          bookFileInput.value = '';
+          bookFileLabel.textContent = 'Choose a file to upload';
+        }).catch(e => { console.error('Book upload failed:', e); alert('Upload failed — see console for details.'); })
+          .finally(() => {
+            uploadProgress.classList.add('hidden');
+            postBookBtn.disabled = false;
+          });
+      };
+      reader.onerror = () => {
+        uploadProgress.classList.add('hidden');
+        postBookBtn.disabled = false;
+        alert('Could not read that file.');
+      };
+      reader.readAsDataURL(file);
+    }catch(e){ console.error('postBook failed:', e); uploadProgress.classList.add('hidden'); postBookBtn.disabled = false; }
+  });
+
+  // --- BOOK READER: opens a book, tracks + resumes reading progress ---
+  const bookReaderModal = document.getElementById('bookReaderModal');
+  const readerTitle = document.getElementById('readerTitle');
+  const readerBody = document.getElementById('readerBody');
+  const readerPageIndicator = document.getElementById('readerPageIndicator');
+  const readerPrevBtn = document.getElementById('readerPrevBtn');
+  const readerNextBtn = document.getElementById('readerNextBtn');
+  const readerCloseBtn = document.getElementById('readerCloseBtn');
+
+  let readerState = null; // { book, kind, page, totalPages, pdfDoc, textPages }
+
+  function fileKindFor(book){
+    const name = (book.fileName || book.title || '').toLowerCase();
+    if(name.endsWith('.pdf')) return 'pdf';
+    if(name.endsWith('.txt')) return 'txt';
+    return 'other';
+  }
+
+  function dataUrlToUint8Array(dataUrl){
+    const base64 = dataUrl.split(',')[1] || '';
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for(let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+
+  function dataUrlToText(dataUrl){
+    const bytes = dataUrlToUint8Array(dataUrl);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  async function openBookReader(book){
+    try{
+      if(!bookReaderModal) return;
+      readerTitle.textContent = book.title || book.fileName || 'Untitled';
+      readerBody.innerHTML = '<div class="reader-unsupported">Loading…</div>';
+      bookReaderModal.classList.remove('hidden');
+
+      const kind = fileKindFor(book);
+      const savedProgress = (book.progress && book.progress[myIdentity]) || null;
+
+      if(kind === 'pdf' && window.pdfjsLib){
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const bytes = dataUrlToUint8Array(book.dataUrl);
+        const pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
+        readerState = {
+          book: book, kind: 'pdf', pdfDoc: pdfDoc,
+          page: savedProgress ? Math.min(savedProgress.page, pdfDoc.numPages) : 1,
+          totalPages: pdfDoc.numPages
+        };
+        await renderReaderPage();
+      } else if(kind === 'txt'){
+        const text = dataUrlToText(book.dataUrl);
+        const pages = [];
+        for(let i = 0; i < text.length; i += TEXT_CHARS_PER_PAGE){
+          pages.push(text.slice(i, i + TEXT_CHARS_PER_PAGE));
+        }
+        if(pages.length === 0) pages.push('(empty file)');
+        readerState = {
+          book: book, kind: 'txt', textPages: pages,
+          page: savedProgress ? Math.min(savedProgress.page, pages.length) : 1,
+          totalPages: pages.length
+        };
+        renderReaderPage();
+      } else {
+        readerState = { book: book, kind: 'other', page: 1, totalPages: 1 };
+        readerBody.innerHTML = '<div class="reader-unsupported">In-app preview isn\'t available for this file type yet.<br><br>' +
+          '<a href="' + book.dataUrl + '" download="' + escapeHtml(book.fileName || 'book') + '">Download to read it</a></div>';
+        readerPageIndicator.textContent = '–';
+      }
+    }catch(e){
+      console.error('openBookReader failed:', e);
+      readerBody.innerHTML = '<div class="reader-unsupported">Couldn\'t open this book. It may be corrupted or an unsupported format.</div>';
+    }
+  }
+
+  async function renderReaderPage(){
+    if(!readerState) return;
+    readerPageIndicator.textContent = 'Page ' + readerState.page + ' of ' + readerState.totalPages;
+
+    if(readerState.kind === 'pdf'){
+      readerBody.innerHTML = '';
+      const page = await readerState.pdfDoc.getPage(readerState.page);
+      const viewport = page.getViewport({ scale: 1.3 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      readerBody.appendChild(canvas);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+    } else if(readerState.kind === 'txt'){
+      readerBody.innerHTML = '';
+      const div = document.createElement('div');
+      div.className = 'reader-text-page';
+      div.textContent = readerState.textPages[readerState.page - 1];
+      readerBody.appendChild(div);
+    }
+
+    saveReadingProgress();
+  }
+
+  function saveReadingProgress(){
+    if(!firebaseReady || !myIdentity || !readerState || readerState.kind === 'other') return;
+    db.ref('books/' + readerState.book.key + '/progress/' + myIdentity).set({
+      page: readerState.page,
+      totalPages: readerState.totalPages,
+      updatedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+  if(readerPrevBtn) readerPrevBtn.addEventListener('click', () => {
+    if(!readerState || readerState.page <= 1) return;
+    readerState.page--;
+    renderReaderPage();
+  });
+  if(readerNextBtn) readerNextBtn.addEventListener('click', () => {
+    if(!readerState || readerState.page >= readerState.totalPages) return;
+    readerState.page++;
+    renderReaderPage();
+  });
+  if(readerCloseBtn) readerCloseBtn.addEventListener('click', () => {
+    bookReaderModal.classList.add('hidden');
+    readerBody.innerHTML = '';
+    readerState = null;
+  });
+
+  // =================================================================
+  // REPORT — read-only compiled view of targets, moods, and meditation
+  // minutes for both partners over a chosen range. It's a summary of
+  // what's already logged elsewhere in the app, not a new data source.
+  // =================================================================
+  const reportRangeRow = document.getElementById('reportRangeRow');
+  const reportContent = document.getElementById('reportContent');
+  let currentReportRange = 'month';
+  let reportRequestToken = 0;
+
+  function datesForReportRange(range){
+    if(range === 'all') return null; // signal: no date filtering, use full history
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const count = range === 'week' ? 7 : 30;
+    const dates = [];
+    for(let i = 0; i < count; i++){
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      dates.push(d);
+    }
+    return dates;
+  }
+
+  function computeReport(range){
+    if(!reportContent) return;
+    if(!firebaseReady){
+      reportContent.innerHTML = '<div class="report-loading">connect a database to see this</div>';
+      return;
+    }
+    const myToken = ++reportRequestToken;
+    const dates = datesForReportRange(range);
+    const rangeStart = dates ? dates[dates.length - 1].getTime() : 0;
+
+    const moodsPromise = db.ref('moodHistory').once('value').then(s => s.val() || {});
+    const soloPromise = db.ref('soloSessions').once('value').then(s => s.val() || {});
+    const targetsPromise = dates
+      ? Promise.all(dates.map(d => db.ref('targets/' + targetsDateKey(d)).once('value').then(s => s.val() || {})))
+      : db.ref('targets').once('value').then(s => Object.values(s.val() || {}));
+
+    Promise.all([moodsPromise, soloPromise, targetsPromise]).then(([moodHistory, soloSessions, targetsDays]) => {
+      if(myToken !== reportRequestToken) return;
+
+      const stats = {
+        rashita: { moodCount: 0, moodTally: {}, targetsSet: 0, targetsDone: 0, meditationMins: 0 },
+        sanjok: { moodCount: 0, moodTally: {}, targetsSet: 0, targetsDone: 0, meditationMins: 0 }
+      };
+
+      ['rashita', 'sanjok'].forEach(id => {
+        Object.values((moodHistory[id]) || {}).forEach(entry => {
+          if(entry.timestamp && entry.timestamp < rangeStart) return;
+          stats[id].moodCount++;
+          if(entry.emoji) stats[id].moodTally[entry.emoji] = (stats[id].moodTally[entry.emoji] || 0) + 1;
+        });
+        Object.values((soloSessions[id]) || {}).forEach(session => {
+          const ts = session.completedAt || 0;
+          if(ts && ts < rangeStart) return;
+          stats[id].meditationMins += Math.round((session.durationSeconds || 0) / 60);
+        });
+      });
+
+      targetsDays.forEach(dayData => {
+        ['rashita', 'sanjok'].forEach(id => {
+          Object.values((dayData && dayData[id]) || {}).forEach(t => {
+            stats[id].targetsSet++;
+            if(t.done) stats[id].targetsDone++;
+          });
+        });
+      });
+
+      renderReport(stats);
+    }).catch(e => { console.error('computeReport failed:', e); });
+  }
+
+  function renderReport(stats){
+    if(!reportContent) return;
+    reportContent.innerHTML = '';
+    const cols = document.createElement('div');
+    cols.className = 'report-cols';
+
+    ['rashita', 'sanjok'].forEach(id => {
+      const s = stats[id];
+      const topMood = Object.keys(s.moodTally).sort((a, b) => s.moodTally[b] - s.moodTally[a])[0];
+      const completionPct = s.targetsSet ? Math.round((s.targetsDone / s.targetsSet) * 100) : null;
+
+      const card = document.createElement('div');
+      card.className = 'report-card';
+      card.innerHTML =
+        '<div class="report-card-name">' + PARTNER_NAMES[id] + '</div>' +
+        '<div class="report-stat"><span class="report-stat-num">' + s.moodCount + '</span><span class="report-stat-label">moods logged' + (topMood ? ' · most often ' + topMood : '') + '</span></div>' +
+        '<div class="report-stat"><span class="report-stat-num">' + (completionPct === null ? '—' : completionPct + '%') + '</span><span class="report-stat-label">targets completed (' + s.targetsDone + '/' + s.targetsSet + ')</span></div>' +
+        '<div class="report-stat"><span class="report-stat-num">' + s.meditationMins + '</span><span class="report-stat-label">meditation minutes</span></div>';
+      cols.appendChild(card);
+    });
+
+    reportContent.appendChild(cols);
+  }
+
+  if(reportRangeRow){
+    reportRangeRow.querySelectorAll('.loss-range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        reportRangeRow.querySelectorAll('.loss-range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentReportRange = btn.dataset.range;
+        computeReport(currentReportRange);
+      });
+    });
+  }
+
+  function initReport(){
+    computeReport(currentReportRange);
+  }
+
+})();
+
+  </script>
+
+</body>
+</html>
