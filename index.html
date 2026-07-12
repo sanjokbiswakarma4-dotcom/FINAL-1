@@ -300,6 +300,18 @@ opacity:1;
   .share-row .code{ font-family:'IBM Plex Mono', monospace; color: var(--text-primary); letter-spacing:.05em; }
   .copy-btn{ background:none; border:1px solid var(--glass-border); color: var(--text-muted); width:auto; padding:5px 10px; font-size:11px; border-radius:7px; }
 
+  .meditation-track-list{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; max-height:160px; overflow-y:auto; }
+  .meditation-track-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:9px 12px; border-radius:8px; cursor:pointer; font-size:13px;
+    color:var(--text-muted); border:1px solid var(--glass-border);
+    transition: all .15s ease;
+  }
+  .meditation-track-item:hover{ border-color: var(--ember); }
+  .meditation-track-item.active{ color: var(--ember); border-color: var(--ember); background: rgba(184,131,74,0.1); }
+  .meditation-track-item .check{ opacity:0; font-size:12px; }
+  .meditation-track-item.active .check{ opacity:1; }
+
   .hidden{ display:none !important; }
 
   /* --- MUSIC panel --- */
@@ -513,6 +525,9 @@ animation:none;
           <div class="chip" data-min="20">20m</div>
         </div>
 
+        <label>Session music</label>
+        <div class="meditation-track-list" id="meditationTrackList"></div>
+
         <button class="btn-primary" id="startBtn">Begin together</button>
         <button class="btn-ghost hidden" id="stopBtn">End session</button>
         <button class="btn-ghost" id="breatheBtn">Breathe</button>
@@ -678,6 +693,76 @@ animation:none;
   const breatheCloseBtn = document.getElementById('breatheCloseBtn');
   const breatheText = document.getElementById('breatheText');
   const bgMusic = document.getElementById('bgMusic');
+  const meditationTrackList = document.getElementById('meditationTrackList');
+
+  // --- Meditation session music picker ---
+  // Separate from the Music panel's playlist — replace MEDITATION_TRACKS
+  // below with your own files/titles for meditation sessions specifically.
+  // Put the mp3s in an "assets/meditation/" folder next to this html file
+  // (or wherever you like — just match the "src" paths here).
+  const MEDITATION_TRACKS = [
+    { title: "Guided Meditation A", src: "assets/A.mp3" },
+    { title: "Guided Meditation B", src: "assets/B.mp3" },
+    { title: "Guided Meditation C", src: "assets/C.mp3" },
+    { title: "Brain Meditation (10 min)", src: "assets/TunePocket-Brain-Meditation-10-Min-Preview.mp3" },
+  ];
+
+  // Choice is remembered per-device (each person picks their own
+  // ambiance locally); it starts when the session begins, stops when
+  // it ends, and can be swapped any time, including mid-session.
+  const MEDITATION_NONE = -1;
+  let meditationTrackIndex = (() => {
+    const saved = parseInt(localStorage.getItem('sameMomentMeditationTrack'), 10);
+    return Number.isInteger(saved) && saved >= MEDITATION_NONE && saved < MEDITATION_TRACKS.length ? saved : MEDITATION_NONE;
+  })();
+  let sessionMusicPlaying = false;
+
+  function renderMeditationTrackList(){
+    if(!meditationTrackList) return;
+    meditationTrackList.innerHTML = '';
+
+    const noneItem = document.createElement('div');
+    noneItem.className = 'meditation-track-item' + (meditationTrackIndex === MEDITATION_NONE ? ' active' : '');
+    noneItem.innerHTML = '<span>No music</span><span class="check">✓</span>';
+    noneItem.addEventListener('click', () => selectMeditationTrack(MEDITATION_NONE));
+    meditationTrackList.appendChild(noneItem);
+
+    MEDITATION_TRACKS.forEach((track, i) => {
+      const item = document.createElement('div');
+      item.className = 'meditation-track-item' + (i === meditationTrackIndex ? ' active' : '');
+      item.innerHTML = '<span>' + track.title + '</span><span class="check">✓</span>';
+      item.addEventListener('click', () => selectMeditationTrack(i));
+      meditationTrackList.appendChild(item);
+    });
+  }
+
+  function selectMeditationTrack(i){
+    meditationTrackIndex = i;
+    localStorage.setItem('sameMomentMeditationTrack', String(i));
+    renderMeditationTrackList();
+    // If a session is currently playing, switch to the newly chosen
+    // track (or silence) right away instead of waiting for a restart.
+    if(sessionMusicPlaying) playMeditationMusic();
+  }
+
+  function playMeditationMusic(){
+    bgMusic.pause();
+    if(meditationTrackIndex === MEDITATION_NONE){
+      bgMusic.removeAttribute('src');
+      return;
+    }
+    bgMusic.src = MEDITATION_TRACKS[meditationTrackIndex].src;
+    bgMusic.volume = 0.25;
+    bgMusic.currentTime = 0;
+    bgMusic.play().catch(() => {});
+  }
+
+  function stopMeditationMusic(){
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+
+  renderMeditationTrackList();
 
   if(!firebaseReady){
     configWarning.classList.remove('hidden');
@@ -808,9 +893,8 @@ animation:none;
 
 startBtn.addEventListener('click', () => {
 
-  bgMusic.volume = 0.25;
-  bgMusic.currentTime = 0;
-  bgMusic.play().catch(() => {});
+  sessionMusicPlaying = true;
+  playMeditationMusic();
 
   chimedForStart = false;
   chimedForEnd = false;
@@ -823,8 +907,8 @@ startBtn.addEventListener('click', () => {
 });
   stopBtn.addEventListener('click', () => {
 
-  bgMusic.pause();
-  bgMusic.currentTime = 0;
+  sessionMusicPlaying = false;
+  stopMeditationMusic();
 
   roomRef.update({ startTime: null });
 
@@ -862,8 +946,8 @@ startBtn.addEventListener('click', () => {
         timerDisplay.textContent = '00:00';
         statusLine.textContent = 'session complete';
 
-        bgMusic.pause();
-bgMusic.currentTime = 0;
+        sessionMusicPlaying = false;
+        stopMeditationMusic();
 
         if(!chimedForEnd){
           chimedForEnd = true;
@@ -912,6 +996,13 @@ bgMusic.currentTime = 0;
     { title: "Dooron", src: "dooron.mp3" },
     { title: "Jindagi Aur Kuch Bhi Nahi", src: "jindagi aur kuch bhi nahi.mp3" },
     { title: "Tum Saath Saath Ho", src: "tum saath saath ho.mp3" },
+    { title: "They Say", src: "They say.mp3" },
+    { title: "Bageicha", src: "bageicha.mp3" },
+    { title: "Chukar Mere Maan Ko", src: "chukar mere maan ko.mp3" },
+    { title: "Hum Tum Kitne Paas", src: "hum tum kitne paas.mp3" },
+    { title: "Kho Betein Hain", src: "kho betein hain.mp3" },
+    { title: "Ma Haraye", src: "ma haraye.mp3" },
+    { title: "Yeh Kaisa Rishta Hai", src: "yeh kaisa rishta hai.mp3" },
   ];
   let currentTrackIndex = -1;
   let musicInitialized = false;
