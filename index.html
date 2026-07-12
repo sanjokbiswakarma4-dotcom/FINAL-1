@@ -12,24 +12,27 @@
 
 <style>
   :root{
-    --ember: #E3A052;
-    --ember-dim: #4A4130;
-    --text-primary: #F5F1E8;
-    --text-muted: #C9C2B2;
-    --glass: rgba(22, 27, 38, 0.55);
-    --glass-border: rgba(255,255,255,0.14);
+    --ember: #B8834A;
+    --ember-dim: #E4D6BE;
+    --sand: #EDE3D0;
+    --glass: rgba(255, 250, 240, 0.55);
+    --glass-border: rgba(62, 52, 38, 0.12);
+    --text-primary: #3E3426;
+    --text-muted: #8C7F68;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; height:100%; font-family:'Cormorant Garamond', serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; }
+  html,body{ margin:0; padding:0; height:100%; font-family:'Cormorant Garamond', serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; background: var(--sand); }
 
   .bg-photo{
     position: fixed; inset:0; width:100%; height:100%;
     object-fit: cover; z-index:0;
+    opacity: 0.16;
+    filter: saturate(0.7) brightness(1.05);
   }
 
   .scrim{
     position: fixed; inset:0; z-index:1;
-    background: linear-gradient(180deg, rgba(10,12,18,0.35) 0%, rgba(10,12,18,0.55) 55%, rgba(10,12,18,0.8) 100%);
+    background: linear-gradient(180deg, rgba(237,227,208,0.75) 0%, rgba(237,227,208,0.88) 55%, rgba(230,218,195,0.94) 100%);
   }
 .love-background{
     position:fixed;
@@ -39,11 +42,11 @@
     align-items:center;
 
     font-family:'Fraunces', serif;
-    font-size:90px;
+    font-size:56px;
     font-weight:300;
-    letter-spacing:10px;
+    letter-spacing:8px;
 
-    color:rgba(255,255,255,0.05);
+    color:rgba(62,52,38,0.06);
 
     text-transform:uppercase;
 
@@ -52,10 +55,6 @@
 
     z-index:1;
 
-    text-shadow:
-        0 0 30px rgba(227,160,82,.12),
-        0 0 60px rgba(227,160,82,.08);
-
     animation:floatText 12s ease-in-out infinite;
 }
 
@@ -63,12 +62,12 @@
 
     0%,100%{
         transform:translateY(0px);
-        opacity:.06;
+        opacity:.5;
     }
 
     50%{
-        transform:translateY(-12px);
-        opacity:.1;
+        transform:translateY(-10px);
+        opacity:.85;
     }
 }
 
@@ -76,8 +75,8 @@
 
 .love-background{
 
-font-size:42px;
-letter-spacing:5px;
+font-size:32px;
+letter-spacing:4px;
 
 }
 
@@ -91,14 +90,19 @@ letter-spacing:5px;
   /* --- COVER: grid of folders, locket biggest, centered --- */
   #cover{ text-align:center; user-select:none; }
   .folder-grid{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 26px;
+  }
+  .small-folders-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
     gap: 26px 22px;
-    justify-items:center;
-    align-items:start;
   }
   .folder-item{ cursor:pointer; }
-  .folder-item.big{ grid-column: 1 / -1; margin-bottom: 6px; }
+  .folder-item.big{ margin-bottom: 6px; }
 
   .locket-wrap{
     position:relative;
@@ -142,7 +146,7 @@ opacity:1;
     width:180px;
     height:180px;
     border-radius:50%;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.55);
     border:1px solid var(--glass-border);
     display:flex;
     align-items:center;
@@ -151,14 +155,14 @@ opacity:1;
     line-height:1;
     cursor:pointer;
     transition:all .5s ease;
-    filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));
+    filter:drop-shadow(0 14px 28px rgba(62,52,38,.15));
 }
 
 .locket:hover{
     transform:translateY(-8px) scale(1.08) rotate(-5deg);
     filter:
-        drop-shadow(0 25px 50px rgba(0,0,0,.45))
-        drop-shadow(0 0 20px rgba(227,160,82,.45));
+        drop-shadow(0 18px 34px rgba(62,52,38,.18))
+        drop-shadow(0 0 16px rgba(184,131,74,.25));
 }
 
 /* generic "opening" animation, shared by the big locket and the small folder icons */
@@ -190,10 +194,7 @@ opacity:1;
     margin-top:24px;
     font-size:20px;
     letter-spacing:.15em;
-    color:white;
-    text-shadow:
-        0 0 10px rgba(255,255,255,.4),
-        0 0 25px rgba(227,160,82,.4);
+    color: var(--text-primary);
 
 }
 
@@ -213,23 +214,22 @@ opacity:1;
   }
   .folder-icon{
     width:74px; height:74px; border-radius:50%;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.55);
     border:1px solid var(--glass-border);
     display:flex; align-items:center; justify-content:center;
     font-size:30px;
     transition: all .4s ease;
-    filter:drop-shadow(0 12px 24px rgba(0,0,0,.35));
+    filter:drop-shadow(0 8px 16px rgba(62,52,38,.12));
   }
   .folder-icon:hover{
     transform:translateY(-6px) scale(1.08) rotate(-4deg);
     filter:
-        drop-shadow(0 16px 30px rgba(0,0,0,.4))
-        drop-shadow(0 0 14px rgba(227,160,82,.4));
+        drop-shadow(0 10px 20px rgba(62,52,38,.16))
+        drop-shadow(0 0 10px rgba(184,131,74,.3));
   }
   .small-label{
     margin-top:10px; font-size:14px; letter-spacing:.1em;
     color: var(--text-muted);
-    text-shadow: 0 0 10px rgba(255,255,255,.25);
   }
 
   /* --- APP PANEL (glass card) --- */
@@ -275,7 +275,7 @@ opacity:1;
 
   label{ display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px; }
   input[type=text]{
-    width:100%; background: rgba(10,12,18,0.4); border:1px solid var(--glass-border);
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
     color: var(--text-primary); border-radius:10px; padding:11px 12px;
     font-family:'IBM Plex Mono', monospace; font-size:14px; margin-bottom:14px; outline:none;
   }
@@ -328,7 +328,7 @@ opacity:1;
     display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;
   }
   #lightboxImg{ max-width:90vw; max-height:65vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
-  #lightboxCaption{ margin-top:16px; font-family:'Fraunces', serif; font-size:18px; text-align:center; max-width:600px; color: var(--text-primary); }
+  #lightboxCaption{ margin-top:16px; font-family:'Fraunces', serif; font-size:18px; text-align:center; max-width:600px; color: #F0E9DA; }
   .lightbox-controls{ display:flex; gap:14px; margin-top:26px; }
   .lightbox-controls button{ width:auto; padding:9px 20px; }
 
@@ -336,7 +336,7 @@ opacity:1;
   .mood-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:22px; }
   .mood-emoji-btn{
     width:48px; height:48px; border-radius:50%;
-    background:rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.55); border:1px solid var(--glass-border);
     font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center;
     transition: all .15s ease;
   }
@@ -345,6 +345,29 @@ opacity:1;
   .mood-display{ text-align:center; font-size:15px; color:var(--text-muted); margin-bottom:18px; line-height:1.9; }
   .mood-emoji-big{ font-size:24px; vertical-align:middle; }
   .identity-hint{ text-align:center; font-size:12px; color: var(--text-muted); margin-top:10px; cursor:pointer; text-decoration:underline; }
+
+  /* --- NOTES panel --- */
+  .notes-list{ max-height:260px; overflow-y:auto; margin-bottom:18px; }
+  .note-card{
+    background: rgba(255,255,255,0.45); border:1px solid var(--glass-border);
+    border-radius:10px; padding:12px 14px; margin-bottom:10px;
+  }
+  .note-text{ font-size:15px; line-height:1.5; color: var(--text-primary); white-space:pre-wrap; word-break:break-word; }
+  .note-meta{ display:flex; align-items:center; justify-content:space-between; margin-top:8px; font-size:11px; color: var(--text-muted); }
+  .note-author{ letter-spacing:.06em; text-transform:uppercase; }
+  .note-delete{
+    width:auto; background:none; border:none; color: var(--text-muted);
+    font-size:11px; cursor:pointer; padding:2px 6px; text-decoration:underline;
+  }
+  .note-delete:hover{ color: var(--ember); }
+  .notes-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding: 10px 0 18px; }
+  textarea#noteInput{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:11px 12px;
+    font-family:'Cormorant Garamond', serif; font-size:15px; margin-bottom:14px;
+    outline:none; resize:vertical;
+  }
+  textarea#noteInput:focus{ border-color: var(--ember); }
 
   /* --- BREATHE OVERLAY --- */
   #breatheOverlay{
@@ -387,8 +410,8 @@ opacity:0;
 }
 
   }
-  .breathe-text{ margin-top: 26px; font-family:'Fraunces', serif; font-size:20px; letter-spacing:0.04em; color: var(--text-primary); }
-  .breathe-close{ margin-top: 36px; width:auto; padding:9px 22px; background:transparent; border:1px solid var(--glass-border); color:var(--text-muted); border-radius:10px; }
+  .breathe-text{ margin-top: 26px; font-family:'Fraunces', serif; font-size:20px; letter-spacing:0.04em; color: #F0E9DA; }
+  .breathe-close{ margin-top: 36px; width:auto; padding:9px 22px; background:transparent; border:1px solid rgba(240,233,218,0.3); color:#D9CFBB; border-radius:10px; }
 
   @media (prefers-reduced-motion: reduce){
     .stage-visual.breathing .orb,
@@ -425,19 +448,26 @@ animation:none;
         <div class="folder-label">meditation</div>
       </div>
 
-      <div class="folder-item small" data-target="panel-music">
-        <div class="folder-icon-wrap"><div class="folder-icon">🎵</div></div>
-        <div class="folder-label small-label">music</div>
-      </div>
+      <div class="small-folders-row">
+        <div class="folder-item small" data-target="panel-music">
+          <div class="folder-icon-wrap"><div class="folder-icon">🎵</div></div>
+          <div class="folder-label small-label">music</div>
+        </div>
 
-      <div class="folder-item small" data-target="panel-memories">
-        <div class="folder-icon-wrap"><div class="folder-icon">📷</div></div>
-        <div class="folder-label small-label">memories</div>
-      </div>
+        <div class="folder-item small" data-target="panel-memories">
+          <div class="folder-icon-wrap"><div class="folder-icon">📷</div></div>
+          <div class="folder-label small-label">memories</div>
+        </div>
 
-      <div class="folder-item small" data-target="panel-moods">
-        <div class="folder-icon-wrap"><div class="folder-icon">💭</div></div>
-        <div class="folder-label small-label">moods</div>
+        <div class="folder-item small" data-target="panel-moods">
+          <div class="folder-icon-wrap"><div class="folder-icon">💭</div></div>
+          <div class="folder-label small-label">moods</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-notes">
+          <div class="folder-icon-wrap"><div class="folder-icon">📝</div></div>
+          <div class="folder-label small-label">notes</div>
+        </div>
       </div>
 
     </div>
@@ -529,6 +559,27 @@ animation:none;
         <div class="mood-row" id="myMoodRow"></div>
         <div class="mood-display" id="moodDisplay"></div>
         <div class="identity-hint" id="switchIdentity">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== NOTES ===== -->
+    <div class="app-panel-content hidden" id="panel-notes">
+      <div class="panel-header">our notes</div>
+
+      <div id="notesIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaNotes">Rashita</div>
+          <div class="chip" id="chooseSanjokNotes">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="notesBoard" class="hidden">
+        <div class="notes-list" id="notesList"></div>
+        <label for="noteInput">Leave a note</label>
+        <textarea id="noteInput" rows="3" maxlength="400" placeholder="Write something for them..."></textarea>
+        <button class="btn-primary" id="postNoteBtn">Post note</button>
+        <div class="identity-hint" id="switchIdentityNotes">not you? switch</div>
       </div>
     </div>
 
@@ -649,6 +700,7 @@ animation:none;
       if(targetId === 'panel-music') initMusic();
       if(targetId === 'panel-memories') initMemories();
       if(targetId === 'panel-moods') initMoods();
+      if(targetId === 'panel-notes') initNotes();
     }catch(e){ console.error('Panel init failed for ' + targetId + ':', e); }
   }
 
@@ -1023,6 +1075,7 @@ bgMusic.currentTime = 0;
       myIdentity = id;
       localStorage.setItem('sameMomentIdentity', id);
       initMoods();
+      initNotes();
     }catch(e){ console.error('setIdentity failed:', e); }
   }
 
@@ -1031,12 +1084,28 @@ bgMusic.currentTime = 0;
   if(chooseRashitaBtn) chooseRashitaBtn.addEventListener('click', () => setIdentity('rashita'));
   if(chooseSanjokBtn) chooseSanjokBtn.addEventListener('click', () => setIdentity('sanjok'));
 
+  const chooseRashitaNotesBtn = document.getElementById('chooseRashitaNotes');
+  const chooseSanjokNotesBtn = document.getElementById('chooseSanjokNotes');
+  if(chooseRashitaNotesBtn) chooseRashitaNotesBtn.addEventListener('click', () => setIdentity('rashita'));
+  if(chooseSanjokNotesBtn) chooseSanjokNotesBtn.addEventListener('click', () => setIdentity('sanjok'));
+
   switchIdentity.addEventListener('click', () => {
     try{
       localStorage.removeItem('sameMomentIdentity');
       myIdentity = null;
       initMoods();
+      initNotes();
     }catch(e){ console.error('switchIdentity failed:', e); }
+  });
+
+  const switchIdentityNotesBtn = document.getElementById('switchIdentityNotes');
+  if(switchIdentityNotesBtn) switchIdentityNotesBtn.addEventListener('click', () => {
+    try{
+      localStorage.removeItem('sameMomentIdentity');
+      myIdentity = null;
+      initMoods();
+      initNotes();
+    }catch(e){ console.error('switchIdentityNotes failed:', e); }
   });
 
   function setupMoodBoard(){
@@ -1081,6 +1150,105 @@ bgMusic.currentTime = 0;
       ' &nbsp;·&nbsp; ' +
       PARTNER_NAMES[partnerId] + ': <span class="mood-emoji-big">' + (theirs ? theirs.emoji : '—') + '</span>';
   }
+
+  // =================================================================
+  // NOTES — shared notes board, synced live via Firebase. Anyone can
+  // post a note; only the person who posted it (based on the same
+  // identity picked in Moods) can delete it.
+  // =================================================================
+  let notesListenerAttached = false;
+  const notesIdentityChooser = document.getElementById('notesIdentityChooser');
+  const notesBoard = document.getElementById('notesBoard');
+  const notesList = document.getElementById('notesList');
+  const noteInput = document.getElementById('noteInput');
+  const postNoteBtn = document.getElementById('postNoteBtn');
+
+  function initNotes(){
+    try{
+      if(!notesIdentityChooser || !notesBoard) return;
+      if(myIdentity){
+        notesIdentityChooser.classList.add('hidden');
+        notesBoard.classList.remove('hidden');
+        setupNotesBoard();
+      } else {
+        notesIdentityChooser.classList.remove('hidden');
+        notesBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initNotes failed:', e); }
+  }
+
+  function setupNotesBoard(){
+    try{
+      if(!notesListenerAttached && firebaseReady){
+        notesListenerAttached = true;
+        db.ref('notes').on('value', snap => {
+          renderNotes(snap.val() || {});
+        });
+      }
+    }catch(e){ console.error('setupNotesBoard failed:', e); }
+  }
+
+  function renderNotes(data){
+    try{
+      notesList.innerHTML = '';
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'notes-empty';
+        empty.textContent = 'No notes yet — leave the first one.';
+        notesList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(note => {
+        const card = document.createElement('div');
+        card.className = 'note-card';
+
+        const text = document.createElement('div');
+        text.className = 'note-text';
+        text.textContent = note.text || '';
+        card.appendChild(text);
+
+        const meta = document.createElement('div');
+        meta.className = 'note-meta';
+
+        const author = document.createElement('span');
+        author.className = 'note-author';
+        author.textContent = PARTNER_NAMES[note.author] || note.author || 'unknown';
+        meta.appendChild(author);
+
+        if(note.author === myIdentity){
+          const del = document.createElement('button');
+          del.className = 'note-delete';
+          del.textContent = 'Delete';
+          del.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('notes/' + note.key).remove();
+          });
+          meta.appendChild(del);
+        }
+
+        card.appendChild(meta);
+        notesList.appendChild(card);
+      });
+    }catch(e){ console.error('renderNotes failed:', e); }
+  }
+
+  if(postNoteBtn) postNoteBtn.addEventListener('click', () => {
+    try{
+      const text = noteInput.value.trim();
+      if(!text || !firebaseReady || !myIdentity) return;
+      db.ref('notes').push({
+        text: text,
+        author: myIdentity,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+      noteInput.value = '';
+    }catch(e){ console.error('postNote failed:', e); }
+  });
 
 })();
 
