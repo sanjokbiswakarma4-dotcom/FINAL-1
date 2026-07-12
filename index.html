@@ -40,19 +40,51 @@
   /* --- COVER: the folder --- */
   #cover{ text-align:center; cursor:pointer; user-select:none; }
   .locket-wrap{
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    position:relative;
 }
+
+.locket-wrap::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+    height:220px;
+
+    border-radius:50%;
+
+    background:radial-gradient(circle,
+        rgba(227,160,82,.25),
+        transparent 70%);
+
+    animation:pulseGlow 4s ease-in-out infinite;
+
+    z-index:-1;
+
+}
+
+@keyframes pulseGlow{
+
+0%,100%{
+transform:scale(.9);
+opacity:.5;
+}
+
+50%{
+transform:scale(1.2);
+opacity:1;
+}
+
+    }
 .locket{
     width:180px;
     cursor:pointer;
-    transition:all .5s ease;
+    transition:all .45s ease;
     filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));
 }
 
 .locket:hover{
-    .locket:hover{
     transform:translateY(-8px) scale(1.08) rotate(-5deg);
     filter:
         drop-shadow(0 25px 50px rgba(0,0,0,.45))
@@ -64,31 +96,39 @@
 }
 
 @keyframes openLocket{
+
     0%{
         transform:scale(1) rotate(0deg);
         opacity:1;
     }
 
-    40%{
+    35%{
         transform:scale(1.1) rotate(-8deg);
     }
 
     70%{
-        transform:scale(.8);
-        opacity:.7;
+        transform:scale(.75);
+        opacity:.6;
     }
 
     100%{
-        transform:scale(3);
+        transform:scale(3.5);
         opacity:0;
-        filter:blur(15px);
+        filter:blur(18px);
     }
 
 }
-  .folder-label{
-    margin-top: 22px; font-family:'Fraunces', serif; font-weight: 500;
-    font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text-primary); opacity: 0.9;
+.folder-label{
+
+    margin-top:24px;
+    font-size:20px;
+    letter-spacing:.15em;
+    color:white;
+    text-shadow:
+        0 0 10px rgba(255,255,255,.4),
+        0 0 25px rgba(227,160,82,.4);
+
+}
   }
   .folder-hint{ margin-top: 6px; font-size: 12px; color: var(--text-muted); }
 
