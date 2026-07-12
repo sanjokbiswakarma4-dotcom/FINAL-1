@@ -430,6 +430,117 @@ opacity:1;
   }
   textarea#noteInput:focus{ border-color: var(--ember); }
 
+  /* --- PIN feature (notes + moods) --- */
+  .pin-btn{
+    width:auto; background:none; border:none; color: var(--text-muted);
+    font-size:12px; cursor:pointer; padding:2px 6px;
+  }
+  .pin-btn:hover{ color: var(--ember); }
+  .pin-btn.pinned{ color: var(--ember); }
+  .pinned-tag{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color: var(--ember); margin-right:6px; }
+
+  /* --- PINNED board (shown on the cover / front page) --- */
+  .pinned-board{
+    width:100%; max-width:400px; margin: 0 auto 22px;
+    background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border:1px solid var(--glass-border); border-radius:16px; padding:16px 16px 8px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+  }
+  .pinned-board-title{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-muted); text-align:center; margin-bottom:10px; }
+  .pinned-item{
+    display:flex; align-items:flex-start; gap:8px;
+    background: rgba(255,255,255,0.45); border:1px solid var(--glass-border); border-radius:10px;
+    padding:9px 11px; margin-bottom:8px; font-size:13px; text-align:left;
+  }
+  .pinned-item .pi-emoji{ font-size:17px; flex:none; }
+  .pinned-item .pi-body{ flex:1; min-width:0; }
+  .pinned-item .pi-who{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color: var(--text-muted); }
+  .pinned-item .pi-text{ word-break:break-word; line-height:1.4; color: var(--text-primary); }
+  .pinned-item .pi-unpin{ width:auto; background:none; border:none; color: var(--text-muted); font-size:11px; cursor:pointer; flex:none; }
+  .pinned-item .pi-unpin:hover{ color:var(--ember); }
+
+  /* --- LOGIN modal (per-person password) --- */
+  #loginModalOverlay{
+    position:fixed; inset:0; z-index:9;
+    background: rgba(8,10,16,0.55);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .login-modal{
+    width:100%; max-width:320px;
+    background: var(--sand); border:1px solid var(--glass-border); border-radius:16px;
+    padding:24px 22px; box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+  }
+  .login-modal-title{ font-family:'Fraunces', serif; font-size:17px; text-align:center; margin-bottom:6px; }
+  .login-modal-sub{ font-size:12px; color: var(--text-muted); text-align:center; margin-bottom:16px; }
+  .login-error{ font-size:12px; color:#B33A3A; text-align:center; margin:-8px 0 12px; min-height:14px; }
+
+  /* --- BOOKS panel --- */
+  .book-upload-row{ margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--glass-border); }
+  .book-upload-row input[type=text]{ margin-bottom:8px; }
+  .book-file-label{
+    display:block; text-align:center; padding:10px 0; border-radius:10px; border:1px dashed var(--glass-border);
+    color: var(--text-muted); font-size:13px; cursor:pointer; margin-bottom:10px;
+  }
+  .book-file-label:hover{ border-color: var(--ember); color: var(--ember); }
+  .book-list{ max-height:300px; overflow-y:auto; }
+  .book-item{
+    display:flex; align-items:center; gap:10px;
+    background: rgba(255,255,255,0.45); border:1px solid var(--glass-border); border-radius:10px;
+    padding:10px 12px; margin-bottom:9px;
+  }
+  .book-icon{ font-size:22px; flex:none; }
+  .book-body{ flex:1; min-width:0; }
+  .book-title{ font-size:14px; color: var(--text-primary); word-break:break-word; }
+  .book-meta{ font-size:11px; color: var(--text-muted); margin-top:2px; }
+  .book-actions{ display:flex; flex-direction:column; gap:4px; flex:none; }
+  .book-actions a, .book-actions button{
+    width:auto; background:none; border:none; color: var(--ember); font-size:11px;
+    text-decoration:underline; cursor:pointer; padding:0; text-align:right;
+  }
+  .book-actions button{ color: var(--text-muted); }
+  .book-actions button:hover{ color:#B33A3A; }
+  .books-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding:14px 0; }
+  .upload-progress{ text-align:center; font-size:12px; color: var(--text-muted); margin-bottom:10px; }
+
+  /* --- REPORT panel --- */
+  .report-cols{ display:flex; gap:12px; margin-bottom:14px; }
+  .report-card{
+    flex:1; min-width:0; background: rgba(255,255,255,0.45); border:1px solid var(--glass-border);
+    border-radius:12px; padding:14px 12px; text-align:center;
+  }
+  .report-card-name{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color: var(--text-muted); margin-bottom:10px; }
+  .report-stat{ margin-bottom:9px; }
+  .report-stat-num{ display:block; font-family:'Fraunces', serif; font-size:19px; color: var(--ember); }
+  .report-stat-label{ font-size:10.5px; color: var(--text-muted); }
+  .report-loading{ text-align:center; font-size:12px; color: var(--text-muted); padding:16px 0; }
+  .report-note{ font-size:11px; color: var(--text-muted); text-align:center; margin-top:6px; line-height:1.5; }
+
+  /* --- JOURNAL panel (private, per person) --- */
+  .journal-list{ max-height:320px; overflow-y:auto; margin-bottom:16px; }
+  .journal-entry{
+    background: rgba(255,255,255,0.5); border:1px solid var(--glass-border); border-radius:10px;
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .journal-entry-title{ font-family:'Fraunces', serif; font-size:16px; color: var(--text-primary); margin-bottom:4px; }
+  .journal-entry-date{ font-size:11px; letter-spacing:.05em; color: var(--text-muted); margin-bottom:10px; text-transform:uppercase; }
+  .journal-entry-text{ font-size:14.5px; line-height:1.7; color: var(--text-primary); white-space:pre-wrap; word-break:break-word; }
+  .journal-entry-actions{ display:flex; justify-content:flex-end; gap:14px; margin-top:10px; }
+  .journal-entry-actions button{
+    width:auto; background:none; border:none; color: var(--text-muted); font-size:11px;
+    cursor:pointer; padding:0; text-decoration:underline;
+  }
+  .journal-entry-actions button:hover{ color: var(--ember); }
+  .journal-empty{ text-align:center; font-size:13px; color: var(--text-muted); padding:12px 0 18px; }
+  input#journalTitleInput{ margin-bottom:10px; }
+  textarea#journalTextInput{
+    width:100%; background: rgba(255,255,255,0.6); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:12px 14px;
+    font-family:'Cormorant Garamond', serif; font-size:15px; margin-bottom:14px;
+    outline:none; resize:vertical; line-height:1.6;
+  }
+  textarea#journalTextInput:focus{ border-color: var(--ember); }
+  .journal-privacy-note{ font-size:11px; color: var(--text-muted); text-align:center; margin-top:2px; margin-bottom:14px; line-height:1.5; }
+
   /* --- TARGETS panel --- */
   .targets-date-nav{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
   .targets-date-nav button{ width:auto; padding:6px 12px; font-size:12px; margin-bottom:0; }
@@ -579,10 +690,31 @@ animation:none;
           <div class="folder-icon-wrap"><div class="folder-icon">🎯</div></div>
           <div class="folder-label small-label">targets</div>
         </div>
+
+        <div class="folder-item small" data-target="panel-journal">
+          <div class="folder-icon-wrap"><div class="folder-icon">📔</div></div>
+          <div class="folder-label small-label">journal</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-books">
+          <div class="folder-icon-wrap"><div class="folder-icon">📚</div></div>
+          <div class="folder-label small-label">books</div>
+        </div>
+
+        <div class="folder-item small" data-target="panel-report">
+          <div class="folder-icon-wrap"><div class="folder-icon">📊</div></div>
+          <div class="folder-label small-label">report</div>
+        </div>
       </div>
 
     </div>
     <div class="folder-hint">tap a folder to open</div>
+
+    <!-- PINNED board — stays on the front page until whoever pinned it removes it -->
+    <div class="pinned-board hidden" id="pinnedBoard">
+      <div class="pinned-board-title">📌 pinned</div>
+      <div id="pinnedList"></div>
+    </div>
   </div>
 
   <!-- APP PANEL -->
@@ -819,9 +951,88 @@ animation:none;
       </div>
     </div>
 
+    <!-- ===== JOURNAL (private) ===== -->
+    <div class="app-panel-content hidden" id="panel-journal">
+      <div class="panel-header">your journal</div>
+
+      <div id="journalIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaJournal">Rashita</div>
+          <div class="chip" id="chooseSanjokJournal">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="journalBoard" class="hidden">
+        <div class="journal-privacy-note">Only visible to you once you're signed in.</div>
+        <div class="journal-list" id="journalList"></div>
+
+        <label for="journalTitleInput">Title (optional)</label>
+        <input type="text" id="journalTitleInput" maxlength="80" placeholder="Give this entry a title...">
+        <label for="journalTextInput">Entry</label>
+        <textarea id="journalTextInput" rows="5" maxlength="4000" placeholder="Write whatever you need to..."></textarea>
+        <button class="btn-primary" id="postJournalBtn">Save entry</button>
+
+        <div class="identity-hint" id="switchIdentityJournal">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== BOOKS ===== -->
+    <div class="app-panel-content hidden" id="panel-books">
+      <div class="panel-header">our books</div>
+
+      <div id="booksIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaBooks">Rashita</div>
+          <div class="chip" id="chooseSanjokBooks">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="booksBoard" class="hidden">
+        <div class="book-upload-row">
+          <label for="bookTitleInput">Title</label>
+          <input type="text" id="bookTitleInput" maxlength="120" placeholder="Book title">
+          <label class="book-file-label" id="bookFileLabel">Choose a file to upload</label>
+          <input type="file" id="bookFileInput" class="hidden" accept=".pdf,.epub,.txt,.doc,.docx">
+          <div class="upload-progress hidden" id="uploadProgress">Uploading...</div>
+          <button class="btn-primary" id="postBookBtn">Upload book</button>
+        </div>
+        <div class="book-list" id="bookList"></div>
+        <div class="identity-hint" id="switchIdentityBooks">not you? switch</div>
+      </div>
+    </div>
+
+    <!-- ===== REPORT ===== -->
+    <div class="app-panel-content hidden" id="panel-report">
+      <div class="panel-header">our report</div>
+      <div class="loss-range-row" id="reportRangeRow">
+        <div class="loss-range-btn" data-range="week">This week</div>
+        <div class="loss-range-btn active" data-range="month">This month</div>
+        <div class="loss-range-btn" data-range="all">All time</div>
+      </div>
+      <div id="reportContent">
+        <div class="report-loading">Loading report...</div>
+      </div>
+      <div class="report-note">Targets, moods, and meditation minutes logged in the app. Not a medical or clinical record — just your own history, for your own reflection.</div>
+    </div>
+
     <button class="btn-ghost" id="closeFolderBtn" style="margin-top:16px;">Close folder</button>
   </div>
 
+</div>
+
+<!-- LOGIN MODAL (per-person password) -->
+<div id="loginModalOverlay" class="hidden">
+  <div class="login-modal">
+    <div class="login-modal-title" id="loginModalTitle">Enter your password</div>
+    <div class="login-modal-sub" id="loginModalSub"></div>
+    <input type="password" id="loginPasswordInput" placeholder="Password" maxlength="60">
+    <input type="password" id="loginPasswordConfirmInput" class="hidden" placeholder="Confirm password" maxlength="60">
+    <div class="login-error" id="loginError"></div>
+    <button class="btn-primary" id="loginSubmitBtn">Continue</button>
+    <button class="btn-ghost" id="loginCancelBtn">Cancel</button>
+  </div>
 </div>
 
 <!-- BREATHE OVERLAY -->
@@ -1011,6 +1222,9 @@ animation:none;
       if(targetId === 'panel-moods') initMoods();
       if(targetId === 'panel-notes') initNotes();
       if(targetId === 'panel-targets') initTargets();
+      if(targetId === 'panel-journal' && typeof initJournal === 'function') initJournal();
+      if(targetId === 'panel-books' && typeof initBooks === 'function') initBooks();
+      if(targetId === 'panel-report' && typeof initReport === 'function') initReport();
     }catch(e){ console.error('Panel init failed for ' + targetId + ':', e); }
   }
 
@@ -1425,17 +1639,12 @@ startBtn.addEventListener('click', () => {
 
   const chooseRashitaSoloBtn = document.getElementById('chooseRashitaSolo');
   const chooseSanjokSoloBtn = document.getElementById('chooseSanjokSolo');
-  if(chooseRashitaSoloBtn) chooseRashitaSoloBtn.addEventListener('click', () => setIdentity('rashita'));
-  if(chooseSanjokSoloBtn) chooseSanjokSoloBtn.addEventListener('click', () => setIdentity('sanjok'));
+  if(chooseRashitaSoloBtn) chooseRashitaSoloBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokSoloBtn) chooseSanjokSoloBtn.addEventListener('click', () => requestIdentity('sanjok'));
 
   if(switchIdentitySolo) switchIdentitySolo.addEventListener('click', () => {
     try{
-      localStorage.removeItem('sameMomentIdentity');
-      myIdentity = null;
-      initMoods();
-      initNotes();
-      initTargets();
-      initSoloMeditation();
+      logoutIdentity();
     }catch(e){ console.error('switchIdentitySolo failed:', e); }
   });
 
@@ -1631,20 +1840,13 @@ startBtn.addEventListener('click', () => {
       initNotes();
       initTargets();
       if(typeof initSoloMeditation === 'function') initSoloMeditation();
+      if(typeof initJournal === 'function') initJournal();
+      if(typeof initBooks === 'function') initBooks();
+      renderPinnedBoard();
     }catch(e){ console.error('setIdentity failed:', e); }
   }
 
-  const chooseRashitaBtn = document.getElementById('chooseRashita');
-  const chooseSanjokBtn = document.getElementById('chooseSanjok');
-  if(chooseRashitaBtn) chooseRashitaBtn.addEventListener('click', () => setIdentity('rashita'));
-  if(chooseSanjokBtn) chooseSanjokBtn.addEventListener('click', () => setIdentity('sanjok'));
-
-  const chooseRashitaNotesBtn = document.getElementById('chooseRashitaNotes');
-  const chooseSanjokNotesBtn = document.getElementById('chooseSanjokNotes');
-  if(chooseRashitaNotesBtn) chooseRashitaNotesBtn.addEventListener('click', () => setIdentity('rashita'));
-  if(chooseSanjokNotesBtn) chooseSanjokNotesBtn.addEventListener('click', () => setIdentity('sanjok'));
-
-  switchIdentity.addEventListener('click', () => {
+  function logoutIdentity(){
     try{
       localStorage.removeItem('sameMomentIdentity');
       myIdentity = null;
@@ -1652,19 +1854,47 @@ startBtn.addEventListener('click', () => {
       initNotes();
       initTargets();
       if(typeof initSoloMeditation === 'function') initSoloMeditation();
+      if(typeof initJournal === 'function') initJournal();
+      if(typeof initBooks === 'function') initBooks();
+      renderPinnedBoard();
+    }catch(e){ console.error('logoutIdentity failed:', e); }
+  }
+
+  const chooseRashitaBtn = document.getElementById('chooseRashita');
+  const chooseSanjokBtn = document.getElementById('chooseSanjok');
+  if(chooseRashitaBtn) chooseRashitaBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokBtn) chooseSanjokBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaNotesBtn = document.getElementById('chooseRashitaNotes');
+  const chooseSanjokNotesBtn = document.getElementById('chooseSanjokNotes');
+  if(chooseRashitaNotesBtn) chooseRashitaNotesBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokNotesBtn) chooseSanjokNotesBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  switchIdentity.addEventListener('click', () => {
+    try{
+      logoutIdentity();
     }catch(e){ console.error('switchIdentity failed:', e); }
   });
 
   const switchIdentityNotesBtn = document.getElementById('switchIdentityNotes');
   if(switchIdentityNotesBtn) switchIdentityNotesBtn.addEventListener('click', () => {
     try{
-      localStorage.removeItem('sameMomentIdentity');
-      myIdentity = null;
-      initMoods();
-      initNotes();
-      initTargets();
-      if(typeof initSoloMeditation === 'function') initSoloMeditation();
+      logoutIdentity();
     }catch(e){ console.error('switchIdentityNotes failed:', e); }
+  });
+
+  const switchIdentityJournalBtn = document.getElementById('switchIdentityJournal');
+  if(switchIdentityJournalBtn) switchIdentityJournalBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityJournal failed:', e); }
+  });
+
+  const switchIdentityBooksBtn = document.getElementById('switchIdentityBooks');
+  if(switchIdentityBooksBtn) switchIdentityBooksBtn.addEventListener('click', () => {
+    try{
+      logoutIdentity();
+    }catch(e){ console.error('switchIdentityBooks failed:', e); }
   });
 
   function setupMoodBoard(){
@@ -1791,8 +2021,9 @@ startBtn.addEventListener('click', () => {
 
       const combined = [];
       Object.keys(data).forEach(identity => {
-        Object.values(data[identity] || {}).forEach(entry => {
-          combined.push(Object.assign({ author: identity }, entry));
+        const entriesForId = data[identity] || {};
+        Object.keys(entriesForId).forEach(key => {
+          combined.push(Object.assign({ author: identity, key: key }, entriesForId[key]));
         });
       });
       combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -1812,13 +2043,26 @@ startBtn.addEventListener('click', () => {
         item.className = 'mood-history-item';
         const when = entry.timestamp ? new Date(entry.timestamp).toLocaleDateString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
         const noteHtml = entry.note ? ('<div class="mhi-note">' + escapeHtml(entry.note) + '</div>') : '';
+        const pinTag = entry.pinned ? '<span class="pinned-tag">📌 pinned</span>' : '';
         item.innerHTML =
           '<div class="mhi-emoji">' + entry.emoji + '</div>' +
           '<div class="mhi-body">' +
-            '<div class="mhi-who">' + (PARTNER_NAMES[entry.author] || entry.author) + (entry.intensity ? ' · ' + entry.intensity + '/5' : '') + '</div>' +
+            '<div class="mhi-who">' + pinTag + (PARTNER_NAMES[entry.author] || entry.author) + (entry.intensity ? ' · ' + entry.intensity + '/5' : '') + '</div>' +
             noteHtml +
             '<div class="mhi-time">' + when + '</div>' +
           '</div>';
+
+        if(entry.author === myIdentity){
+          const pinBtn = document.createElement('button');
+          pinBtn.className = 'pin-btn' + (entry.pinned ? ' pinned' : '');
+          pinBtn.textContent = entry.pinned ? 'Unpin' : 'Pin';
+          pinBtn.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('moodHistory/' + entry.author + '/' + entry.key + '/pinned').set(!entry.pinned);
+          });
+          item.appendChild(pinBtn);
+        }
+
         moodHistoryList.appendChild(item);
       });
     }catch(e){ console.error('renderMoodHistoryAndStreaks failed:', e); }
@@ -1896,10 +2140,19 @@ startBtn.addEventListener('click', () => {
 
         const author = document.createElement('span');
         author.className = 'note-author';
-        author.textContent = PARTNER_NAMES[note.author] || note.author || 'unknown';
+        author.textContent = (note.pinned ? '📌 ' : '') + (PARTNER_NAMES[note.author] || note.author || 'unknown');
         meta.appendChild(author);
 
         if(note.author === myIdentity){
+          const pin = document.createElement('button');
+          pin.className = 'pin-btn' + (note.pinned ? ' pinned' : '');
+          pin.textContent = note.pinned ? 'Unpin' : 'Pin';
+          pin.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('notes/' + note.key + '/pinned').set(!note.pinned);
+          });
+          meta.appendChild(pin);
+
           const del = document.createElement('button');
           del.className = 'note-delete';
           del.textContent = 'Delete';
@@ -2245,19 +2498,588 @@ startBtn.addEventListener('click', () => {
 
   const chooseRashitaTargetsBtn = document.getElementById('chooseRashitaTargets');
   const chooseSanjokTargetsBtn = document.getElementById('chooseSanjokTargets');
-  if(chooseRashitaTargetsBtn) chooseRashitaTargetsBtn.addEventListener('click', () => setIdentity('rashita'));
-  if(chooseSanjokTargetsBtn) chooseSanjokTargetsBtn.addEventListener('click', () => setIdentity('sanjok'));
+  if(chooseRashitaTargetsBtn) chooseRashitaTargetsBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokTargetsBtn) chooseSanjokTargetsBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaJournalBtn = document.getElementById('chooseRashitaJournal');
+  const chooseSanjokJournalBtn = document.getElementById('chooseSanjokJournal');
+  if(chooseRashitaJournalBtn) chooseRashitaJournalBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokJournalBtn) chooseSanjokJournalBtn.addEventListener('click', () => requestIdentity('sanjok'));
+
+  const chooseRashitaBooksBtn = document.getElementById('chooseRashitaBooks');
+  const chooseSanjokBooksBtn = document.getElementById('chooseSanjokBooks');
+  if(chooseRashitaBooksBtn) chooseRashitaBooksBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokBooksBtn) chooseSanjokBooksBtn.addEventListener('click', () => requestIdentity('sanjok'));
 
   if(switchIdentityTargets) switchIdentityTargets.addEventListener('click', () => {
     try{
-      localStorage.removeItem('sameMomentIdentity');
-      myIdentity = null;
-      initMoods();
-      initNotes();
-      initTargets();
-      if(typeof initSoloMeditation === 'function') initSoloMeditation();
+      logoutIdentity();
     }catch(e){ console.error('switchIdentityTargets failed:', e); }
   });
+
+  // =================================================================
+  // LOGIN MODAL — a lightweight per-person password gate. It is not
+  // bank-grade security (this is a static page with no server), but it
+  // stops one partner from casually picking the other's name and
+  // editing their moods/notes/targets/journal. Password hashes (SHA-256,
+  // salted) are stored in Firebase at auth/<identity>/hash — never the
+  // plain password itself.
+  // =================================================================
+  const loginModalOverlay = document.getElementById('loginModalOverlay');
+  const loginModalTitle = document.getElementById('loginModalTitle');
+  const loginModalSub = document.getElementById('loginModalSub');
+  const loginPasswordInput = document.getElementById('loginPasswordInput');
+  const loginPasswordConfirmInput = document.getElementById('loginPasswordConfirmInput');
+  const loginError = document.getElementById('loginError');
+  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+  const loginCancelBtn = document.getElementById('loginCancelBtn');
+  let loginResolver = null;
+
+  async function hashPassword(str){
+    try{
+      const enc = new TextEncoder().encode('same-moment-salt::' + str);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }catch(e){ console.error('hashPassword failed:', e); return null; }
+  }
+
+  function openLoginModal(id, mode){
+    return new Promise(resolve => {
+      loginResolver = resolve;
+      loginModalTitle.textContent = (mode === 'create' ? 'Set a password, ' : 'Welcome back, ') + PARTNER_NAMES[id];
+      loginModalSub.textContent = mode === 'create'
+        ? 'This keeps your data only editable by you.'
+        : 'Enter your password to continue.';
+      loginPasswordConfirmInput.classList.toggle('hidden', mode !== 'create');
+      loginPasswordInput.value = '';
+      loginPasswordConfirmInput.value = '';
+      loginError.textContent = '';
+      loginModalOverlay.classList.remove('hidden');
+      setTimeout(() => loginPasswordInput.focus(), 50);
+    });
+  }
+
+  function closeLoginModal(result){
+    loginModalOverlay.classList.add('hidden');
+    if(loginResolver){
+      const resolve = loginResolver;
+      loginResolver = null;
+      resolve(result);
+    }
+  }
+
+  if(loginCancelBtn) loginCancelBtn.addEventListener('click', () => closeLoginModal(null));
+
+  if(loginSubmitBtn) loginSubmitBtn.addEventListener('click', () => {
+    const isCreateMode = !loginPasswordConfirmInput.classList.contains('hidden');
+    const pw = loginPasswordInput.value;
+    if(!pw || pw.length < 4){
+      loginError.textContent = 'Password must be at least 4 characters.';
+      return;
+    }
+    if(isCreateMode && pw !== loginPasswordConfirmInput.value){
+      loginError.textContent = "Passwords don't match.";
+      return;
+    }
+    closeLoginModal(pw);
+  });
+
+  [loginPasswordInput, loginPasswordConfirmInput].forEach(inp => {
+    if(!inp) return;
+    inp.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); loginSubmitBtn.click(); }
+    });
+  });
+
+  async function requestIdentity(id){
+    try{
+      if(!firebaseReady){ setIdentity(id); return; }
+      const snap = await db.ref('auth/' + id).once('value');
+      const existing = snap.val();
+      if(!existing || !existing.hash){
+        const pw = await openLoginModal(id, 'create');
+        if(pw === null) return;
+        const hash = await hashPassword(pw);
+        if(!hash) return;
+        await db.ref('auth/' + id).set({ hash: hash, createdAt: firebase.database.ServerValue.TIMESTAMP });
+        setIdentity(id);
+      } else {
+        const pw = await openLoginModal(id, 'enter');
+        if(pw === null) return;
+        const hash = await hashPassword(pw);
+        if(hash && hash === existing.hash){
+          setIdentity(id);
+        } else {
+          alert('Incorrect password.');
+        }
+      }
+    }catch(e){ console.error('requestIdentity failed:', e); }
+  }
+
+  // =================================================================
+  // PIN — shared helper used by both Notes and Moods. Pinned items are
+  // shown on the front page (cover) in the Pinned board until whoever
+  // pinned them un-pins/deletes it. Anyone can only pin/unpin their own
+  // posts, same rule as deleting.
+  // =================================================================
+  const pinnedBoard = document.getElementById('pinnedBoard');
+  const pinnedList = document.getElementById('pinnedList');
+  let lastNotesData = {};
+  let lastMoodHistoryData = {};
+
+  function renderPinnedBoard(){
+    if(!pinnedList || !pinnedBoard) return;
+    const items = [];
+
+    Object.keys(lastNotesData || {}).forEach(key => {
+      const n = lastNotesData[key];
+      if(n && n.pinned){
+        items.push({
+          type: 'note', key: key, author: n.author, text: n.text,
+          emoji: '📝', timestamp: n.createdAt || 0
+        });
+      }
+    });
+
+    Object.keys(lastMoodHistoryData || {}).forEach(identity => {
+      Object.keys(lastMoodHistoryData[identity] || {}).forEach(key => {
+        const m = lastMoodHistoryData[identity][key];
+        if(m && m.pinned){
+          items.push({
+            type: 'mood', key: key, author: identity,
+            text: (m.note ? m.note : (m.intensity ? m.intensity + '/5' : '')),
+            emoji: m.emoji || '💭', timestamp: m.timestamp || 0
+          });
+        }
+      });
+    });
+
+    if(items.length === 0){
+      pinnedBoard.classList.add('hidden');
+      pinnedList.innerHTML = '';
+      return;
+    }
+
+    items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    pinnedBoard.classList.remove('hidden');
+    pinnedList.innerHTML = '';
+
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'pinned-item';
+
+      const emoji = document.createElement('div');
+      emoji.className = 'pi-emoji';
+      emoji.textContent = item.emoji;
+      el.appendChild(emoji);
+
+      const body = document.createElement('div');
+      body.className = 'pi-body';
+      const who = document.createElement('div');
+      who.className = 'pi-who';
+      who.textContent = PARTNER_NAMES[item.author] || item.author;
+      body.appendChild(who);
+      const text = document.createElement('div');
+      text.className = 'pi-text';
+      text.textContent = item.text || '';
+      body.appendChild(text);
+      el.appendChild(body);
+
+      if(myIdentity && item.author === myIdentity){
+        const unpin = document.createElement('button');
+        unpin.className = 'pi-unpin';
+        unpin.textContent = 'Unpin';
+        unpin.addEventListener('click', () => {
+          if(!firebaseReady) return;
+          if(item.type === 'note'){
+            db.ref('notes/' + item.key + '/pinned').set(false);
+          } else {
+            db.ref('moodHistory/' + item.author + '/' + item.key + '/pinned').set(false);
+          }
+        });
+        el.appendChild(unpin);
+      }
+
+      pinnedList.appendChild(el);
+    });
+  }
+
+  if(firebaseReady){
+    db.ref('notes').on('value', snap => {
+      lastNotesData = snap.val() || {};
+      renderPinnedBoard();
+    });
+    db.ref('moodHistory').on('value', snap => {
+      lastMoodHistoryData = snap.val() || {};
+      renderPinnedBoard();
+    });
+  }
+
+  // =================================================================
+  // JOURNAL — private, per-person. Only the signed-in identity's own
+  // entries are read/shown; there is no shared/partner view of this
+  // data anywhere in the app.
+  // =================================================================
+  const journalIdentityChooser = document.getElementById('journalIdentityChooser');
+  const journalBoard = document.getElementById('journalBoard');
+  const journalList = document.getElementById('journalList');
+  const journalTitleInput = document.getElementById('journalTitleInput');
+  const journalTextInput = document.getElementById('journalTextInput');
+  const postJournalBtn = document.getElementById('postJournalBtn');
+  let journalListenerAttachedFor = null;
+
+  function initJournal(){
+    try{
+      if(!journalIdentityChooser || !journalBoard) return;
+      if(myIdentity){
+        journalIdentityChooser.classList.add('hidden');
+        journalBoard.classList.remove('hidden');
+        setupJournalBoard();
+      } else {
+        journalIdentityChooser.classList.remove('hidden');
+        journalBoard.classList.add('hidden');
+        journalList.innerHTML = '';
+      }
+    }catch(e){ console.error('initJournal failed:', e); }
+  }
+
+  function setupJournalBoard(){
+    if(!firebaseReady || !myIdentity) return;
+    if(journalListenerAttachedFor === myIdentity) return;
+    journalListenerAttachedFor = myIdentity;
+    db.ref('journal/' + myIdentity).on('value', snap => {
+      renderJournal(snap.val() || {});
+    });
+  }
+
+  function renderJournal(data){
+    try{
+      journalList.innerHTML = '';
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'journal-empty';
+        empty.textContent = 'No entries yet — write the first one below.';
+        journalList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'journal-entry';
+
+        if(entry.title){
+          const title = document.createElement('div');
+          title.className = 'journal-entry-title';
+          title.textContent = entry.title;
+          card.appendChild(title);
+        }
+
+        const date = document.createElement('div');
+        date.className = 'journal-entry-date';
+        date.textContent = entry.createdAt ? new Date(entry.createdAt).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+        card.appendChild(date);
+
+        const text = document.createElement('div');
+        text.className = 'journal-entry-text';
+        text.textContent = entry.text || '';
+        card.appendChild(text);
+
+        const actions = document.createElement('div');
+        actions.className = 'journal-entry-actions';
+        const del = document.createElement('button');
+        del.textContent = 'Delete';
+        del.addEventListener('click', () => {
+          if(!firebaseReady || !myIdentity) return;
+          db.ref('journal/' + myIdentity + '/' + entry.key).remove();
+        });
+        actions.appendChild(del);
+        card.appendChild(actions);
+
+        journalList.appendChild(card);
+      });
+    }catch(e){ console.error('renderJournal failed:', e); }
+  }
+
+  if(postJournalBtn) postJournalBtn.addEventListener('click', () => {
+    try{
+      const text = journalTextInput.value.trim();
+      if(!text || !firebaseReady || !myIdentity) return;
+      db.ref('journal/' + myIdentity).push({
+        title: journalTitleInput.value.trim(),
+        text: text,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+      journalTitleInput.value = '';
+      journalTextInput.value = '';
+    }catch(e){ console.error('postJournal failed:', e); }
+  });
+
+  // =================================================================
+  // BOOKS — either partner can upload a book; both can browse and
+  // read the shared shelf. Files are stored as base64 directly in the
+  // Realtime Database (there's no Storage bucket configured), so this
+  // works best for smaller files — a few MB at most. Anyone can delete
+  // only what they uploaded.
+  // =================================================================
+  const booksIdentityChooser = document.getElementById('booksIdentityChooser');
+  const booksBoard = document.getElementById('booksBoard');
+  const bookList = document.getElementById('bookList');
+  const bookTitleInput = document.getElementById('bookTitleInput');
+  const bookFileInput = document.getElementById('bookFileInput');
+  const bookFileLabel = document.getElementById('bookFileLabel');
+  const postBookBtn = document.getElementById('postBookBtn');
+  const uploadProgress = document.getElementById('uploadProgress');
+  let booksListenerAttached = false;
+  const MAX_BOOK_BYTES = 8 * 1024 * 1024; // ~8MB, mind Realtime Database node-size limits
+
+  function initBooks(){
+    try{
+      if(!booksIdentityChooser || !booksBoard) return;
+      if(myIdentity){
+        booksIdentityChooser.classList.add('hidden');
+        booksBoard.classList.remove('hidden');
+        setupBooksBoard();
+      } else {
+        booksIdentityChooser.classList.remove('hidden');
+        booksBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initBooks failed:', e); }
+  }
+
+  function setupBooksBoard(){
+    if(!booksListenerAttached && firebaseReady){
+      booksListenerAttached = true;
+      db.ref('books').on('value', snap => {
+        renderBooks(snap.val() || {});
+      });
+    }
+  }
+
+  if(bookFileLabel && bookFileInput){
+    bookFileLabel.addEventListener('click', () => bookFileInput.click());
+    bookFileInput.addEventListener('change', () => {
+      const f = bookFileInput.files && bookFileInput.files[0];
+      bookFileLabel.textContent = f ? f.name : 'Choose a file to upload';
+    });
+  }
+
+  function renderBooks(data){
+    try{
+      bookList.innerHTML = '';
+      const entries = Object.keys(data)
+        .map(key => Object.assign({ key: key }, data[key]))
+        .sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
+
+      if(entries.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'books-empty';
+        empty.textContent = 'No books yet — upload the first one above.';
+        bookList.appendChild(empty);
+        return;
+      }
+
+      entries.forEach(book => {
+        const item = document.createElement('div');
+        item.className = 'book-item';
+
+        const icon = document.createElement('div');
+        icon.className = 'book-icon';
+        icon.textContent = '📘';
+        item.appendChild(icon);
+
+        const body = document.createElement('div');
+        body.className = 'book-body';
+        const title = document.createElement('div');
+        title.className = 'book-title';
+        title.textContent = book.title || book.fileName || 'Untitled';
+        body.appendChild(title);
+        const meta = document.createElement('div');
+        meta.className = 'book-meta';
+        meta.textContent = 'Uploaded by ' + (PARTNER_NAMES[book.uploadedBy] || book.uploadedBy || 'unknown') +
+          (book.fileName ? ' · ' + book.fileName : '');
+        body.appendChild(meta);
+        item.appendChild(body);
+
+        const actions = document.createElement('div');
+        actions.className = 'book-actions';
+        const link = document.createElement('a');
+        link.textContent = 'Open';
+        link.href = book.dataUrl || '#';
+        link.download = book.fileName || 'book';
+        link.target = '_blank';
+        actions.appendChild(link);
+
+        if(book.uploadedBy === myIdentity){
+          const del = document.createElement('button');
+          del.textContent = 'Delete';
+          del.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('books/' + book.key).remove();
+          });
+          actions.appendChild(del);
+        }
+        item.appendChild(actions);
+
+        bookList.appendChild(item);
+      });
+    }catch(e){ console.error('renderBooks failed:', e); }
+  }
+
+  if(postBookBtn) postBookBtn.addEventListener('click', () => {
+    try{
+      if(!firebaseReady || !myIdentity) return;
+      const file = bookFileInput.files && bookFileInput.files[0];
+      const title = bookTitleInput.value.trim();
+      if(!file){ alert('Choose a file first.'); return; }
+      if(file.size > MAX_BOOK_BYTES){
+        alert('That file is too large for this storage setup (limit ~8MB). Try a smaller file.');
+        return;
+      }
+      uploadProgress.classList.remove('hidden');
+      postBookBtn.disabled = true;
+      const reader = new FileReader();
+      reader.onload = () => {
+        db.ref('books').push({
+          title: title || file.name,
+          fileName: file.name,
+          dataUrl: reader.result,
+          uploadedBy: myIdentity,
+          uploadedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+          bookTitleInput.value = '';
+          bookFileInput.value = '';
+          bookFileLabel.textContent = 'Choose a file to upload';
+        }).catch(e => { console.error('Book upload failed:', e); alert('Upload failed — see console for details.'); })
+          .finally(() => {
+            uploadProgress.classList.add('hidden');
+            postBookBtn.disabled = false;
+          });
+      };
+      reader.onerror = () => {
+        uploadProgress.classList.add('hidden');
+        postBookBtn.disabled = false;
+        alert('Could not read that file.');
+      };
+      reader.readAsDataURL(file);
+    }catch(e){ console.error('postBook failed:', e); uploadProgress.classList.add('hidden'); postBookBtn.disabled = false; }
+  });
+
+  // =================================================================
+  // REPORT — read-only compiled view of targets, moods, and meditation
+  // minutes for both partners over a chosen range. It's a summary of
+  // what's already logged elsewhere in the app, not a new data source.
+  // =================================================================
+  const reportRangeRow = document.getElementById('reportRangeRow');
+  const reportContent = document.getElementById('reportContent');
+  let currentReportRange = 'month';
+  let reportRequestToken = 0;
+
+  function datesForReportRange(range){
+    if(range === 'all') return null; // signal: no date filtering, use full history
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const count = range === 'week' ? 7 : 30;
+    const dates = [];
+    for(let i = 0; i < count; i++){
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      dates.push(d);
+    }
+    return dates;
+  }
+
+  function computeReport(range){
+    if(!reportContent) return;
+    if(!firebaseReady){
+      reportContent.innerHTML = '<div class="report-loading">connect a database to see this</div>';
+      return;
+    }
+    const myToken = ++reportRequestToken;
+    const dates = datesForReportRange(range);
+    const rangeStart = dates ? dates[dates.length - 1].getTime() : 0;
+
+    const moodsPromise = db.ref('moodHistory').once('value').then(s => s.val() || {});
+    const soloPromise = db.ref('soloSessions').once('value').then(s => s.val() || {});
+    const targetsPromise = dates
+      ? Promise.all(dates.map(d => db.ref('targets/' + targetsDateKey(d)).once('value').then(s => s.val() || {})))
+      : db.ref('targets').once('value').then(s => Object.values(s.val() || {}));
+
+    Promise.all([moodsPromise, soloPromise, targetsPromise]).then(([moodHistory, soloSessions, targetsDays]) => {
+      if(myToken !== reportRequestToken) return;
+
+      const stats = {
+        rashita: { moodCount: 0, moodTally: {}, targetsSet: 0, targetsDone: 0, meditationMins: 0 },
+        sanjok: { moodCount: 0, moodTally: {}, targetsSet: 0, targetsDone: 0, meditationMins: 0 }
+      };
+
+      ['rashita', 'sanjok'].forEach(id => {
+        Object.values((moodHistory[id]) || {}).forEach(entry => {
+          if(entry.timestamp && entry.timestamp < rangeStart) return;
+          stats[id].moodCount++;
+          if(entry.emoji) stats[id].moodTally[entry.emoji] = (stats[id].moodTally[entry.emoji] || 0) + 1;
+        });
+        Object.values((soloSessions[id]) || {}).forEach(session => {
+          const ts = session.completedAt || 0;
+          if(ts && ts < rangeStart) return;
+          stats[id].meditationMins += Math.round((session.durationSeconds || 0) / 60);
+        });
+      });
+
+      targetsDays.forEach(dayData => {
+        ['rashita', 'sanjok'].forEach(id => {
+          Object.values((dayData && dayData[id]) || {}).forEach(t => {
+            stats[id].targetsSet++;
+            if(t.done) stats[id].targetsDone++;
+          });
+        });
+      });
+
+      renderReport(stats);
+    }).catch(e => { console.error('computeReport failed:', e); });
+  }
+
+  function renderReport(stats){
+    if(!reportContent) return;
+    reportContent.innerHTML = '';
+    const cols = document.createElement('div');
+    cols.className = 'report-cols';
+
+    ['rashita', 'sanjok'].forEach(id => {
+      const s = stats[id];
+      const topMood = Object.keys(s.moodTally).sort((a, b) => s.moodTally[b] - s.moodTally[a])[0];
+      const completionPct = s.targetsSet ? Math.round((s.targetsDone / s.targetsSet) * 100) : null;
+
+      const card = document.createElement('div');
+      card.className = 'report-card';
+      card.innerHTML =
+        '<div class="report-card-name">' + PARTNER_NAMES[id] + '</div>' +
+        '<div class="report-stat"><span class="report-stat-num">' + s.moodCount + '</span><span class="report-stat-label">moods logged' + (topMood ? ' · most often ' + topMood : '') + '</span></div>' +
+        '<div class="report-stat"><span class="report-stat-num">' + (completionPct === null ? '—' : completionPct + '%') + '</span><span class="report-stat-label">targets completed (' + s.targetsDone + '/' + s.targetsSet + ')</span></div>' +
+        '<div class="report-stat"><span class="report-stat-num">' + s.meditationMins + '</span><span class="report-stat-label">meditation minutes</span></div>';
+      cols.appendChild(card);
+    });
+
+    reportContent.appendChild(cols);
+  }
+
+  if(reportRangeRow){
+    reportRangeRow.querySelectorAll('.loss-range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        reportRangeRow.querySelectorAll('.loss-range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentReportRange = btn.dataset.range;
+        computeReport(currentReportRange);
+      });
+    });
+  }
+
+  function initReport(){
+    computeReport(currentReportRange);
+  }
 
 })();
 
