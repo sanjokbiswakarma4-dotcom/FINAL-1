@@ -140,6 +140,15 @@ opacity:1;
     }
 .locket{
     width:180px;
+    height:180px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.05);
+    border:1px solid var(--glass-border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:92px;
+    line-height:1;
     cursor:pointer;
     transition:all .5s ease;
     filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));
@@ -391,7 +400,7 @@ animation:none;
   @media (max-width: 420px){
     .folder-grid{ gap: 18px 12px; }
     .folder-icon{ width:64px; height:64px; font-size:26px; }
-    .locket{ width:150px; }
+    .locket{ width:150px; height:150px; font-size:76px; }
   }
 </style>
 </head>
@@ -411,13 +420,9 @@ animation:none;
 
       <div class="folder-item big" data-target="panel-meditation">
         <div class="locket-wrap">
-          <img
-            src="assets/locket.png"
-            id="folder"
-            class="locket"
-            alt="Love Locket">
+          <div id="folder" class="locket">🧘</div>
         </div>
-        <div class="folder-label">our meditation</div>
+        <div class="folder-label">meditation</div>
       </div>
 
       <div class="folder-item small" data-target="panel-music">
@@ -635,9 +640,11 @@ animation:none;
     appPanel.classList.remove('hidden');
     closeFolderBtn.classList.remove('hidden');
 
-    if(targetId === 'panel-music') initMusic();
-    if(targetId === 'panel-memories') initMemories();
-    if(targetId === 'panel-moods') initMoods();
+    try{
+      if(targetId === 'panel-music') initMusic();
+      if(targetId === 'panel-memories') initMemories();
+      if(targetId === 'panel-moods') initMoods();
+    }catch(e){ console.error('Panel init failed for ' + targetId + ':', e); }
   }
 
   document.querySelectorAll('.folder-item').forEach(item => {
@@ -844,9 +851,10 @@ bgMusic.currentTime = 0;
   // Put the mp3s in an "assets/music/" folder next to this html file.
   // =================================================================
   const TRACKS = [
-    { title: "Track 1 — replace me", src: "assets/music/track1.mp3" },
-    { title: "Track 2 — replace me", src: "assets/music/track2.mp3" },
-    { title: "Track 3 — replace me", src: "assets/music/track3.mp3" },
+    { title: "Behos", src: "behos.mp3" },
+    { title: "Dooron", src: "dooron.mp3" },
+    { title: "Jindagi Aur Kuch Bhi Nahi", src: "jindagi aur kuch bhi nahi.mp3" },
+    { title: "Tum Saath Saath Ho", src: "tum saath saath ho.mp3" },
   ];
   let currentTrackIndex = -1;
   let musicInitialized = false;
@@ -907,9 +915,11 @@ bgMusic.currentTime = 0;
   });
 
   function initMusic(){
-    if(musicInitialized) return;
-    musicInitialized = true;
-    renderPlaylist();
+    try{
+      if(musicInitialized) return;
+      musicInitialized = true;
+      renderPlaylist();
+    }catch(e){ console.error('initMusic failed:', e); }
   }
 
   // =================================================================
@@ -917,12 +927,11 @@ bgMusic.currentTime = 0;
   // Put the images in an "assets/memories/" folder next to this html file.
   // =================================================================
   const PHOTOS = [
-    { src: "assets/memories/photo1.jpg", caption: "Add a caption here" },
-    { src: "assets/memories/photo2.jpg", caption: "Add a caption here" },
-    { src: "assets/memories/photo3.jpg", caption: "Add a caption here" },
-    { src: "assets/memories/photo4.jpg", caption: "Add a caption here" },
-    { src: "assets/memories/photo5.jpg", caption: "Add a caption here" },
-    { src: "assets/memories/photo6.jpg", caption: "Add a caption here" },
+    { src: "1.jpg", caption: "Add a caption here" },
+    { src: "2.jpg", caption: "Add a caption here" },
+    { src: "3.jpg", caption: "Add a caption here" },
+    { src: "4.jpg", caption: "Add a caption here" },
+    { src: "5.jpg", caption: "Add a caption here" },
   ];
   let memoriesInitialized = false;
   let lightboxIndex = 0;
@@ -968,9 +977,11 @@ bgMusic.currentTime = 0;
   });
 
   function initMemories(){
-    if(memoriesInitialized) return;
-    memoriesInitialized = true;
-    renderGallery();
+    try{
+      if(memoriesInitialized) return;
+      memoriesInitialized = true;
+      renderGallery();
+    }catch(e){ console.error('initMemories failed:', e); }
   }
 
   // =================================================================
@@ -990,52 +1001,64 @@ bgMusic.currentTime = 0;
   const switchIdentity = document.getElementById('switchIdentity');
 
   function initMoods(){
-    if(myIdentity){
-      identityChooser.classList.add('hidden');
-      moodBoard.classList.remove('hidden');
-      setupMoodBoard();
-    } else {
-      identityChooser.classList.remove('hidden');
-      moodBoard.classList.add('hidden');
-    }
+    try{
+      if(myIdentity){
+        identityChooser.classList.add('hidden');
+        moodBoard.classList.remove('hidden');
+        setupMoodBoard();
+      } else {
+        identityChooser.classList.remove('hidden');
+        moodBoard.classList.add('hidden');
+      }
+    }catch(e){ console.error('initMoods failed:', e); }
   }
 
-  document.getElementById('chooseRashita').addEventListener('click', () => setIdentity('rashita'));
-  document.getElementById('chooseSanjok').addEventListener('click', () => setIdentity('sanjok'));
   function setIdentity(id){
-    myIdentity = id;
-    localStorage.setItem('sameMomentIdentity', id);
-    initMoods();
+    try{
+      myIdentity = id;
+      localStorage.setItem('sameMomentIdentity', id);
+      initMoods();
+    }catch(e){ console.error('setIdentity failed:', e); }
   }
+
+  const chooseRashitaBtn = document.getElementById('chooseRashita');
+  const chooseSanjokBtn = document.getElementById('chooseSanjok');
+  if(chooseRashitaBtn) chooseRashitaBtn.addEventListener('click', () => setIdentity('rashita'));
+  if(chooseSanjokBtn) chooseSanjokBtn.addEventListener('click', () => setIdentity('sanjok'));
+
   switchIdentity.addEventListener('click', () => {
-    localStorage.removeItem('sameMomentIdentity');
-    myIdentity = null;
-    initMoods();
+    try{
+      localStorage.removeItem('sameMomentIdentity');
+      myIdentity = null;
+      initMoods();
+    }catch(e){ console.error('switchIdentity failed:', e); }
   });
 
   function setupMoodBoard(){
-    if(!moodRowRendered){
-      moodRowRendered = true;
-      MOOD_EMOJIS.forEach(emoji => {
-        const btn = document.createElement('div');
-        btn.className = 'mood-emoji-btn';
-        btn.textContent = emoji;
-        btn.addEventListener('click', () => {
-          if(!firebaseReady || !myIdentity) return;
-          db.ref('moods/' + myIdentity).set({
-            emoji: emoji,
-            updatedAt: firebase.database.ServerValue.TIMESTAMP
+    try{
+      if(!moodRowRendered){
+        moodRowRendered = true;
+        MOOD_EMOJIS.forEach(emoji => {
+          const btn = document.createElement('div');
+          btn.className = 'mood-emoji-btn';
+          btn.textContent = emoji;
+          btn.addEventListener('click', () => {
+            if(!firebaseReady || !myIdentity) return;
+            db.ref('moods/' + myIdentity).set({
+              emoji: emoji,
+              updatedAt: firebase.database.ServerValue.TIMESTAMP
+            });
           });
+          myMoodRow.appendChild(btn);
         });
-        myMoodRow.appendChild(btn);
-      });
-    }
-    if(!moodsListenerAttached && firebaseReady){
-      moodsListenerAttached = true;
-      db.ref('moods').on('value', snap => {
-        renderMoodDisplay(snap.val() || {});
-      });
-    }
+      }
+      if(!moodsListenerAttached && firebaseReady){
+        moodsListenerAttached = true;
+        db.ref('moods').on('value', snap => {
+          renderMoodDisplay(snap.val() || {});
+        });
+      }
+    }catch(e){ console.error('setupMoodBoard failed:', e); }
   }
 
   function renderMoodDisplay(data){
