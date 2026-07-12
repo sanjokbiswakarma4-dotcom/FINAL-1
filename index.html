@@ -39,27 +39,57 @@
 
   /* --- COVER: the folder --- */
   #cover{ text-align:center; cursor:pointer; user-select:none; }
-  .folder-wrap{ perspective: 900px; display:inline-block; }
-  .folder{ position:relative; width:170px; height:128px; transform-style:preserve-3d; margin: 0 auto; }
-  .folder .tab{
-    position:absolute; top:-16px; left:18px; width:70px; height:20px;
-    background: var(--ember); border-radius: 8px 8px 0 0;
-  }
-  .folder .back{
-    position:absolute; inset:0;
-    background: linear-gradient(160deg, #E3A052, #C97D34);
-    border-radius: 6px 14px 14px 14px;
-    box-shadow: 0 25px 45px rgba(0,0,0,0.4);
-  }
-  .folder .front{
-    position:absolute; left:0; right:0; bottom:0; height:86px;
-    background: linear-gradient(160deg, #F2BC78, #DB8E42);
-    border-radius: 8px;
-    transform-origin: bottom;
-    transition: transform 0.7s cubic-bezier(.4,0,.2,1);
-    box-shadow: 0 10px 22px rgba(0,0,0,0.3);
-  }
-  .folder.open .front{ transform: rotateX(-118deg); }
+  .locket-wrap{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.locket{
+    width:180px;
+    cursor:pointer;
+    transition:all .5s ease;
+    filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));
+}
+
+.locket:hover{
+    transform:scale(1.08) rotate(-5deg);
+}
+
+.locket.opening{
+    animation:openLocket 1s forwards;
+}
+
+@keyframes openLocket{
+    0%{
+        transform:scale(1) rotate(0deg);
+        opacity:1;
+    }
+
+    40%{
+        transform:scale(1.1) rotate(-8deg);
+    }
+
+    70%{
+        transform:scale(.8);
+        opacity:.7;
+    }
+
+    100%{
+        transform:scale(3);
+        opacity:0;
+        filter:blur(15px);
+    }
+}
+.locket{
+    width:180px;
+    cursor:pointer;
+    transition:all .5s ease;
+    filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));
+}
+
+.locket:hover{
+    transform:scale(1.08) rotate(-5deg);
+}
   .folder-label{
     margin-top: 22px; font-family:'Fraunces', serif; font-weight: 500;
     font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase;
@@ -192,13 +222,9 @@ animation:none;
 
   <!-- COVER -->
   <div id="cover">
-    <div class="folder-wrap">
-      <div class="folder" id="folder">
-        <div class="tab"></div>
-        <div class="back"></div>
-        <div class="front"></div>
-      </div>
-    </div>
+  <div class="locket-wrap">
+    <img src="assets/locket.png" id="folder" class="locket" alt="Love Locket">
+</div>
     <div class="folder-label">our meditation</div>
     <div class="folder-hint">tap to open</div>
   </div>
@@ -318,7 +344,7 @@ animation:none;
 
   // --- Folder open/close ---
   folder.addEventListener('click', () => {
-    folder.classList.add('open');
+    folder.classList.add('opening');
     setTimeout(() => {
       cover.classList.add('hidden');
       appPanel.classList.remove('hidden');
