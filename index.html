@@ -20,7 +20,8 @@
     --glass-border: rgba(255,255,255,0.14);
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; height:100%; font-family:'IBM Plex Sans', sans-serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; }
+  html,body{ margin:0; padding:0; height:100%; font-family:'Cormorant Garamond
+Outfit', sans-serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; }
 
   .bg-photo{
     position: fixed; inset:0; width:100%; height:100%;
@@ -71,12 +72,12 @@
   #appPanel{
     width:100%; max-width: 400px;
     background: var(--glass);
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(35px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 32px 28px 28px;
-    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.6);
+    box-shadow: 0 25px 80px rgba(0,0,0,0.45);
   }
   .wordmark{
     font-family:'Fraunces', serif; font-weight:500; font-size:14px;
@@ -137,14 +138,41 @@
     background: rgba(8,10,16,0.72);
     display:flex; align-items:center; justify-content:center; flex-direction:column;
   }
-  .breathe-circle{
-    width:160px; height:160px; border-radius:50%;
-    background: radial-gradient(circle at 40% 35%, var(--ember), var(--ember-dim) 75%);
-    animation: breatheGuide 8s ease-in-out infinite;
-  }
-  @keyframes breatheGuide{
-    0%,100%{ transform:scale(0.75); }
-    50%{ transform:scale(1.15); }
+  .breathe-rings{
+    position:relative;
+    width:180px;
+    height:180px;
+}
+
+.breathe-rings span{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.3);
+    animation:ripple 6s infinite;
+}
+
+.breathe-rings span:nth-child(2){
+    animation-delay:2s;
+}
+
+.breathe-rings span:nth-child(3){
+    animation-delay:4s;
+}
+
+@keyframes ripple{
+
+0%{
+transform:scale(.5);
+opacity:1;
+}
+
+100%{
+transform:scale(1.8);
+opacity:0;
+}
+
+}
   }
   .breathe-text{ margin-top: 26px; font-family:'Fraunces', serif; font-size:20px; letter-spacing:0.04em; color: var(--text-primary); }
   .breathe-close{ margin-top: 36px; width:auto; padding:9px 22px; background:transparent; border:1px solid var(--glass-border); color:var(--text-muted); border-radius:10px; }
@@ -176,7 +204,7 @@
 
   <!-- APP PANEL -->
   <div id="appPanel" class="hidden">
-    <div class="wordmark">Same Moment</div>
+    <div class="wordmark">✦ SAME MOMENT ✦</div>
 
     <div id="configWarning" class="config-warning hidden">
       This copy isn't connected to a database yet. Open the file, find
@@ -228,7 +256,11 @@
 
 <!-- BREATHE OVERLAY -->
 <div id="breatheOverlay" class="hidden">
-  <div class="breathe-circle"></div>
+  <div class="breathe-rings">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
   <div class="breathe-text" id="breatheText">breathe in...</div>
   <button class="breathe-close" id="breatheCloseBtn">Close</button>
 </div>
