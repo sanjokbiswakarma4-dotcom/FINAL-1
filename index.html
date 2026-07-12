@@ -374,12 +374,15 @@ animation:none;
   const breatheOverlay = document.getElementById('breatheOverlay');
   const breatheCloseBtn = document.getElementById('breatheCloseBtn');
   const breatheText = document.getElementById('breatheText');
+  const bgMusic = document.getElementById('bgMusic');
 
   if(!firebaseReady){ configWarning.classList.remove('hidden'); }
 
   // --- Folder open/close ---
   folder.addEventListener('click', () => {
     folder.classList.add('opening');
+
+    
     setTimeout(() => {
       cover.classList.add('hidden');
       appPanel.classList.remove('hidden');
@@ -465,11 +468,30 @@ animation:none;
   }
   joinBtn.addEventListener('click', joinRoom);
 
-  startBtn.addEventListener('click', () => {
-    chimedForStart = false; chimedForEnd = false;
-    roomRef.update({ duration: durationMin * 60, startTime: Date.now() });
+startBtn.addEventListener('click', () => {
+
+  bgMusic.volume = 0.25;
+  bgMusic.currentTime = 0;
+  bgMusic.play().catch(() => {});
+
+  chimedForStart = false;
+  chimedForEnd = false;
+
+  roomRef.update({
+    duration: durationMin * 60,
+    startTime: Date.now()
   });
-  stopBtn.addEventListener('click', () => { roomRef.update({ startTime: null }); });
+
+});
+  stopBtn.addEventListener('click', () => {
+
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+
+  roomRef.update({ startTime: null });
+
+});
+ 
 
   function render(state, myKey){
     if(!state) return;
@@ -501,6 +523,10 @@ animation:none;
       } else {
         timerDisplay.textContent = '00:00';
         statusLine.textContent = 'session complete';
+        
+        bgMusic.pause();
+bgMusic.currentTime = 0;
+        
         if(!chimedForEnd){ chimedForEnd = true; playChime(); }
         stageVisual.classList.remove('breathing');
       }
@@ -533,7 +559,12 @@ animation:none;
     clearInterval(breatheTextTimer);
   });
 })();
-</script>
+  
+  </script>
+
+<audio id="bgMusic" loop>
+    <source src="assets/music.mp3" type="audio/mpeg">
+</audio>
 
 </body>
 </html>
