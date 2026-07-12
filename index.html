@@ -52,7 +52,11 @@
 }
 
 .locket:hover{
-    transform:scale(1.08) rotate(-5deg);
+    .locket:hover{
+    transform:translateY(-8px) scale(1.08) rotate(-5deg);
+    filter:
+        drop-shadow(0 25px 50px rgba(0,0,0,.45))
+        drop-shadow(0 0 20px rgba(227,160,82,.45));
 }
 
 .locket.opening{
@@ -79,16 +83,7 @@
         opacity:0;
         filter:blur(15px);
     }
-}
-.locket{
-    width:180px;
-    cursor:pointer;
-    transition:all .5s ease;
-    filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));
-}
 
-.locket:hover{
-    transform:scale(1.08) rotate(-5deg);
 }
   .folder-label{
     margin-top: 22px; font-family:'Fraunces', serif; font-weight: 500;
