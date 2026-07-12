@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Same Moment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<style>
+  :root{
+    --ember: #E3A052;
+    --ember-dim: #4A4130;
+    --text-primary: #F5F1E8;
+    --text-muted: #C9C2B2;
+    --glass: rgba(22, 27, 38, 0.55);
+    --glass-border: rgba(255,255,255,0.14);
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; height:100%; font-family:'IBM Plex Sans', sans-serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; }
+
+  .bg-photo{
+    position: fixed; inset:0; width:100%; height:100%;
+    object-fit: cover; z-index:0;
+  }
+  .scrim{
+    position: fixed; inset:0; z-index:1;
+    background: linear-gradient(180deg, rgba(10,12,18,0.35) 0%, rgba(10,12,18,0.55) 55%, rgba(10,12,18,0.8) 100%);
+  }
+
+  .stage{
+    position: relative; z-index: 2;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; padding: 24px;
+  }
+
+  /* --- COVER: the folder --- */
+  #cover{ text-align:center; cursor:pointer; user-select:none; }
+  .folder-wrap{ perspective: 900px; display:inline-block; }
+  .folder{ position:relative; width:170px; height:128px; transform-style:preserve-3d; margin: 0 auto; }
+  .folder .tab{
+    position:absolute; top:-16px; left:18px; width:70px; height:20px;
+    background: var(--ember); border-radius: 8px 8px 0 0;
+  }
+  .folder .back{
+    position:absolute; inset:0;
+    background: linear-gradient(160deg, #E3A052, #C97D34);
+    border-radius: 6px 14px 14px 14px;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+  }
+  .folder .front{
+    position:absolute; left:0; right:0; bottom:0; height:86px;
+    background: linear-gradient(160deg, #F2BC78, #DB8E42);
+    border-radius: 8px;
+    transform-origin: bottom;
+    transition: transform 0.7s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.3);
+  }
+  .folder.open .front{ transform: rotateX(-118deg); }
+  .folder-label{
+    margin-top: 22px; font-family:'Fraunces', serif; font-weight: 500;
+    font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-primary); opacity: 0.9;
+  }
+  .folder-hint{ margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+
+  /* --- APP PANEL (glass card) --- */
+  #appPanel{
+    width:100%; max-width: 400px;
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.6);
+  }
+  .wordmark{
+    font-family:'Fraunces', serif; font-weight:500; font-size:14px;
+    letter-spacing:0.14em; text-transform:uppercase; color: var(--text-muted);
+    text-align:center; margin-bottom: 24px;
+  }
+  .config-warning{
+    background: rgba(58,42,32,0.85); border:1px solid #6B4A2E; color:#F2C89A;
+    border-radius:10px; padding:12px 14px; font-size:12px; line-height:1.5; margin-bottom:18px;
+  }
+  .config-warning code{ background: rgba(0,0,0,0.3); padding:1px 5px; border-radius:4px; }
+
+  .stage-visual{ position:relative; width:180px; height:180px; margin:0 auto 16px; }
+  .orb{ position:absolute; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); transition: opacity .6s ease, margin .6s ease; }
+  .orb.you{ width:120px; height:120px; background: radial-gradient(circle at 35% 35%, var(--ember), var(--ember-dim) 75%); opacity:.35; }
+  .orb.partner{ width:120px; height:120px; background: radial-gradient(circle at 65% 65%, var(--ember), var(--ember-dim) 75%); opacity:0; margin-left:40px; }
+  .stage-visual.both .orb.you{ opacity:.55; margin-left:-16px; }
+  .stage-visual.both .orb.partner{ opacity:.55; margin-left:16px; }
+  .stage-visual.breathing .orb{ animation: breathe 8s ease-in-out infinite; }
+  @keyframes breathe{ 0%,100%{ transform:translate(-50%,-50%) scale(.86); opacity:.5; } 50%{ transform:translate(-50%,-50%) scale(1.12); opacity:.85; } }
+
+  .timer{ font-family:'Fraunces', serif; font-weight:300; font-size:50px; text-align:center; margin:2px 0 6px; font-variant-numeric:tabular-nums; }
+  .status{ text-align:center; font-size:13px; color:var(--text-muted); margin-bottom:20px; min-height:18px; }
+  .status.lit{ color: var(--ember); }
+
+  label{ display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+  input[type=text]{
+    width:100%; background: rgba(10,12,18,0.4); border:1px solid var(--glass-border);
+    color: var(--text-primary); border-radius:10px; padding:11px 12px;
+    font-family:'IBM Plex Mono', monospace; font-size:14px; margin-bottom:14px; outline:none;
+  }
+  input[type=text]:focus{ border-color: var(--ember); }
+  .row{ display:flex; gap:10px; margin-bottom:14px; }
+  .row input{ margin-bottom:0; }
+
+  .chips{ display:flex; gap:8px; margin-bottom:18px; }
+  .chip{ flex:1; text-align:center; padding:9px 0; border-radius:10px; border:1px solid var(--glass-border); color:var(--text-muted); font-size:13px; cursor:pointer; transition: all .15s ease; }
+  .chip.active{ border-color: var(--ember); color: var(--ember); background: rgba(227,160,82,0.12); }
+
+  button{ width:100%; padding:13px 0; border-radius:10px; border:none; font-family:'IBM Plex Sans', sans-serif; font-weight:500; font-size:14px; cursor:pointer; transition: opacity .15s ease; }
+  button:disabled{ cursor:not-allowed; opacity:.5; }
+  .btn-primary{ background: var(--ember); color:#1B140A; margin-bottom:10px; }
+  .btn-primary:hover:not(:disabled){ opacity:.9; }
+  .btn-ghost{ background: transparent; color: var(--text-muted); border:1px solid var(--glass-border); margin-bottom:10px; }
+  .btn-ghost:hover{ color: var(--text-primary); border-color: var(--text-muted); }
+  .btn-row{ display:flex; gap:10px; }
+  .btn-row button{ margin-bottom:10px; }
+
+  .share-row{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--glass-border); font-size:12px; color:var(--text-muted); }
+  .share-row .code{ font-family:'IBM Plex Mono', monospace; color: var(--text-primary); letter-spacing:.05em; }
+  .copy-btn{ background:none; border:1px solid var(--glass-border); color: var(--text-muted); width:auto; padding:5px 10px; font-size:11px; border-radius:7px; }
+
+  .hidden{ display:none !important; }
+
+  /* --- BREATHE OVERLAY --- */
+  #breatheOverlay{
+    position:fixed; inset:0; z-index:5;
+    background: rgba(8,10,16,0.72);
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+  }
+  .breathe-circle{
+    width:160px; height:160px; border-radius:50%;
+    background: radial-gradient(circle at 40% 35%, var(--ember), var(--ember-dim) 75%);
+    animation: breatheGuide 8s ease-in-out infinite;
+  }
+  @keyframes breatheGuide{
+    0%,100%{ transform:scale(0.75); }
+    50%{ transform:scale(1.15); }
+  }
+  .breathe-text{ margin-top: 26px; font-family:'Fraunces', serif; font-size:20px; letter-spacing:0.04em; color: var(--text-primary); }
+  .breathe-close{ margin-top: 36px; width:auto; padding:9px 22px; background:transparent; border:1px solid var(--glass-border); color:var(--text-muted); border-radius:10px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .stage-visual.breathing .orb, .breathe-circle{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<img class="bg-photo" src="assets/background.jpg" alt="">
+<div class="scrim"></div>
+
+<div class="stage">
+
+  <!-- COVER -->
+  <div id="cover">
+    <div class="folder-wrap">
+      <div class="folder" id="folder">
+        <div class="tab"></div>
+        <div class="back"></div>
+        <div class="front"></div>
+      </div>
+    </div>
+    <div class="folder-label">our meditation</div>
+    <div class="folder-hint">tap to open</div>
+  </div>
+
+  <!-- APP PANEL -->
+  <div id="appPanel" class="hidden">
+    <div class="wordmark">Same Moment</div>
+
+    <div id="configWarning" class="config-warning hidden">
+      This copy isn't connected to a database yet. Open the file, find
+      <code>firebaseConfig</code>, and paste in your Firebase project's values.
+    </div>
+
+    <div id="setup">
+      <label for="nameInput">Your name</label>
+      <input type="text" id="nameInput" placeholder="e.g. Ava" maxlength="20">
+
+      <label for="roomInput">Room code — share this with them</label>
+      <div class="row">
+        <input type="text" id="roomInput" placeholder="e.g. dawn-4471" maxlength="24">
+        <button class="btn-ghost" style="width:auto; padding:0 14px;" id="generateBtn">New</button>
+      </div>
+
+      <button class="btn-primary" id="joinBtn" disabled>Join room</button>
+    </div>
+
+    <div id="session" class="hidden">
+      <div class="stage-visual" id="stageVisual">
+        <div class="orb you"></div>
+        <div class="orb partner"></div>
+      </div>
+      <div class="timer" id="timerDisplay">10:00</div>
+      <div class="status" id="statusLine">waiting for you to begin</div>
+
+      <div class="chips" id="chips">
+        <div class="chip" data-min="5">5m</div>
+        <div class="chip active" data-min="10">10m</div>
+        <div class="chip" data-min="15">15m</div>
+        <div class="chip" data-min="20">20m</div>
+      </div>
+
+      <button class="btn-primary" id="startBtn">Begin together</button>
+      <button class="btn-ghost hidden" id="stopBtn">End session</button>
+      <button class="btn-ghost" id="breatheBtn">Breathe</button>
+
+      <div class="share-row">
+        <span>Room: <span class="code" id="roomCodeDisplay"></span></span>
+        <button class="copy-btn" id="copyBtn">Copy code</button>
+      </div>
+    </div>
+
+    <button class="btn-ghost hidden" id="closeFolderBtn" style="margin-top:6px;">Close folder</button>
+  </div>
+
+</div>
+
+<!-- BREATHE OVERLAY -->
+<div id="breatheOverlay" class="hidden">
+  <div class="breathe-circle"></div>
+  <div class="breathe-text" id="breatheText">breathe in...</div>
+  <button class="breathe-close" id="breatheCloseBtn">Close</button>
+</div>
+
+<script>
+(function(){
+  // ---------------------------------------------------------------
+  // Firebase project config (already filled in)
+  // ---------------------------------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyApPo1wZYRx0Ni47Ap5bV_2ik2GoPPZrmI",
+    authDomain: "newweb-6bd03.firebaseapp.com",
+    databaseURL: "https://newweb-6bd03-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "newweb-6bd03",
+  };
+
+  let db = null, firebaseReady = false;
+  try{
+    if(!firebaseConfig.databaseURL.startsWith("PASTE_")){
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      firebaseReady = true;
+    }
+  }catch(e){ console.error("Firebase failed to initialize:", e); }
+
+  let room=null, myName=null, durationMin=10, roomRef=null, presenceInterval=null;
+  let audioCtx=null, chimedForStart=false, chimedForEnd=false;
+
+  const folder = document.getElementById('folder');
+  const cover = document.getElementById('cover');
+  const appPanel = document.getElementById('appPanel');
+  const closeFolderBtn = document.getElementById('closeFolderBtn');
+  const configWarning = document.getElementById('configWarning');
+  const setupEl = document.getElementById('setup');
+  const sessionEl = document.getElementById('session');
+  const nameInput = document.getElementById('nameInput');
+  const roomInput = document.getElementById('roomInput');
+  const joinBtn = document.getElementById('joinBtn');
+  const generateBtn = document.getElementById('generateBtn');
+  const stageVisual = document.getElementById('stageVisual');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const statusLine = document.getElementById('statusLine');
+  const chips = document.querySelectorAll('.chip');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const breatheBtn = document.getElementById('breatheBtn');
+  const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+  const copyBtn = document.getElementById('copyBtn');
+  const breatheOverlay = document.getElementById('breatheOverlay');
+  const breatheCloseBtn = document.getElementById('breatheCloseBtn');
+  const breatheText = document.getElementById('breatheText');
+
+  if(!firebaseReady){ configWarning.classList.remove('hidden'); }
+
+  // --- Folder open/close ---
+  folder.addEventListener('click', () => {
+    folder.classList.add('open');
+    setTimeout(() => {
+      cover.classList.add('hidden');
+      appPanel.classList.remove('hidden');
+      closeFolderBtn.classList.remove('hidden');
+    }, 650);
+  });
+  closeFolderBtn.addEventListener('click', () => {
+    appPanel.classList.add('hidden');
+    closeFolderBtn.classList.add('hidden');
+    folder.classList.remove('open');
+    cover.classList.remove('hidden');
+  });
+
+  // --- Setup form ---
+  function updateJoinEnabled(){
+    joinBtn.disabled = !firebaseReady || !(nameInput.value.trim() && roomInput.value.trim());
+  }
+  nameInput.addEventListener('input', updateJoinEnabled);
+  roomInput.addEventListener('input', updateJoinEnabled);
+
+  const words = ['dawn','dusk','still','quiet','soft','ember','moon','tide','calm','warm'];
+  generateBtn.addEventListener('click', () => {
+    const w = words[Math.floor(Math.random()*words.length)];
+    const n = Math.floor(1000 + Math.random()*9000);
+    roomInput.value = w + '-' + n;
+    updateJoinEnabled();
+  });
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      durationMin = parseInt(chip.dataset.min, 10);
+    });
+  });
+
+  function playChime(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      [523.25, 783.99].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now + i*0.15);
+        gain.gain.linearRampToValueAtTime(0.15, now + i*0.15 + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.15 + 2.2);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(now + i*0.15); osc.stop(now + i*0.15 + 2.3);
+      });
+    }catch(e){}
+  }
+
+  function sanitizeKey(str){ return str.replace(/[.#$\[\]/]/g, '_'); }
+  function formatTime(totalSeconds){
+    const s = Math.max(0, Math.ceil(totalSeconds));
+    const m = Math.floor(s/60), sec = s%60;
+    return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+  }
+
+  function joinRoom(){
+    myName = nameInput.value.trim();
+    const myKey = sanitizeKey(myName);
+    room = roomInput.value.trim().toLowerCase().replace(/\s+/g, '-');
+    roomRef = db.ref('rooms/' + sanitizeKey(room));
+
+    roomRef.once('value').then(snapshot => {
+      if(!snapshot.exists()){
+        roomRef.set({ duration: durationMin * 60, startTime: null, presence: {} });
+      }
+      roomRef.child('presence/' + myKey).set(Date.now());
+
+      setupEl.classList.add('hidden');
+      sessionEl.classList.remove('hidden');
+      roomCodeDisplay.textContent = room;
+
+      presenceInterval = setInterval(() => {
+        roomRef.child('presence/' + myKey).set(Date.now());
+      }, 2000);
+
+      roomRef.on('value', snap => render(snap.val(), myKey));
+    });
+  }
+  joinBtn.addEventListener('click', joinRoom);
+
+  startBtn.addEventListener('click', () => {
+    chimedForStart = false; chimedForEnd = false;
+    roomRef.update({ duration: durationMin * 60, startTime: Date.now() });
+  });
+  stopBtn.addEventListener('click', () => { roomRef.update({ startTime: null }); });
+
+  function render(state, myKey){
+    if(!state) return;
+    const now = Date.now();
+    const presence = state.presence || {};
+    const partnerKey = Object.keys(presence).find(k => k !== myKey);
+    const partnerPresent = partnerKey && (now - presence[partnerKey] < 6000);
+
+    stageVisual.classList.toggle('both', !!partnerPresent);
+
+    if(!state.startTime){
+      const mins = Math.round((state.duration || durationMin*60) / 60);
+      chips.forEach(c => c.classList.toggle('active', parseInt(c.dataset.min,10) === mins));
+    }
+
+    if(state.startTime){
+      const elapsed = (now - state.startTime) / 1000;
+      const remaining = state.duration - elapsed;
+      startBtn.classList.add('hidden');
+      stopBtn.classList.remove('hidden');
+      chips.forEach(c => { c.style.pointerEvents='none'; c.style.opacity='0.5'; });
+      stageVisual.classList.add('breathing');
+
+      if(remaining > 0){
+        timerDisplay.textContent = formatTime(remaining);
+        statusLine.textContent = partnerPresent ? 'sitting together' : 'sitting quietly — waiting for them to join';
+        statusLine.classList.add('lit');
+        if(!chimedForStart){ chimedForStart = true; playChime(); }
+      } else {
+        timerDisplay.textContent = '00:00';
+        statusLine.textContent = 'session complete';
+        if(!chimedForEnd){ chimedForEnd = true; playChime(); }
+        stageVisual.classList.remove('breathing');
+      }
+    } else {
+      startBtn.classList.remove('hidden');
+      stopBtn.classList.add('hidden');
+      chips.forEach(c => { c.style.pointerEvents='auto'; c.style.opacity='1'; });
+      stageVisual.classList.remove('breathing');
+      timerDisplay.textContent = formatTime(state.duration || durationMin*60);
+      statusLine.textContent = partnerPresent ? "they're here — ready when you are" : 'waiting for them to join';
+      statusLine.classList.remove('lit');
+    }
+  }
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(room).then(() => {
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => { copyBtn.textContent = 'Copy code'; }, 1500);
+    }).catch(() => {});
+  });
+
+  // --- Standalone Breathe guide (independent of session) ---
+  let breatheTextTimer = null;
+  breatheBtn.addEventListener('click', () => {
+    breatheOverlay.classList.remove('hidden');
+    let phase = 'in';
+    breatheText.textContent = 'breathe in...';
+    breatheTextTimer = setInterval(() => {
+      phase = phase === 'in' ? 'out' : 'in';
+      breatheText.textContent = phase === 'in' ? 'breathe in...' : 'breathe out...';
+    }, 4000);
+  });
+  breatheCloseBtn.addEventListener('click', () => {
+    breatheOverlay.classList.add('hidden');
+    clearInterval(breatheTextTimer);
+  });
+})();
+</script>
+
+</body>
+</html>
