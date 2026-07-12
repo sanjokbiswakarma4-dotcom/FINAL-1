@@ -20,8 +20,7 @@
     --glass-border: rgba(255,255,255,0.14);
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; height:100%; font-family:'Cormorant Garamond
-Outfit', sans-serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; }
+  html,body{ margin:0; padding:0; height:100%; font-family:'Cormorant Garamond', serif; color: var(--text-primary); -webkit-font-smoothing:antialiased; overflow:hidden; }
 
   .bg-photo{
     position: fixed; inset:0; width:100%; height:100%;
@@ -172,13 +171,15 @@ transform:scale(1.8);
 opacity:0;
 }
 
-}
   }
   .breathe-text{ margin-top: 26px; font-family:'Fraunces', serif; font-size:20px; letter-spacing:0.04em; color: var(--text-primary); }
   .breathe-close{ margin-top: 36px; width:auto; padding:9px 22px; background:transparent; border:1px solid var(--glass-border); color:var(--text-muted); border-radius:10px; }
 
   @media (prefers-reduced-motion: reduce){
-    .stage-visual.breathing .orb, .breathe-circle{ animation:none; }
+    .stage-visual.breathing .orb,
+.breathe-rings span{
+animation:none;
+}
   }
 </style>
 </head>
