@@ -405,6 +405,13 @@ animation:none;
   let room=null, myName=null, durationMin=10, roomRef=null, presenceInterval=null;
   let audioCtx=null, chimedForStart=false, chimedForEnd=false;
 
+  // NEW: cache of the last known room state + a dedicated local ticker,
+  // so the countdown redraws every second instead of only when Firebase
+  // pushes an update (which was previously tied to the 2s presence write).
+  let lastState = null;
+  let myKeyGlobal = null;
+  let tickInterval = null;
+
   const folder = document.getElementById('folder');
   const cover = document.getElementById('cover');
   const appPanel = document.getElementById('appPanel');
@@ -500,6 +507,7 @@ animation:none;
   function joinRoom(){
     myName = nameInput.value.trim();
     const myKey = sanitizeKey(myName);
+    myKeyGlobal = myKey;
     room = roomInput.value.trim().toLowerCase().replace(/\s+/g, '-');
     roomRef = db.ref('rooms/' + sanitizeKey(room));
 
@@ -517,7 +525,21 @@ animation:none;
         roomRef.child('presence/' + myKey).set(Date.now());
       }, 2000);
 
-      roomRef.on('value', snap => render(snap.val(), myKey));
+      // Firebase listener: only fires when the room data actually changes
+      // (start/stop, presence writes, duration change). Cache the value —
+      // do NOT rely on this alone to drive the visible countdown.
+      roomRef.on('value', snap => {
+        lastState = snap.val();
+        render(lastState, myKey);
+      });
+
+      // NEW: local ticker repaints the timer every second using the cached
+      // state, so the display counts down smoothly instead of jumping only
+      // when a presence write happens to land.
+      if(tickInterval) clearInterval(tickInterval);
+      tickInterval = setInterval(() => {
+        if(lastState) render(lastState, myKeyGlobal);
+      }, 1000);
     });
   }
   joinBtn.addEventListener('click', joinRoom);
