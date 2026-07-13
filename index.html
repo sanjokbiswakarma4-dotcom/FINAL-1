@@ -3507,8 +3507,17 @@ startBtn.addEventListener('click', () => {
         return;
       }
 
-      const fileSnap = await db.ref('bookFiles/' + book.key).once('value');
-      const dataUrl = fileSnap.val();
+      // Some books were uploaded before file content was split out into
+      // its own 'bookFiles' node, so their data still lives directly on
+      // the book's metadata record (book.dataUrl). Check that first, and
+      // only fall back to a 'bookFiles' lookup if it's not there — this
+      // keeps both old and new uploads readable without needing a
+      // migration to happen first.
+      let dataUrl = book.dataUrl || null;
+      if(!dataUrl){
+        const fileSnap = await db.ref('bookFiles/' + book.key).once('value');
+        dataUrl = fileSnap.val();
+      }
       if(!dataUrl){
         readerBody.innerHTML = '<div class="reader-unsupported">This book\'s file couldn\'t be found. It may still be uploading.</div>';
         return;
@@ -4179,8 +4188,15 @@ startBtn.addEventListener('click', () => {
         vaultViewerBody.innerHTML = 'Couldn\'t open this file right now.';
         return;
       }
-      const snap = await db.ref('vaultFiles/' + item.key).once('value');
-      const dataUrl = snap.val();
+      // Same legacy-format safety net as the book reader: fall back to
+      // any embedded dataUrl on the item itself before checking the
+      // dedicated 'vaultFiles' node, in case a future migration ever
+      // changes how vault items are stored.
+      let dataUrl = item.dataUrl || null;
+      if(!dataUrl){
+        const snap = await db.ref('vaultFiles/' + item.key).once('value');
+        dataUrl = snap.val();
+      }
       if(!dataUrl){
         vaultViewerBody.innerHTML = 'This file couldn\'t be found. It may still be uploading.';
         return;
