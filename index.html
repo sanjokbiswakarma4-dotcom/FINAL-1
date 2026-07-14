@@ -9,6 +9,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <style>
@@ -1366,14 +1367,24 @@ animation:none;
     authDomain: "newweb-6bd03.firebaseapp.com",
     databaseURL: "https://newweb-6bd03-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "newweb-6bd03",
+    // NOTE: verify this in Firebase Console → Storage. Newer Firebase
+    // projects use the "<project-id>.firebasestorage.app" format instead
+    // of the older "<project-id>.appspot.com" — if books fail to upload,
+    // this is the first thing to check.
+    storageBucket: "newweb-6bd03.appspot.com",
   };
 
   let db = null, firebaseReady = false;
+  let storage = null, storageReady = false;
   try{
     if(!firebaseConfig.databaseURL.startsWith("PASTE_")){
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
       firebaseReady = true;
+      if(firebaseConfig.storageBucket){
+        storage = firebase.storage();
+        storageReady = true;
+      }
     }
   }catch(e){ console.error("Firebase failed to initialize:", e); }
 
@@ -3234,13 +3245,18 @@ startBtn.addEventListener('click', () => {
 
   // =================================================================
   // BOOKS — either partner can upload a book; both can browse and
-  // read the shared shelf. Files are stored as base64 directly in the
-  // Realtime Database (there's no Storage bucket configured), so this
-  // works best for smaller files — a few MB at most. Anyone can delete
-  // only what they uploaded. Reading progress (current page) is tracked
-  // per-person per-book at books/<id>/progress/<identity>, so each of
-  // you can continue your own book from where you left off, and the
-  // "continue reading" banner shows whichever book you touched last.
+  // read the shared shelf. New uploads store the actual file in
+  // Firebase Storage (books/<timestamp>-<filename>) and only small
+  // metadata (title, filename, uploader, a download URL, reading
+  // progress) in the Realtime Database — so there is no ~8MB size
+  // ceiling like a pure-RTDB approach would have. Older entries that
+  // still have their file content embedded as base64 in the Realtime
+  // Database keep working too (see openBookReader). Anyone can delete
+  // only what they uploaded. Reading progress (current page) is
+  // tracked per-person per-book at books/<id>/progress/<identity>, so
+  // each of you can continue your own book from where you left off,
+  // and the "continue reading" banner shows whichever book you
+  // touched last.
   // =================================================================
   const BOOKS_UPLOADER_IDENTITY = 'sanjok'; // only Sanjok can add to the shelf
 
@@ -3259,7 +3275,7 @@ startBtn.addEventListener('click', () => {
   let booksListenerAttached = false;
   let booksDataLoaded = false;
   let lastBooksData = {};
-  const MAX_BOOK_BYTES = 8 * 1024 * 1024; // ~8MB, mind Realtime Database node-size limits
+  const MAX_BOOK_BYTES = 500 * 1024 * 1024; // ~500MB, stored in Firebase Storage (not the Realtime Database)
   const TEXT_CHARS_PER_PAGE = 1800;
 
   function initBooks(){
@@ -3284,14 +3300,11 @@ startBtn.addEventListener('click', () => {
   }
 
   function setupBooksBoard(){
-    // Only the small metadata (title, filename, uploader, progress) lives
-    // under 'books' — the heavy base64 file content lives separately under
-    // 'bookFiles', fetched only when a book is actually opened. Previously
-    // both lived together, so every listing had to download every book's
-    // full content just to show the shelf — on a slow connection that could
-    // time out or lag, making books "disappear" on refresh. This also adds
-    // an explicit loading state so an empty shelf is never confused with
-    // data that just hasn't arrived yet.
+    // Only the small metadata (title, filename, uploader, download URL,
+    // progress) lives under 'books' — heavy file content (for legacy
+    // base64 entries) lives separately under 'bookFiles', fetched only
+    // when a book is actually opened. This keeps the shelf fast to load
+    // no matter how big the books themselves are.
     if(!booksListenerAttached && firebaseReady){
       booksListenerAttached = true;
       db.ref('books').on('value', snap => {
@@ -3411,6 +3424,9 @@ startBtn.addEventListener('click', () => {
           del.addEventListener('click', e => {
             e.stopPropagation();
             if(!firebaseReady) return;
+            if(book.storagePath && storageReady){
+              storage.ref(book.storagePath).delete().catch(err => console.error('Storage delete failed:', err));
+            }
             db.ref('books/' + book.key).remove();
             db.ref('bookFiles/' + book.key).remove();
           });
@@ -3430,36 +3446,50 @@ startBtn.addEventListener('click', () => {
       const title = bookTitleInput.value.trim();
       if(!file){ alert('Choose a file first.'); return; }
       if(file.size > MAX_BOOK_BYTES){
-        alert('That file is too large for this storage setup (limit ~8MB). Try a smaller file.');
+        alert('That file is too large (limit ~500MB).');
+        return;
+      }
+      if(!storageReady){
+        alert("Firebase Storage isn't set up yet — check storageBucket in firebaseConfig.");
         return;
       }
       uploadProgress.classList.remove('hidden');
+      uploadProgress.textContent = 'Uploading... 0%';
       postBookBtn.disabled = true;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const newRef = db.ref('books').push();
-        newRef.set({
-          title: title || file.name,
-          fileName: file.name,
-          uploadedBy: myIdentity,
-          uploadedAt: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => db.ref('bookFiles/' + newRef.key).set(reader.result))
-          .then(() => {
-            bookTitleInput.value = '';
-            bookFileInput.value = '';
-            bookFileLabel.textContent = 'Choose a file to upload';
-          }).catch(e => { console.error('Book upload failed:', e); alert('Upload failed — see console for details.'); })
-          .finally(() => {
-            uploadProgress.classList.add('hidden');
-            postBookBtn.disabled = false;
-          });
-      };
-      reader.onerror = () => {
+
+      const storagePath = 'books/' + Date.now() + '-' + file.name;
+      const uploadTask = storage.ref(storagePath).put(file);
+
+      uploadTask.on('state_changed', snap => {
+        const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
+        uploadProgress.textContent = 'Uploading... ' + pct + '%';
+      }, e => {
+        console.error('Book upload failed:', e);
+        alert('Upload failed — see console for details.');
         uploadProgress.classList.add('hidden');
         postBookBtn.disabled = false;
-        alert('Could not read that file.');
-      };
-      reader.readAsDataURL(file);
+      }, () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(url => {
+          return db.ref('books').push({
+            title: title || file.name,
+            fileName: file.name,
+            fileUrl: url,
+            storagePath: storagePath,
+            uploadedBy: myIdentity,
+            uploadedAt: firebase.database.ServerValue.TIMESTAMP
+          });
+        }).then(() => {
+          bookTitleInput.value = '';
+          bookFileInput.value = '';
+          bookFileLabel.textContent = 'Choose a file to upload';
+        }).catch(e => {
+          console.error('Saving book metadata failed:', e);
+          alert('Upload finished but saving its details failed — see console.');
+        }).finally(() => {
+          uploadProgress.classList.add('hidden');
+          postBookBtn.disabled = false;
+        });
+      });
     }catch(e){ console.error('postBook failed:', e); uploadProgress.classList.add('hidden'); postBookBtn.disabled = false; }
   });
 
@@ -3507,12 +3537,49 @@ startBtn.addEventListener('click', () => {
         return;
       }
 
-      // Some books were uploaded before file content was split out into
-      // its own 'bookFiles' node, so their data still lives directly on
-      // the book's metadata record (book.dataUrl). Check that first, and
-      // only fall back to a 'bookFiles' lookup if it's not there — this
-      // keeps both old and new uploads readable without needing a
-      // migration to happen first.
+      const kind = fileKindFor(book);
+      const savedProgress = (book.progress && book.progress[myIdentity]) || null;
+      if(window.pdfjsLib){
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+
+      // New-style books: the file lives in Firebase Storage and is
+      // loaded straight from its URL — no size limit, no base64
+      // round-trip through the Realtime Database.
+      if(book.fileUrl){
+        if(kind === 'pdf' && window.pdfjsLib){
+          const pdfDoc = await pdfjsLib.getDocument({ url: book.fileUrl }).promise;
+          readerState = {
+            book: book, kind: 'pdf', pdfDoc: pdfDoc,
+            page: savedProgress ? Math.min(savedProgress.page, pdfDoc.numPages) : 1,
+            totalPages: pdfDoc.numPages
+          };
+          await renderReaderPage();
+        } else if(kind === 'txt'){
+          const text = await fetch(book.fileUrl).then(r => r.text());
+          const pages = [];
+          for(let i = 0; i < text.length; i += TEXT_CHARS_PER_PAGE){
+            pages.push(text.slice(i, i + TEXT_CHARS_PER_PAGE));
+          }
+          if(pages.length === 0) pages.push('(empty file)');
+          readerState = {
+            book: book, kind: 'txt', textPages: pages,
+            page: savedProgress ? Math.min(savedProgress.page, pages.length) : 1,
+            totalPages: pages.length
+          };
+          renderReaderPage();
+        } else {
+          readerState = { book: book, kind: 'other', page: 1, totalPages: 1 };
+          readerBody.innerHTML = '<div class="reader-unsupported">In-app preview isn\'t available for this file type yet.<br><br>' +
+            '<a href="' + book.fileUrl + '" target="_blank" rel="noopener">Download to read it</a></div>';
+          readerPageIndicator.textContent = '–';
+        }
+        return;
+      }
+
+      // Legacy books: file content stored as base64 directly in the
+      // Realtime Database (either on the record itself or under
+      // bookFiles/<id>), from before Storage was wired up.
       let dataUrl = book.dataUrl || null;
       if(!dataUrl){
         const fileSnap = await db.ref('bookFiles/' + book.key).once('value');
@@ -3524,11 +3591,7 @@ startBtn.addEventListener('click', () => {
       }
       book = Object.assign({}, book, { dataUrl: dataUrl });
 
-      const kind = fileKindFor(book);
-      const savedProgress = (book.progress && book.progress[myIdentity]) || null;
-
       if(kind === 'pdf' && window.pdfjsLib){
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const bytes = dataUrlToUint8Array(book.dataUrl);
         const pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
         readerState = {
@@ -3558,7 +3621,7 @@ startBtn.addEventListener('click', () => {
       }
     }catch(e){
       console.error('openBookReader failed:', e);
-      readerBody.innerHTML = '<div class="reader-unsupported">Couldn\'t open this book. It may be corrupted or an unsupported format.</div>';
+      readerBody.innerHTML = '<div class="reader-unsupported">Couldn\'t open this book. It may be corrupted, an unsupported format, or blocked by CORS (check Storage bucket CORS settings).</div>';
     }
   }
 
@@ -4188,10 +4251,6 @@ startBtn.addEventListener('click', () => {
         vaultViewerBody.innerHTML = 'Couldn\'t open this file right now.';
         return;
       }
-      // Same legacy-format safety net as the book reader: fall back to
-      // any embedded dataUrl on the item itself before checking the
-      // dedicated 'vaultFiles' node, in case a future migration ever
-      // changes how vault items are stored.
       let dataUrl = item.dataUrl || null;
       if(!dataUrl){
         const snap = await db.ref('vaultFiles/' + item.key).once('value');
