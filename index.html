@@ -705,16 +705,52 @@ opacity:1;
   .targets-date-nav{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
   .targets-date-nav button{ width:auto; padding:6px 12px; font-size:12px; margin-bottom:0; }
   .targets-date-label{ font-family:'Fraunces', serif; font-size:14px; text-align:center; flex:1; color:var(--text-primary); }
+  .targets-day-summary{ text-align:center; font-size:11.5px; color:var(--text-muted); margin-bottom:16px; line-height:1.6; }
+  .targets-day-summary b{ color:var(--ember); font-weight:600; }
   .targets-columns{ display:flex; gap:12px; margin-bottom:8px; }
-  .targets-col{ flex:1; min-width:0; }
-  .targets-col-header{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); text-align:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--glass-border); }
+  .targets-col{
+    flex:1; min-width:0; background:rgba(255,255,255,0.28); border:1px solid var(--glass-border);
+    border-radius:12px; padding:12px 10px 10px;
+  }
+  .targets-col-header{ display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--glass-border); }
+  .targets-col-name{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); }
+  .targets-col-progress{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ember); background:rgba(227,160,82,0.14); border-radius:20px; padding:2px 8px; }
+  .targets-progress-track{ height:4px; border-radius:3px; background:rgba(62,52,38,0.1); margin-bottom:10px; overflow:hidden; }
+  .targets-progress-fill{ height:100%; background:var(--ember); transition:width .3s ease; }
+  .targets-locked-banner{
+    display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--text-muted);
+    background:rgba(255,255,255,0.4); border:1px solid var(--glass-border); border-radius:8px;
+    padding:6px 9px; margin-bottom:8px; text-align:left; line-height:1.4;
+  }
   .targets-list{ display:flex; flex-direction:column; gap:6px; max-height:230px; overflow-y:auto; margin-bottom:10px; min-height:36px; }
-  .target-item{ display:flex; align-items:flex-start; gap:7px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.4); border:1px solid var(--glass-border); font-size:12.5px; }
-  .target-item.done .target-text{ text-decoration:line-through; color:var(--text-muted); opacity:.7; }
-  .target-check{ width:17px; height:17px; border-radius:50%; border:1.5px solid var(--ember); flex:none; margin-top:1px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ember); background:transparent; line-height:1; }
+  .target-item{
+    display:flex; align-items:flex-start; gap:7px; padding:8px; border-radius:8px;
+    background:rgba(255,255,255,0.45); border:1px solid var(--glass-border); font-size:12.5px;
+    transition: background .2s ease, border-color .2s ease;
+  }
+  .target-item.status-done{ border-color:rgba(184,131,74,0.4); background:rgba(227,160,82,0.08); }
+  .target-item.status-missed{ border-color:rgba(179,58,58,0.3); background:rgba(179,58,58,0.06); }
+  .target-item.status-done .target-text{ text-decoration:line-through; color:var(--text-muted); opacity:.75; }
+  .target-item.status-missed .target-text{ text-decoration:line-through; color:#8a4a4a; opacity:.75; }
+  .target-check-group{ display:flex; gap:4px; flex:none; margin-top:1px; }
+  .target-check{
+    width:17px; height:17px; border-radius:50%; border:1.5px solid var(--ember); flex:none;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px;
+    color:var(--ember); background:transparent; line-height:1; transition: all .15s ease;
+  }
+  .target-check:hover{ transform:scale(1.12); }
+  .target-check.wrong{ border-color:#B33A3A; color:#B33A3A; }
   .target-check.checked{ background:var(--ember); color:#1B140A; }
-  .target-check:disabled{ cursor:default; opacity:.6; }
-  .target-text{ flex:1; word-break:break-word; line-height:1.4; }
+  .target-check.checked.wrong{ background:#B33A3A; color:#fff; }
+  .target-check:disabled{ cursor:default; opacity:.6; transform:none; }
+  .target-status-badge{
+    width:17px; height:17px; border-radius:50%; flex:none; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:10px; line-height:1;
+  }
+  .target-status-badge.done{ background:var(--ember); color:#1B140A; }
+  .target-status-badge.missed{ background:#B33A3A; color:#fff; }
+  .target-status-badge.missed.auto{ opacity:.5; }
+  .target-text{ flex:1; word-break:break-word; line-height:1.4; padding-top:1px; }
   .target-text[contenteditable="true"]{ outline:1px dashed var(--ember); border-radius:4px; padding:1px 3px; }
   .target-actions{ display:flex; gap:2px; flex:none; }
   .target-actions button{ width:auto; padding:2px 5px; font-size:11px; background:none; border:none; color:var(--text-muted); cursor:pointer; }
@@ -723,6 +759,11 @@ opacity:1;
   .targets-add-row{ display:flex; gap:6px; }
   .targets-add-row input{ margin-bottom:0; font-size:12px; padding:8px 9px; }
   .targets-add-row button{ width:auto; padding:0 12px; font-size:12px; margin-bottom:0; }
+  .targets-finish-btn{
+    margin-top:8px; background:transparent; border:1px solid var(--ember); color:var(--ember);
+    font-size:11.5px; padding:8px 0; border-radius:8px; letter-spacing:.02em;
+  }
+  .targets-finish-btn:hover{ background:rgba(227,160,82,0.14); }
   @media (max-width: 420px){
     .targets-columns{ flex-direction:column; }
     .targets-col{ margin-bottom:6px; }
@@ -1087,23 +1128,36 @@ animation:none;
           <button class="btn-ghost" id="targetsNextDay">→</button>
         </div>
         <div class="identity-hint" id="targetsTodayBtn" style="margin:0 0 14px;">jump to today</div>
+        <div class="targets-day-summary" id="targetsDaySummary"></div>
 
         <div class="targets-columns">
           <div class="targets-col" data-partner="rashita">
-            <div class="targets-col-header">Rashita</div>
+            <div class="targets-col-header">
+              <span class="targets-col-name">Rashita</span>
+              <span class="targets-col-progress" id="targetsProgressRashita"></span>
+            </div>
+            <div class="targets-progress-track"><div class="targets-progress-fill" id="targetsProgressFillRashita" style="width:0%;"></div></div>
+            <div class="targets-locked-banner hidden" id="targetsLockedRashita"></div>
             <div class="targets-list" id="targetsListRashita"></div>
             <div class="targets-add-row hidden" id="targetsAddRowRashita">
               <input type="text" id="targetsInputRashita" placeholder="Add a target..." maxlength="120">
               <button class="btn-primary" id="targetsAddBtnRashita">Add</button>
             </div>
+            <button class="targets-finish-btn hidden" id="targetsFinishRashita">Finish day — lock it in</button>
           </div>
           <div class="targets-col" data-partner="sanjok">
-            <div class="targets-col-header">Sanjok</div>
+            <div class="targets-col-header">
+              <span class="targets-col-name">Sanjok</span>
+              <span class="targets-col-progress" id="targetsProgressSanjok"></span>
+            </div>
+            <div class="targets-progress-track"><div class="targets-progress-fill" id="targetsProgressFillSanjok" style="width:0%;"></div></div>
+            <div class="targets-locked-banner hidden" id="targetsLockedSanjok"></div>
             <div class="targets-list" id="targetsListSanjok"></div>
             <div class="targets-add-row hidden" id="targetsAddRowSanjok">
               <input type="text" id="targetsInputSanjok" placeholder="Add a target..." maxlength="120">
               <button class="btn-primary" id="targetsAddBtnSanjok">Add</button>
             </div>
+            <button class="targets-finish-btn hidden" id="targetsFinishSanjok">Finish day — lock it in</button>
           </div>
         </div>
 
@@ -2538,9 +2592,48 @@ startBtn.addEventListener('click', () => {
     rashita: document.getElementById('targetsAddBtnRashita'),
     sanjok: document.getElementById('targetsAddBtnSanjok')
   };
+  const targetsProgressEls = {
+    rashita: document.getElementById('targetsProgressRashita'),
+    sanjok: document.getElementById('targetsProgressSanjok')
+  };
+  const targetsProgressFillEls = {
+    rashita: document.getElementById('targetsProgressFillRashita'),
+    sanjok: document.getElementById('targetsProgressFillSanjok')
+  };
+  const targetsLockedEls = {
+    rashita: document.getElementById('targetsLockedRashita'),
+    sanjok: document.getElementById('targetsLockedSanjok')
+  };
+  const targetsFinishEls = {
+    rashita: document.getElementById('targetsFinishRashita'),
+    sanjok: document.getElementById('targetsFinishSanjok')
+  };
+  const targetsDaySummary = document.getElementById('targetsDaySummary');
 
   let targetsListenerRef = null;
   let currentTargetsDate = new Date();
+
+  // A target's resolution state. Legacy entries only ever had a
+  // boolean `done` field — this reads either shape.
+  function targetStatus(t){
+    if(t && t.status) return t.status;
+    return (t && t.done) ? 'done' : 'pending';
+  }
+
+  // A day is permanently closed for editing once either: the person
+  // explicitly hit "Finish day" for their own column (targets/<date>/
+  // <partner>/_meta.locked), or the calendar date itself has passed —
+  // once a day is over, nobody should be able to go back and rewrite
+  // what happened, since the money total already depends on it.
+  function isDateInPast(date){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const d = new Date(date); d.setHours(0,0,0,0);
+    return d < today;
+  }
+  function isPartnerLocked(dayData, partner, dateInPast){
+    const meta = dayData && dayData[partner] && dayData[partner]._meta;
+    return dateInPast || !!(meta && meta.locked);
+  }
 
   // --- Money-lost tracker: ₹1 per target left incomplete for a day ---
   const lossRangeRow = document.getElementById('lossRangeRow');
@@ -2603,12 +2696,21 @@ startBtn.addEventListener('click', () => {
     return dates;
   }
 
-  function countIncomplete(dayData){
-    // dayData looks like { rashita: {id:{...}}, sanjok: {id:{...}} }
+  function countIncomplete(dayData, dateInPast){
+    // dayData looks like { rashita: {id:{...}, _meta:{...}}, sanjok: {...} }.
+    // A target counts against the money total once it's explicitly
+    // marked "missed", or once its day has closed (past, or manually
+    // finished) while it was still sitting unresolved.
     const counts = { rashita: 0, sanjok: 0 };
     ['rashita', 'sanjok'].forEach(partner => {
       const entries = (dayData && dayData[partner]) || {};
-      Object.values(entries).forEach(t => { if(t && !t.done) counts[partner]++; });
+      const locked = isPartnerLocked(dayData, partner, dateInPast);
+      Object.keys(entries).forEach(key => {
+        if(key === '_meta') return;
+        const status = targetStatus(entries[key]);
+        if(status === 'missed') counts[partner]++;
+        else if(status === 'pending' && locked) counts[partner]++;
+      });
     });
     return counts;
   }
@@ -2634,16 +2736,17 @@ startBtn.addEventListener('click', () => {
     // viewed IS today's live data, use it directly instead of an
     // extra read.
     if(currentLossRange === 'day' && isSameDay(currentTargetsDate, new Date()) && lastTargetsData){
-      renderLossAmounts(countIncomplete(lastTargetsData));
+      renderLossAmounts(countIncomplete(lastTargetsData, false));
       return;
     }
 
-    Promise.all(dates.map(d => db.ref('targets/' + targetsDateKey(d)).once('value').then(s => s.val() || {})))
-      .then(allDaysData => {
+    Promise.all(dates.map(d => db.ref('targets/' + targetsDateKey(d)).once('value')
+      .then(s => ({ data: s.val() || {}, dateInPast: !isSameDay(d, new Date()) }))))
+      .then(allDays => {
         if(myToken !== lossRequestToken) return; // a newer request superseded this one
         const totals = { rashita: 0, sanjok: 0 };
-        allDaysData.forEach(dayData => {
-          const c = countIncomplete(dayData);
+        allDays.forEach(entry => {
+          const c = countIncomplete(entry.data, entry.dateInPast);
           totals.rashita += c.rashita;
           totals.sanjok += c.sanjok;
         });
@@ -2677,48 +2780,130 @@ startBtn.addEventListener('click', () => {
 
   function renderTargetsBoard(data){
     lastTargetsData = data;
+    const dateInPast = isDateInPast(currentTargetsDate);
     if(currentLossRange === 'day' && isSameDay(currentTargetsDate, new Date())){
-      renderLossAmounts(countIncomplete(data));
+      renderLossAmounts(countIncomplete(data, dateInPast));
     }
+
+    let combinedDone = 0, combinedTotal = 0;
+
     ['rashita', 'sanjok'].forEach(partner => {
       const listEl = targetsListEls[partner];
       if(!listEl) return;
-      listEl.innerHTML = '';
       const partnerData = data[partner] || {};
+      const locked = isPartnerLocked(data, partner, dateInPast);
+      const explicitlyLocked = !!(partnerData._meta && partnerData._meta.locked);
+
       const entries = Object.keys(partnerData)
+        .filter(key => key !== '_meta')
         .map(key => Object.assign({ key: key }, partnerData[key]))
         .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+      const doneCount = entries.filter(t => targetStatus(t) === 'done').length;
+      combinedDone += doneCount;
+      combinedTotal += entries.length;
+
+      // Header progress pill + bar
+      if(targetsProgressEls[partner]){
+        targetsProgressEls[partner].textContent = entries.length ? (doneCount + '/' + entries.length) : '—';
+      }
+      if(targetsProgressFillEls[partner]){
+        targetsProgressFillEls[partner].style.width = entries.length ? Math.round((doneCount / entries.length) * 100) + '%' : '0%';
+      }
+
+      // Locked banner
+      const lockedEl = targetsLockedEls[partner];
+      if(lockedEl){
+        if(locked && entries.length > 0){
+          lockedEl.classList.remove('hidden');
+          lockedEl.textContent = explicitlyLocked
+            ? '✓ Finished for the day — this record is locked in.'
+            : '🔒 This day has passed — the record is locked in.';
+        } else {
+          lockedEl.classList.add('hidden');
+        }
+      }
+
+      // Add-row: only the owner, and only while the day is still open
+      if(targetsAddRowEls[partner]) targetsAddRowEls[partner].classList.toggle('hidden', partner !== myIdentity || locked);
+
+      // Finish-day button: only the owner, only for today, only while
+      // still open, and only if there's actually something to finish.
+      const finishBtn = targetsFinishEls[partner];
+      if(finishBtn){
+        const canFinish = partner === myIdentity && !locked && isSameDay(currentTargetsDate, new Date()) && entries.length > 0;
+        finishBtn.classList.toggle('hidden', !canFinish);
+      }
+
+      listEl.innerHTML = '';
 
       if(entries.length === 0){
         const empty = document.createElement('div');
         empty.className = 'targets-empty';
-        empty.textContent = partner === myIdentity ? 'No targets yet — add one below.' : 'Nothing set for this day.';
+        empty.textContent = partner === myIdentity && !locked ? 'No targets yet — add one below.' : 'Nothing was set for this day.';
         listEl.appendChild(empty);
         return;
       }
 
       entries.forEach(target => {
-        const item = document.createElement('div');
-        item.className = 'target-item' + (target.done ? ' done' : '');
+        const status = targetStatus(target);
+        const autoMissed = status === 'pending' && locked;
+        const effectiveStatus = autoMissed ? 'missed' : status;
+        const canDecide = partner === myIdentity && !locked && status === 'pending';
 
-        const check = document.createElement('button');
-        check.className = 'target-check' + (target.done ? ' checked' : '');
-        check.textContent = target.done ? '✓' : '';
-        check.disabled = partner !== myIdentity;
-        if(partner === myIdentity){
-          check.addEventListener('click', () => {
+        const item = document.createElement('div');
+        item.className = 'target-item' + (effectiveStatus !== 'pending' ? ' status-' + effectiveStatus : '');
+
+        if(canDecide){
+          const group = document.createElement('div');
+          group.className = 'target-check-group';
+
+          const tick = document.createElement('button');
+          tick.className = 'target-check';
+          tick.textContent = '✓';
+          tick.title = 'Mark done';
+          tick.addEventListener('click', () => {
             if(!firebaseReady) return;
-            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).update({ done: !target.done });
+            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key)
+              .update({ status: 'done', done: true, decidedAt: firebase.database.ServerValue.TIMESTAMP });
           });
+          group.appendChild(tick);
+
+          const cross = document.createElement('button');
+          cross.className = 'target-check wrong';
+          cross.textContent = '✕';
+          cross.title = 'Mark missed';
+          cross.addEventListener('click', () => {
+            if(!firebaseReady) return;
+            db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key)
+              .update({ status: 'missed', done: false, decidedAt: firebase.database.ServerValue.TIMESTAMP });
+          });
+          group.appendChild(cross);
+
+          item.appendChild(group);
+        } else {
+          const badge = document.createElement('div');
+          if(effectiveStatus === 'done'){
+            badge.className = 'target-status-badge done';
+            badge.textContent = '✓';
+          } else if(effectiveStatus === 'missed'){
+            badge.className = 'target-status-badge missed' + (autoMissed ? ' auto' : '');
+            badge.textContent = '✕';
+            if(autoMissed) badge.title = 'Not marked before the day ended';
+          } else {
+            badge.className = 'target-status-badge';
+            badge.style.border = '1.5px solid var(--glass-border)';
+            badge.title = 'Not yet marked';
+          }
+          item.appendChild(badge);
         }
-        item.appendChild(check);
 
         const text = document.createElement('div');
         text.className = 'target-text';
         text.textContent = target.text || '';
         item.appendChild(text);
 
-        if(partner === myIdentity){
+        if(partner === myIdentity && !locked){
           const actions = document.createElement('div');
           actions.className = 'target-actions';
 
@@ -2743,7 +2928,43 @@ startBtn.addEventListener('click', () => {
         listEl.appendChild(item);
       });
     });
+
+    if(targetsDaySummary){
+      targetsDaySummary.innerHTML = combinedTotal === 0
+        ? 'No targets set for this day yet.'
+        : '<b>' + combinedDone + '</b> of <b>' + combinedTotal + '</b> targets completed';
+    }
   }
+
+  // "Finish day" — locks the caller's own column for today: any
+  // target still sitting pending gets marked missed (it didn't get
+  // ticked in time), then the day is flagged locked so nothing about
+  // it — including the money it contributes — can be edited again.
+  function finishTargetsDay(partner){
+    if(!firebaseReady || partner !== myIdentity) return;
+    if(!isSameDay(currentTargetsDate, new Date())) return;
+    const dateKey = targetsDateKey(currentTargetsDate);
+    const partnerData = (lastTargetsData && lastTargetsData[partner]) || {};
+    const entries = Object.keys(partnerData).filter(k => k !== '_meta');
+    if(entries.length === 0) return;
+
+    if(!confirm("Finish today's targets? Anything still unmarked will count as missed, and you won't be able to change today's list after this.")) return;
+
+    const updates = {};
+    entries.forEach(key => {
+      const t = partnerData[key];
+      if(targetStatus(t) === 'pending'){
+        updates[key + '/status'] = 'missed';
+        updates[key + '/done'] = false;
+      }
+    });
+    updates['_meta'] = { locked: true, lockedAt: firebase.database.ServerValue.TIMESTAMP };
+    db.ref('targets/' + dateKey + '/' + partner).update(updates);
+  }
+
+  ['rashita', 'sanjok'].forEach(partner => {
+    if(targetsFinishEls[partner]) targetsFinishEls[partner].addEventListener('click', () => finishTargetsDay(partner));
+  });
 
   function placeCaretAtEnd(el){
     try{
@@ -2766,6 +2987,11 @@ startBtn.addEventListener('click', () => {
       textEl.removeEventListener('keydown', onKey);
       textEl.contentEditable = 'false';
       const newText = textEl.textContent.trim();
+      const locked = isPartnerLocked(lastTargetsData || {}, partner, isDateInPast(currentTargetsDate));
+      if(locked){
+        textEl.textContent = target.text;
+        return;
+      }
       if(newText && newText !== target.text){
         if(firebaseReady){
           db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + partner + '/' + target.key).update({ text: newText });
@@ -2784,12 +3010,15 @@ startBtn.addEventListener('click', () => {
 
   function addTargetForMe(){
     if(!myIdentity || !firebaseReady) return;
+    const dateInPast = isDateInPast(currentTargetsDate);
+    if(isPartnerLocked(lastTargetsData || {}, myIdentity, dateInPast)) return;
     const input = targetsInputEls[myIdentity];
     if(!input) return;
     const text = input.value.trim();
     if(!text) return;
     db.ref('targets/' + targetsDateKey(currentTargetsDate) + '/' + myIdentity).push({
       text: text,
+      status: 'pending',
       done: false,
       createdAt: firebase.database.ServerValue.TIMESTAMP
     });
@@ -4394,9 +4623,11 @@ startBtn.addEventListener('click', () => {
 
       targetsDays.forEach(dayData => {
         ['rashita', 'sanjok'].forEach(id => {
-          Object.values((dayData && dayData[id]) || {}).forEach(t => {
+          const entries = (dayData && dayData[id]) || {};
+          Object.keys(entries).forEach(key => {
+            if(key === '_meta') return;
             stats[id].targetsSet++;
-            if(t.done) stats[id].targetsDone++;
+            if(targetStatus(entries[key]) === 'done') stats[id].targetsDone++;
           });
         });
       });
