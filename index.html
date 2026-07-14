@@ -3275,8 +3275,18 @@ startBtn.addEventListener('click', () => {
   let booksListenerAttached = false;
   let booksDataLoaded = false;
   let lastBooksData = {};
-  const MAX_BOOK_BYTES = 500 * 1024 * 1024; // ~500MB, stored in Firebase Storage (not the Realtime Database)
+  const MAX_BOOK_BYTES = 100 * 1024 * 1024; // ~100MB. Files are split into small chunks (see BOOK_CHUNK_SIZE)
+                                             // and written to the Realtime Database — no Firebase Storage /
+                                             // Blaze plan required. Comfortably fits the free Spark plan's
+                                             // 1GB storage for a personal book shelf.
+  const BOOK_CHUNK_SIZE = 250000; // characters per chunk (~185KB decoded) — keeps each database write small and fast
   const TEXT_CHARS_PER_PAGE = 1800;
+
+  function splitIntoChunks(str, size){
+    const chunks = [];
+    for(let i = 0; i < str.length; i += size) chunks.push(str.slice(i, i + size));
+    return chunks;
+  }
 
   function initBooks(){
     try{
@@ -3446,50 +3456,59 @@ startBtn.addEventListener('click', () => {
       const title = bookTitleInput.value.trim();
       if(!file){ alert('Choose a file first.'); return; }
       if(file.size > MAX_BOOK_BYTES){
-        alert('That file is too large (limit ~500MB).');
-        return;
-      }
-      if(!storageReady){
-        alert("Firebase Storage isn't set up yet — check storageBucket in firebaseConfig.");
+        alert('That file is too large (limit ~' + Math.round(MAX_BOOK_BYTES / 1024 / 1024) + 'MB). Try a smaller file.');
         return;
       }
       uploadProgress.classList.remove('hidden');
-      uploadProgress.textContent = 'Uploading... 0%';
+      uploadProgress.textContent = 'Reading file...';
       postBookBtn.disabled = true;
 
-      const storagePath = 'books/' + Date.now() + '-' + file.name;
-      const uploadTask = storage.ref(storagePath).put(file);
-
-      uploadTask.on('state_changed', snap => {
-        const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
-        uploadProgress.textContent = 'Uploading... ' + pct + '%';
-      }, e => {
-        console.error('Book upload failed:', e);
-        alert('Upload failed — see console for details.');
-        uploadProgress.classList.add('hidden');
-        postBookBtn.disabled = false;
-      }, () => {
-        uploadTask.snapshot.ref.getDownloadURL().then(url => {
-          return db.ref('books').push({
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try{
+          const dataUrl = reader.result;
+          const chunks = splitIntoChunks(dataUrl, BOOK_CHUNK_SIZE);
+          const newRef = db.ref('books').push();
+          await newRef.set({
             title: title || file.name,
             fileName: file.name,
-            fileUrl: url,
-            storagePath: storagePath,
+            chunkCount: chunks.length,
             uploadedBy: myIdentity,
             uploadedAt: firebase.database.ServerValue.TIMESTAMP
           });
-        }).then(() => {
+
+          // Write chunks in small batches so each round-trip to the
+          // database stays fast, and so we can show real progress —
+          // a single giant write for a big book could otherwise stall
+          // with no feedback.
+          const BATCH_SIZE = 12;
+          for(let i = 0; i < chunks.length; i += BATCH_SIZE){
+            const batch = {};
+            for(let j = i; j < Math.min(i + BATCH_SIZE, chunks.length); j++){
+              batch['chunks/' + j] = chunks[j];
+            }
+            await db.ref('bookFiles/' + newRef.key).update(batch);
+            const pct = Math.round((Math.min(i + BATCH_SIZE, chunks.length) / chunks.length) * 100);
+            uploadProgress.textContent = 'Uploading... ' + pct + '%';
+          }
+
           bookTitleInput.value = '';
           bookFileInput.value = '';
           bookFileLabel.textContent = 'Choose a file to upload';
-        }).catch(e => {
-          console.error('Saving book metadata failed:', e);
-          alert('Upload finished but saving its details failed — see console.');
-        }).finally(() => {
+        }catch(e){
+          console.error('Book upload failed:', e);
+          alert('Upload failed — see console for details.');
+        }finally{
           uploadProgress.classList.add('hidden');
           postBookBtn.disabled = false;
-        });
-      });
+        }
+      };
+      reader.onerror = () => {
+        uploadProgress.classList.add('hidden');
+        postBookBtn.disabled = false;
+        alert('Could not read that file.');
+      };
+      reader.readAsDataURL(file);
     }catch(e){ console.error('postBook failed:', e); uploadProgress.classList.add('hidden'); postBookBtn.disabled = false; }
   });
 
@@ -3577,13 +3596,28 @@ startBtn.addEventListener('click', () => {
         return;
       }
 
-      // Legacy books: file content stored as base64 directly in the
-      // Realtime Database (either on the record itself or under
-      // bookFiles/<id>), from before Storage was wired up.
-      let dataUrl = book.dataUrl || null;
+      // Chunked books (the default upload path): file content is split
+      // across bookFiles/<id>/chunks/0, 1, 2... to keep every database
+      // write small. Fetch them all and reassemble in order.
+      let dataUrl = null;
+      if(book.chunkCount){
+        const chunksSnap = await db.ref('bookFiles/' + book.key + '/chunks').once('value');
+        const chunksData = chunksSnap.val();
+        if(chunksData){
+          dataUrl = Object.keys(chunksData)
+            .map(Number).sort((a, b) => a - b)
+            .map(i => chunksData[i]).join('');
+        }
+      }
+
+      // Legacy books: file content stored as one base64 blob directly
+      // in the Realtime Database (either on the record itself or under
+      // bookFiles/<id>), from before chunked uploads existed.
+      if(!dataUrl) dataUrl = book.dataUrl || null;
       if(!dataUrl){
         const fileSnap = await db.ref('bookFiles/' + book.key).once('value');
-        dataUrl = fileSnap.val();
+        const legacyVal = fileSnap.val();
+        if(typeof legacyVal === 'string') dataUrl = legacyVal;
       }
       if(!dataUrl){
         readerBody.innerHTML = '<div class="reader-unsupported">This book\'s file couldn\'t be found. It may still be uploading.</div>';
