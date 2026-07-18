@@ -1043,20 +1043,44 @@ animation:none;
     <!-- ===== MUSIC ===== -->
     <div class="app-panel-content hidden" id="panel-music">
       <div class="panel-header">our playlist</div>
-      <div class="playlist" id="playlistList"></div>
-      <div class="player-controls">
-        <button class="btn-ghost" id="prevTrackBtn">⏮ Prev</button>
-        <button class="btn-primary" id="playPauseBtn">▶ Play</button>
-        <button class="btn-ghost" id="nextTrackBtn">Next ⏭</button>
+
+      <div id="musicIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaMusic">Rashita</div>
+          <div class="chip" id="chooseSanjokMusic">Sanjok</div>
+        </div>
       </div>
-      <div class="now-playing" id="nowPlaying">Select a song</div>
+
+      <div id="musicBoard" class="hidden">
+        <div class="playlist" id="playlistList"></div>
+        <div class="player-controls">
+          <button class="btn-ghost" id="prevTrackBtn">⏮ Prev</button>
+          <button class="btn-primary" id="playPauseBtn">▶ Play</button>
+          <button class="btn-ghost" id="nextTrackBtn">Next ⏭</button>
+        </div>
+        <div class="now-playing" id="nowPlaying">Select a song</div>
+        <div class="identity-hint" id="switchIdentityMusic">not you? switch</div>
+      </div>
     </div>
 
     <!-- ===== MEMORIES ===== -->
     <div class="app-panel-content hidden" id="panel-memories">
       <div class="panel-header">our memories</div>
-      <div class="gallery-grid" id="galleryGrid"></div>
-      <div class="gallery-hint">tap a photo to view it full-size</div>
+
+      <div id="memoriesIdentityChooser">
+        <div class="status" style="margin-bottom:14px;">who are you?</div>
+        <div class="chips">
+          <div class="chip" id="chooseRashitaMemories">Rashita</div>
+          <div class="chip" id="chooseSanjokMemories">Sanjok</div>
+        </div>
+      </div>
+
+      <div id="memoriesBoard" class="hidden">
+        <div class="gallery-grid" id="galleryGrid"></div>
+        <div class="gallery-hint">tap a photo to view it full-size</div>
+        <div class="identity-hint" id="switchIdentityMemories">not you? switch</div>
+      </div>
     </div>
 
     <!-- ===== MOODS ===== -->
@@ -2084,13 +2108,34 @@ startBtn.addEventListener('click', () => {
     nextTrackBtn.click();
   });
 
+  const musicIdentityChooser = document.getElementById('musicIdentityChooser');
+  const musicBoard = document.getElementById('musicBoard');
+
   function initMusic(){
     try{
-      if(musicInitialized) return;
-      musicInitialized = true;
-      renderPlaylist();
+      if(!musicIdentityChooser || !musicBoard) return;
+      if(myIdentity){
+        musicIdentityChooser.classList.add('hidden');
+        musicBoard.classList.remove('hidden');
+        if(!musicInitialized){
+          musicInitialized = true;
+          renderPlaylist();
+        }
+      } else {
+        musicIdentityChooser.classList.remove('hidden');
+        musicBoard.classList.add('hidden');
+      }
     }catch(e){ console.error('initMusic failed:', e); }
   }
+
+  const chooseRashitaMusicBtn = document.getElementById('chooseRashitaMusic');
+  const chooseSanjokMusicBtn = document.getElementById('chooseSanjokMusic');
+  if(chooseRashitaMusicBtn) chooseRashitaMusicBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokMusicBtn) chooseSanjokMusicBtn.addEventListener('click', () => requestIdentity('sanjok'));
+  const switchIdentityMusicBtn = document.getElementById('switchIdentityMusic');
+  if(switchIdentityMusicBtn) switchIdentityMusicBtn.addEventListener('click', () => {
+    try{ logoutIdentity(); }catch(e){ console.error('switchIdentityMusic failed:', e); }
+  });
 
   // =================================================================
   // MEMORIES — photo gallery. Replace PHOTOS with your real files.
@@ -2146,13 +2191,34 @@ startBtn.addEventListener('click', () => {
     memoriesLightbox.classList.add('hidden');
   });
 
+  const memoriesIdentityChooser = document.getElementById('memoriesIdentityChooser');
+  const memoriesBoard = document.getElementById('memoriesBoard');
+
   function initMemories(){
     try{
-      if(memoriesInitialized) return;
-      memoriesInitialized = true;
-      renderGallery();
+      if(!memoriesIdentityChooser || !memoriesBoard) return;
+      if(myIdentity){
+        memoriesIdentityChooser.classList.add('hidden');
+        memoriesBoard.classList.remove('hidden');
+        if(!memoriesInitialized){
+          memoriesInitialized = true;
+          renderGallery();
+        }
+      } else {
+        memoriesIdentityChooser.classList.remove('hidden');
+        memoriesBoard.classList.add('hidden');
+      }
     }catch(e){ console.error('initMemories failed:', e); }
   }
+
+  const chooseRashitaMemoriesBtn = document.getElementById('chooseRashitaMemories');
+  const chooseSanjokMemoriesBtn = document.getElementById('chooseSanjokMemories');
+  if(chooseRashitaMemoriesBtn) chooseRashitaMemoriesBtn.addEventListener('click', () => requestIdentity('rashita'));
+  if(chooseSanjokMemoriesBtn) chooseSanjokMemoriesBtn.addEventListener('click', () => requestIdentity('sanjok'));
+  const switchIdentityMemoriesBtn = document.getElementById('switchIdentityMemories');
+  if(switchIdentityMemoriesBtn) switchIdentityMemoriesBtn.addEventListener('click', () => {
+    try{ logoutIdentity(); }catch(e){ console.error('switchIdentityMemories failed:', e); }
+  });
 
   // =================================================================
   // MOODS — each partner picks who they are once, then taps an emoji.
@@ -2205,6 +2271,8 @@ startBtn.addEventListener('click', () => {
       if(typeof initBooks === 'function') initBooks();
       if(typeof initCalendar === 'function') initCalendar();
       if(typeof initVault === 'function') initVault();
+      if(typeof initMusic === 'function') initMusic();
+      if(typeof initMemories === 'function') initMemories();
       renderPinnedBoard();
     }catch(e){ console.error('setIdentity failed:', e); }
   }
@@ -2221,6 +2289,8 @@ startBtn.addEventListener('click', () => {
       if(typeof initBooks === 'function') initBooks();
       if(typeof initCalendar === 'function') initCalendar();
       if(typeof initVault === 'function') initVault();
+      if(typeof initMusic === 'function') initMusic();
+      if(typeof initMemories === 'function') initMemories();
       renderPinnedBoard();
     }catch(e){ console.error('logoutIdentity failed:', e); }
   }
@@ -2620,19 +2690,27 @@ startBtn.addEventListener('click', () => {
     return (t && t.done) ? 'done' : 'pending';
   }
 
-  // A day is permanently closed for editing once either: the person
-  // explicitly hit "Finish day" for their own column (targets/<date>/
-  // <partner>/_meta.locked), or the calendar date itself has passed —
-  // once a day is over, nobody should be able to go back and rewrite
-  // what happened, since the money total already depends on it.
   function isDateInPast(date){
     const today = new Date(); today.setHours(0,0,0,0);
     const d = new Date(date); d.setHours(0,0,0,0);
     return d < today;
   }
+
+  // Two different kinds of "locked":
+  // - Soft lock (day has passed, but never explicitly finished): you
+  //   can no longer add new targets, edit their text, or delete them —
+  //   but a target you simply forgot to mark stays correctable, so a
+  //   missed check-in doesn't turn into a permanently wrong record.
+  // - Hard lock (you deliberately hit "Finish day" for that column):
+  //   nothing about that day can change anymore, including forgotten
+  //   items — this is the one that makes the money total final.
   function isPartnerLocked(dayData, partner, dateInPast){
     const meta = dayData && dayData[partner] && dayData[partner]._meta;
     return dateInPast || !!(meta && meta.locked);
+  }
+  function isPartnerHardLocked(dayData, partner){
+    const meta = dayData && dayData[partner] && dayData[partner]._meta;
+    return !!(meta && meta.locked);
   }
 
   // --- Money-lost tracker: ₹1 per target left incomplete for a day ---
@@ -2818,7 +2896,7 @@ startBtn.addEventListener('click', () => {
           lockedEl.classList.remove('hidden');
           lockedEl.textContent = explicitlyLocked
             ? '✓ Finished for the day — this record is locked in.'
-            : '🔒 This day has passed — the record is locked in.';
+            : '🕓 This day has passed — anything you forgot to mark can still be ticked, but nothing new can be added or edited.';
         } else {
           lockedEl.classList.add('hidden');
         }
@@ -2849,7 +2927,8 @@ startBtn.addEventListener('click', () => {
         const status = targetStatus(target);
         const autoMissed = status === 'pending' && locked;
         const effectiveStatus = autoMissed ? 'missed' : status;
-        const canDecide = partner === myIdentity && !locked && status === 'pending';
+        const hardLocked = isPartnerHardLocked(data, partner);
+        const canDecide = partner === myIdentity && !hardLocked && status === 'pending';
 
         const item = document.createElement('div');
         item.className = 'target-item' + (effectiveStatus !== 'pending' ? ' status-' + effectiveStatus : '');
